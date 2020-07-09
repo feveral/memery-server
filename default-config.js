@@ -1,6 +1,6 @@
 module.exports = {
     port: 3000,
-    mongoURL: '',
+    mongoURL: 'mongodb://user:password@ip:port/memery',
     tokenSecret: '',
     googleClientId: '',
     googleClientSecret: '',
