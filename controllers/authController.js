@@ -1,24 +1,25 @@
 const jwt = require('jsonwebtoken')
-const googleOAuth = require('../libs/googleOAuth.js')
+const auth = require('../libs/auth.js')
 const config = require('../config.js')
+const constants = require('../constants.js')
 const User = require('../models/user.js')
 
 module.exports = {
 
     async verifyMemeToken(ctx, next) {
-        const auth = ctx.headers.authorization
+        const authorization = ctx.headers.authorization
         
-        if (auth.substring(0, 7) !== 'Bearer ') {
+        if (authorization.substring(0, 7) !== 'Bearer ') {
             ctx.response.status = 401
             ctx.body = {status: false, error: 'token fromat should be "Bearer <jwt token>"'}
             return
         }
         
-        const meme_token = auth.substring(7)
+        const meme_token = authorization.substring(7)
         
         try {
-            const userEmail = jwt.verify(meme_token, config.tokenSecret).email
-            ctx.user = userEmail
+            const user = jwt.verify(meme_token, config.tokenSecret)
+            ctx.user = user.id
         } catch (e) {
             if (e.name === 'JsonWebTokenError' && e.message === 'invalid token') {
                 ctx.response.status = 401
@@ -35,26 +36,24 @@ module.exports = {
         await next()
     },
 
-    async login(ctx) {
-        if (process.env.NODE_ENV === 'development') {
-            const meme_token = googleOAuth.obtainMemeToken({
-                email: 'example@gmail.com'
-            })
-            // TODO: should save user
-            ctx.body = {status: true, meme_token}
-            return
-        }
+    async registerAnonymous (ctx) {
+        const user = await User.add(constants.USER_LEVEL_ANONYMOUS)
+        const meme_token = auth.obtainMemeToken(user)
+        ctx.body = {status: true, user, meme_token}
+    },
 
-        const type  = ctx.request.body.type
-        const token = ctx.request.bodytoken
-        const profile = await googleOAuth.verifyGoogleToken(token)
-        if (profile === null) {
+    async login(ctx) {
+        const type  = ctx.request.body.type // should be 'google' or 'facebook'
+        const token = ctx.request.body.token // 'id_token' or 'access_token'
+        const tokenType = ctx.request.body.token_type
+        const googleProfile = await auth.verifyGoogleToken(token, tokenType)
+        if (googleProfile === null) {
             ctx.response.status = 403
-            ctx.body = { status: false, error: 'login fail: google access token invalid' }
+            ctx.body = { status: false, error: 'google sign in fail: token invalid or token type invalid.' }
         }
-        const meme_token = googleOAuth.obtainServiceToken(profile)
-        const users = await User.find({email: profile.email})
-        if (users.length === 0) User.saveGoogle(profile, 'customer')
+        let user = await User.findOne({googleEmail: googleProfile.email})
+        if (!user) user = await User.saveGoogle(googleProfile)
+        const meme_token = auth.obtainMemeToken(user)
         ctx.body = { status: true, meme_token }
     },
 }

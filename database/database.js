@@ -13,6 +13,10 @@ class Database {
         this.getDB();
     }
 
+    async getClient() {
+        return this._client
+    }
+
     async getDB() {
         if (this._client === undefined || this._db === undefined) {
             try {
