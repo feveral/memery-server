@@ -16,5 +16,6 @@ app.use(koaBody())
 app.use(router.routes())
 app.use(router.allowedMethods())
 app.use(history())
+app.use(koaStatic('./images/'))
 
 app.listen(config.port, () => console.log(`Server is listening on port ${config.port}.`))

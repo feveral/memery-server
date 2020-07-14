@@ -1,10 +1,11 @@
 const fs = require('fs')
+const shortUUID = require('short-uuid')
+const config = require('../config.js')
 
 module.exports = {
-
     async upload (ctx) {
-        // TODO: filename random
-        fs.writeFileSync('images/bmk3.jpg', ctx.file.buffer)
-        ctx.body = {status: true}
+        const imageId = shortUUID().generate()
+        fs.writeFileSync(`images/${imageId}.jpg`, ctx.file.buffer)
+        ctx.body = {status: true, image_url: `${config.serverBaseUrl}/${imageId}.jpg`}
     }
 }

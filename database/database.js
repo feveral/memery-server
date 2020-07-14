@@ -20,7 +20,8 @@ class Database {
                 this._db = await this._client.db(this._dbName);
                 return this._db;
             } catch (error) {
-                console.log(`connnected ${config.MONGO_URL} error`);
+                console.log(`connnected ${config.mongoUrl} error`);
+                console.log(`error: ${error}`)
             }
         }
         return this._db;
@@ -41,6 +42,6 @@ class Database {
     }
 }
 
-const database = new Database(config.MONGO_DATABASE_NAME);
+const database = new Database(config.mongoDatabaseName);
 
 module.exports = database;

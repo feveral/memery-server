@@ -1,6 +1,8 @@
 module.exports = {
     port: 3000,
-    mongoURL: 'mongodb://user:password@ip:port/memery',
+    mongoUrl: 'mongodb://user:password@ip:port/memery',
+    mongoDatabaseName: 'memery',
+    serverBaseUrl: `http://localhost:3000`,
     tokenSecret: '',
     googleClientId: '',
     googleClientSecret: '',
