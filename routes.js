@@ -9,7 +9,12 @@ module.exports = (router) => {
     router.post('/api/auth/anonymous', authController.registerAnonymous)
     router.post('/api/auth/login', authController.login)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
+
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
+    router.get('/api/meme/trending', memeController.getTrending)
+    router.post('/api/meme/upvote', memeController.upvote)
+    router.post('/api/meme/downvote', memeController.downvote)
+    
     router.get('/api/tag', tagController.getTags)
 }

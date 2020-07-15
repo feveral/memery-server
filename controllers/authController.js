@@ -9,7 +9,7 @@ module.exports = {
     async verifyMemeToken(ctx, next) {
         const authorization = ctx.headers.authorization
         
-        if (authorization.substring(0, 7) !== 'Bearer ') {
+        if (!authorization || authorization.substring(0, 7) !== 'Bearer ') {
             ctx.response.status = 401
             ctx.body = {status: false, error: 'token fromat should be "Bearer <jwt token>"'}
             return
@@ -44,12 +44,27 @@ module.exports = {
 
     async login(ctx) {
         const type  = ctx.request.body.type // should be 'google' or 'facebook'
-        const token = ctx.request.body.token // 'id_token' or 'access_token'
-        const tokenType = ctx.request.body.token_type
+        const token = ctx.request.body.token 
+        const tokenType = ctx.request.body.token_type // 'id_token' or 'access_token'
+        if (type !== 'google' && type !== 'facebook') {
+            ctx.response.status = 400
+            ctx.body = {status: false, error: 'body parameter "type" should be "google" or "facebook".'}
+            return 
+        } else if (!token) {
+            ctx.response.status = 400
+            ctx.body = {status: false, error: 'body parameter "token" should be given.'}
+            return
+        } else if (tokenType !== 'id_token' && tokenType !== 'access_token') {
+            ctx.response.status = 400
+            ctx.body = {status: false, error: 'body parameter "token_type" should be "id_token" or "access_token".'}
+            return
+        }
+
         const googleProfile = await auth.verifyGoogleToken(token, tokenType)
         if (googleProfile === null) {
             ctx.response.status = 403
             ctx.body = { status: false, error: 'google sign in fail: token invalid or token type invalid.' }
+            return
         }
         let user = await User.findOne({googleEmail: googleProfile.email})
         if (!user) user = await User.saveGoogle(googleProfile)
