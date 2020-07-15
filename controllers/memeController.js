@@ -10,14 +10,14 @@ module.exports = {
         const meme = await Meme.add(userId, image_url, description, tags)
         await Tag.addMany(tags, meme.id)
         await User.addOwnMeme(userId, meme.id)
-        ctx.body = {status: true}
+        ctx.body = meme
     },
 
     async getTrending (ctx) {
         const userId = ctx.user
         const {skip} = ctx.query
         const memes = await Meme.findTrending(15, skip) // limit should not be too big
-        ctx.body = {status: true, memes}
+        ctx.body = memes
     },
 
     async upvote (ctx) {

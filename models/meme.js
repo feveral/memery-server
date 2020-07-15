@@ -20,6 +20,7 @@ class Meme {
         const meme = new Meme(id, userId, imageUrl, description, tags, 0, 0, new Date())
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
+        delete meme._id
         return meme
     }
 

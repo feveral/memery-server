@@ -5,9 +5,9 @@ module.exports = {
     async getProfile(ctx) {
         const user = await User.findOne({id: ctx.user})
         if (user) {
-            ctx.body = {status: true, user}
+            ctx.body = user
         } else {
-            ctx.body = {status: false, error: 'user not found'}
+            ctx.body = {message: 'user not found'}
         }
     },
 

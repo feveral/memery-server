@@ -6,6 +6,6 @@ module.exports = {
     async upload (ctx) {
         const imageId = shortUUID().generate()
         fs.writeFileSync(`images/${imageId}.jpg`, ctx.file.buffer)
-        ctx.body = {status: true, image_url: `${config.serverBaseUrl}/${imageId}.jpg`}
+        ctx.body = {image_url: `${config.serverBaseUrl}/${imageId}.jpg`}
     }
 }
