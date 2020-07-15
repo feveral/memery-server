@@ -15,7 +15,7 @@ class Tag {
         return tag
     }
 
-    static async addMany (names, meme_id) {
+    static async addMany (names, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         const tags = []
         names.forEach((name) => {
@@ -24,7 +24,7 @@ class Tag {
         for (let i = 0; i < tags.length; i++) {
             await collection.updateOne(
                 {name: tags[i].name},
-                {'$push': {meme_ids: meme_id}},
+                {'$push': {meme_ids: memeId}},
                 {upsert: true}
             )
         }

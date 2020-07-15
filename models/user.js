@@ -9,12 +9,13 @@ class User {
      * @param {string} level can be 'anonymous', 'regular', 'admin'
      * @param {Date} registerTime 
      */
-    constructor (id, name='', level, isDefaultId, registerTime, upvoteMemeIds, downvoteMemeIds) {
+    constructor (id, name='', level, isDefaultId, registerTime, ownMemeIds, upvoteMemeIds, downvoteMemeIds) {
         this.id = id
         this.name = name
         this.level = level
         this.is_default_id = isDefaultId
         this.register_time = registerTime
+        this.own_meme_ids = ownMemeIds
         this.upvote_meme_ids = upvoteMemeIds
         this.downvote_meme_ids = downvoteMemeIds
     }
@@ -31,7 +32,7 @@ class User {
         const newUserId = (result.length > 0) 
                             ? parseInt(result[0].id) + 1
                             : parseInt(config.userIdStart) + 1
-        const user = new User(newUserId.toString(), '', level, true, new Date(), [], [])
+        const user = new User(newUserId.toString(), '', level, true, new Date(), [], [], [])
         await collectionUser.insertOne(user)
         return user
     }
@@ -73,6 +74,14 @@ class User {
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const result = await collection.findOne(filter, {projection:{_id: 0}})
         return result
+    }
+
+    static async addOwnMeme (userId, memeId) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        await collection.updateOne(
+            {id: userId},
+            {'$push': {own_meme_ids: memeId}},
+        )
     }
 
     //TODO: should use transaction 
