@@ -69,8 +69,9 @@ class User {
     static async findOne ({id, googleEmail, facebookEmail}) {
         const filter = {}
         if (id) filter.id = id
-        if (googleEmail) filter.google_profile = {email: googleEmail}
-        if (facebookEmail) filter.facebook_profile = {email: facebookEmail}
+        if (googleEmail) filter['google_profile.email'] = googleEmail
+        if (facebookEmail) filter['facebook_profile.email'] = facebookEmail
+        
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const result = await collection.findOne(filter, {projection:{_id: 0}})
         return result
