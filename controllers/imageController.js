@@ -8,7 +8,8 @@ module.exports = {
 
         if (ext !== 'jpg' && ext !== 'png') {
             ctx.response.status = 400
-            ctx.body = { message: 'query parameter should be "jpg" or "png"'}
+            ctx.body = { message: 'query parameter ext should be "jpg" or "png"'}
+            return
         }
 
         const imageId = shortUUID().generate()

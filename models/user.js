@@ -20,7 +20,7 @@ class User {
         this.downvote_meme_ids = downvoteMemeIds
     }
 
-    static async add (level) {
+    static async add ({id, level}) {
         //TODO: should block attack ip address
         //TODO: should revise the way to find 'max id'
         //TODO: should use transaction
@@ -32,14 +32,14 @@ class User {
         const newUserId = (result.length > 0) 
                             ? parseInt(result[0].id) + 1
                             : parseInt(config.userIdStart) + 1
-        const user = new User(newUserId.toString(), '', level, true, new Date(), [], [], [])
+        const user = new User(id || newUserId.toString(), '', level, true, new Date(), [], [], [])
         await collectionUser.insertOne(user)
         return user
     }
 
     static async saveGoogle (googleProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const user = await User.add(constants.USER_LEVEL_REGULAR)
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR})
         await collection.updateOne(
             {id: user.id},
             {'$set': {google_profile: googleProfile, name: googleProfile.name}},
@@ -49,7 +49,7 @@ class User {
 
     static async saveFacebook (facebookProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const user = await User.add(constants.USER_LEVEL_REGULAR)
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR})
         await collection.updateOne(
             {id: user.id}, 
             {'$set': {facebook_profile: facebookProfile, name: facebookProfile.name}},

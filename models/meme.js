@@ -44,6 +44,7 @@ class Meme {
 
     static async upvote (memeId) {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
+        await collection.updateOne({}, {})
     }
 
     static async downvote (memeId) {

@@ -36,13 +36,16 @@ module.exports = {
         await next()
     },
 
-    async registerAnonymous (ctx) {
-        const user = await User.add(constants.USER_LEVEL_ANONYMOUS)
-        const meme_token = auth.obtainMemeToken(user)
-        ctx.body = {user, meme_token}
-    },
-
     async login(ctx) {
+
+        if (process.env.NODE_ENV === 'development') {
+            let user = await User.findOne({id: 'dev_user_id'})
+            if (!user) user = await User.add({id: 'dev_user_id', level: constants.USER_LEVEL_REGULAR})
+            const meme_token = auth.obtainMemeToken(user)
+            ctx.body = {meme_token}
+            return
+        }
+
         const type  = ctx.request.body.type // should be 'google' or 'facebook'
         const token = ctx.request.body.token 
         const tokenType = ctx.request.body.token_type // 'id_token' or 'access_token'
