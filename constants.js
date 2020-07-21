@@ -4,7 +4,6 @@ module.exports = {
     COLLECTION_TAG: 'tag',
     COLLECTION_COMMENT: 'comment',
 
-    USER_LEVEL_ANONYMOUS: 'anonymous',
     USER_LEVEL_REGULAR: 'regular',
     USER_LEVEL_ADMIN: 'admin'
 }

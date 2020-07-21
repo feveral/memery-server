@@ -1,6 +1,5 @@
 const Meme = require('../models/meme.js')
 const Tag = require('../models/tag.js')
-const User = require('../models/user.js')
 
 module.exports = {
 
@@ -9,7 +8,6 @@ module.exports = {
         const {image_url, description, tags} = ctx.request.body
         const meme = await Meme.add(userId, image_url, description, tags)
         await Tag.addMany(tags, meme.id)
-        await User.addOwnMeme(userId, meme.id)
         ctx.body = meme
     },
 
@@ -30,10 +28,10 @@ module.exports = {
     },
 
     async upvote (ctx) {
-        ctx.body = {status: true}
+        ctx.body = {}
     },
 
     async downvote (ctx) {
-        ctx.body = {status: true}
+        ctx.body = {}
     }
 }
