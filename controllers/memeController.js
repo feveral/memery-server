@@ -42,6 +42,7 @@ module.exports = {
         if (action === 'upvote') await Meme.upvote(ctx.user, meme_id)
         else if (action === 'downvote') await Meme.downvote(ctx.user, meme_id)
         else if (action === 'clearvote') await Meme.clearvote(ctx.user, meme_id)
-        ctx.body = {}
+        ctx.response.status = 204
+        ctx.body = null
     },
 }
