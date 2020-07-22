@@ -9,8 +9,8 @@ class User {
      * @param {string} level can be 'anonymous', 'regular', 'admin'
      * @param {Date} registerTime 
      */
-    constructor (id, name='', level, isDefaultId, registerTime, upvoteMemeIds, downvoteMemeIds) {
-        this.id = id
+    constructor (customId, name='', level, isDefaultId, registerTime, upvoteMemeIds, downvoteMemeIds) {
+        this.custom_id = customId
         this.name = name
         this.level = level
         this.is_default_id = isDefaultId
@@ -19,7 +19,7 @@ class User {
         this.downvote_meme_ids = downvoteMemeIds
     }
 
-    static async add ({id, level}) {
+    static async add ({customId, level}) {
         //TODO: should block attack ip address
         //TODO: should revise the way to find 'max id'
         //TODO: should use transaction
@@ -27,11 +27,11 @@ class User {
         const result = await collectionUser
             .find({is_default_id: true})
             .collation({locale: "en_US", numericOrdering: true}) // to keep sorting as number
-            .sort({id: -1}).limit(1).toArray()
-        const newUserId = (result.length > 0) 
-                            ? parseInt(result[0].id) + 1
-                            : parseInt(config.userIdStart) + 1
-        const user = new User(id || newUserId.toString(), '', level, true, new Date(), [], [])
+            .sort({custom_id: -1}).limit(1).toArray()
+        const newCustomId = (result.length > 0) 
+                            ? parseInt(result[0].custom_id) + 1
+                            : parseInt(config.customIdStart) + 1
+        const user = new User(customId || newCustomId.toString(), '', level, true, new Date(), [], [])
         await collectionUser.insertOne(user)
         return user
     }
@@ -40,57 +40,52 @@ class User {
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const user = await User.add({level: constants.USER_LEVEL_REGULAR})
         await collection.updateOne(
-            {id: user.id},
+            {custom_id: user.custom_id},
             {'$set': {google_profile: googleProfile, name: googleProfile.name}},
             {upsert: true})
-        return await User.findOne({id: user.id})
+        return await User.findOne({custom_id: user.custom_id})
     }
 
     static async saveFacebook (facebookProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const user = await User.add({level: constants.USER_LEVEL_REGULAR})
         await collection.updateOne(
-            {id: user.id}, 
+            {custom_id: user.custom_id}, 
             {'$set': {facebook_profile: facebookProfile, name: facebookProfile.name}},
             {upsert: true}
         )
     }
 
-    static async find ({id, level, limit=20, skip=0}) {
+    static async find ({_id, customId, level, limit=20, skip=0}) {
         const filter = {}
-        if (id) filter.id = id
+        if (_id) filter._id = _id
+        if (customId) filter.custom_id = customId
         if (level) filter.level = level
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const result = await collection.find(filter).limit(limit).skip(skip).toArray()
         return result
     }
 
-    static async findOne ({id, googleEmail, facebookEmail}) {
+    static async findOne ({_id, customId, googleEmail, facebookEmail}) {
         const filter = {}
-        if (id) filter.id = id
+        if (_id) filter._id = _id
+        if (customId) filter.custom_id = customId
         if (googleEmail) filter['google_profile.email'] = googleEmail
         if (facebookEmail) filter['facebook_profile.email'] = facebookEmail
         
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const result = await collection.findOne(filter, {projection:{_id: 0}})
+        const result = await collection.findOne(filter)
         return result
     }
 
-    static async addOwnMeme (userId, memeId) {
-        const collection = await database.getCollection(constants.COLLECTION_USER)
-        await collection.updateOne(
-            {id: userId},
-            {'$push': {own_meme_ids: memeId}},
-        )
-    }
-
+    //TODO: not testing
     //TODO: should use transaction 
-    static async updateUserId (oldUserId, newUserId) {
+    static async updateUserId (oldCustomId, newCustomId) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const isNewIdEsist = await User.findOne({id: newUserId})
+        const isNewIdEsist = await User.findOne({custom_id: newUserId})
         if (isNewIdEsist) throw Error('user id has already used.')
         await collection.updateOne(
-            {id: oldUserId},
+            {custom_id: oldUserId},
             {'$set': {id: newUserId}
         })
     }

@@ -1,10 +1,14 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
+const ObjectID = require('mongodb').ObjectID
 
 class Comment {
 
+    /**
+     * @param {string} userId user's object id
+     */
     constructor (memeId, userId, createdAt, content) {
-        this.meme_id = memeId
+        this.meme_id = ObjectID(memeId)
         this.user_id = userId
         this.created_at = createdAt
         this.content = content
@@ -15,18 +19,6 @@ class Comment {
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         await collection.insertOne(comment)
         return comment
-        // const time = new Date()
-        // await collection.updateOne({meme_id: memeId, count:{ $lt: 3 }, start_time: { $gte: time }, end_time: { $lte: time }},
-        //     {
-        //         '$push': { comments: { user_id: userId, created_at: time, content } },
-        //         '$inc': { count: 1 },
-        //         '$set': { end_time: { count: {}}},
-        //         '$setOnInsert': {
-        //             create_at: time,
-        //         }
-        //     },
-        //     {upsert: true}
-        // )
     }
 
     static async find ({memeId, limit=20, skip=0}) {

@@ -19,7 +19,7 @@ module.exports = {
         
         try {
             const user = jwt.verify(meme_token, config.tokenSecret)
-            ctx.user = user.id
+            ctx.user = user._id
         } catch (e) {
             if (e.name === 'JsonWebTokenError' && e.message === 'invalid token') {
                 ctx.response.status = 401
@@ -39,8 +39,8 @@ module.exports = {
     async login(ctx) {
 
         if (process.env.NODE_ENV === 'development') {
-            let user = await User.findOne({id: 'dev_user_id'})
-            if (!user) user = await User.add({id: 'dev_user_id', level: constants.USER_LEVEL_REGULAR})
+            let user = await User.findOne({customId: 'dev_user_id'})
+            if (!user) user = await User.add({customId: 'dev_user_id', level: constants.USER_LEVEL_REGULAR})
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}
             return

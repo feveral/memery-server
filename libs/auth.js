@@ -17,7 +17,7 @@ module.exports = {
     },
 
     obtainMemeToken (user) {
-        const payload = JSON.stringify({id: user.id, level: user.level, sign_timestamp: Date.now()})
+        const payload = JSON.stringify({_id: user._id, sign_timestamp: Date.now()})
         const options = {'algorithm': 'HS256'}
         const token = jwt.sign(payload, config.tokenSecret, options)
         return token

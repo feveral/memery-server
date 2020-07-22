@@ -7,7 +7,7 @@ module.exports = {
         const userId = ctx.user
         const {image_url, description, tags} = ctx.request.body
         const meme = await Meme.add(userId, image_url, description, tags)
-        await Tag.addMany(tags, meme.id)
+        await Tag.addMany(tags, meme._id)
         ctx.body = meme
     },
 

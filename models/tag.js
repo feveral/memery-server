@@ -3,27 +3,16 @@ const constants = require('../constants.js')
 
 class Tag {
 
-    constructor (name, memes) {
+    constructor (name, memeIds) {
         this.name = name
-        this.memes = memes
-    }
-
-    static async add (name, memes) {
-        const tag = new Tag(name, memes)
-        const collection = await database.getCollection(constants.COLLECTION_TAG)
-        await collection.insertOne(tag)
-        return tag
+        this.meme_ids = memeIds
     }
 
     static async addMany (names, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        const tags = []
-        names.forEach((name) => {
-            tags.push(new Tag(name, []))
-        })
-        for (let i = 0; i < tags.length; i++) {
+        for (let i = 0; i < names.length; i++) {
             await collection.updateOne(
-                {name: tags[i].name},
+                {name: names[i]},
                 {'$push': {meme_ids: memeId}},
                 {upsert: true}
             )
@@ -40,7 +29,7 @@ class Tag {
     static async isTagExist (name) {
         const filter = {name}
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        const result = await collection.find(filter).limit(limit).skip(skip)
+        const result = await collection.find(filter).limit(1).skip(skip)
         return result.length > 0
     }
 
