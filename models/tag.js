@@ -20,9 +20,13 @@ class Tag {
     }
 
     static async find({name, limit=7, skip=0}) {
-        const filter = {name: RegExp(`${name}`,'i')}
+        let nameRegex = ''
+        for (let i = 0; i < name.length; i++) {
+            nameRegex += `.*${name[i]}`
+        }
+        const filter = {name: {'$regex': `${nameRegex}.*`}}
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        const result = await collection.find(filter).limit(limit).skip(skip)
+        const result = await collection.find(filter).limit(limit).skip(skip).toArray()
         return result
     }
 

@@ -18,7 +18,7 @@ module.exports = {
         try {
             skip = parseInt(skip)
         } catch (e) {
-            ctx.reponse.status = 400
+            ctx.response.status = 400
             ctx.body = { message: 'query parameter "skip" should be an integer.'}
             return
         }

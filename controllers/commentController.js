@@ -10,6 +10,7 @@ module.exports = {
         if (!meme_id) {
             ctx.response.status = 400
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
+            return
         }
         try {
             skip = parseInt(skip)
