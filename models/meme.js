@@ -41,13 +41,46 @@ class Meme {
         return result
     }
 
-    static async upvote (memeId) {
-        const collection = await database.getCollection(constants.COLLECTION_MEME)
-        await collection.updateOne({}, {})
+    //TODO: need transaction
+    static async upvote (userId, memeId) {
+        const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const resultUpvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet': {upvote_meme_ids: ObjectID(memeId)} })
+        const resultDownvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {downvote_meme_ids: ObjectID(memeId)}})
+        if (resultUpvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {upvote: 1}})
+        }
+        if (resultDownvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {downvote: -1}})
+        }
     }
 
-    static async downvote (memeId) {
+    //TODO: need transaction
+    static async downvote (userId, memeId) {
+        const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const resultUpvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {upvote_meme_ids: ObjectID(memeId)} })
+        const resultDownvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet': {downvote_meme_ids: ObjectID(memeId)}})
+        if (resultUpvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {upvote: -1}})
+        }
+        if (resultDownvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {downvote: 1}})
+        }
+    }
 
+    //TODO: need transaction
+    static async clearvote (userId, memeId) {
+        const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const resultUpvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {upvote_meme_ids: ObjectID(memeId)} })
+        const resultDownvote = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {downvote_meme_ids: ObjectID(memeId)}})
+        if (resultUpvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {upvote: -1}})
+        }
+        if (resultDownvote.result.nModified === 1) {
+            await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {downvote: -1}})
+        }
     }
 }
 

@@ -14,7 +14,16 @@ class Database {
     }
 
     async getClient() {
-        return this._client
+        if (this._client === undefined) {
+            try {
+                this._client = await mongo.connect(config.mongoUrl, {useNewUrlParser: true, useUnifiedTopology: true});
+                return this._client;
+            } catch (error) {
+                console.log(`connnected ${config.mongoUrl} error`);
+                console.log(`error: ${error}`);
+            }            
+        }
+        return this._client;
     }
 
     async getDB() {
@@ -25,7 +34,7 @@ class Database {
                 return this._db;
             } catch (error) {
                 console.log(`connnected ${config.mongoUrl} error`);
-                console.log(`error: ${error}`)
+                console.log(`error: ${error}`);
             }
         }
         return this._db;

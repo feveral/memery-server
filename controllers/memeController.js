@@ -27,11 +27,21 @@ module.exports = {
         ctx.body = memes
     },
 
-    async upvote (ctx) {
+    async vote (ctx) {
+        const {meme_id, action} = ctx.request.body
+        if (!meme_id) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "meme_id" should be given.' }
+            return
+        }
+        if (!action || (action !== 'upvote' && action !== 'downvote' && action !== 'clearvote')) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "action" should be "upvote", "downvote" or "clearvote". ' }
+            return
+        }
+        if (action === 'upvote') await Meme.upvote(ctx.user, meme_id)
+        else if (action === 'downvote') await Meme.downvote(ctx.user, meme_id)
+        else if (action === 'clearvote') await Meme.clearvote(ctx.user, meme_id)
         ctx.body = {}
     },
-
-    async downvote (ctx) {
-        ctx.body = {}
-    }
 }
