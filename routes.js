@@ -10,14 +10,16 @@ module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
 
+    router.get('/api/image', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
+
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
     router.get('/api/meme/trending', memeController.getTrending)
     router.post('/api/meme/upvote', authController.verifyMemeToken, memeController.upvote)
     router.post('/api/meme/downvote', authController.verifyMemeToken, memeController.downvote)
     router.delete('/api/meme', () => {})
     
-    router.get('/api/comment', authController.verifyMemeToken, commentController.getComments)
+    router.get('/api/comment', commentController.getComments)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
     router.delete('/api/api/comment', () => {})
 

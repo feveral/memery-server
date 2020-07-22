@@ -1,3 +1,4 @@
+const ObjectID = require('mongodb').ObjectID
 const database = require('../database/database.js')
 const constants = require('../constants.js')
 const config = require('../config.js')
@@ -58,7 +59,7 @@ class User {
 
     static async find ({_id, customId, level, limit=20, skip=0}) {
         const filter = {}
-        if (_id) filter._id = _id
+        if (_id) filter._id = ObjectID(_id)
         if (customId) filter.custom_id = customId
         if (level) filter.level = level
         const collection = await database.getCollection(constants.COLLECTION_USER)
@@ -68,7 +69,7 @@ class User {
 
     static async findOne ({_id, customId, googleEmail, facebookEmail}) {
         const filter = {}
-        if (_id) filter._id = _id
+        if (_id) filter._id = ObjectID(_id)
         if (customId) filter.custom_id = customId
         if (googleEmail) filter['google_profile.email'] = googleEmail
         if (facebookEmail) filter['facebook_profile.email'] = facebookEmail
@@ -80,7 +81,7 @@ class User {
 
     //TODO: not testing
     //TODO: should use transaction 
-    static async updateUserId (oldCustomId, newCustomId) {
+    static async updateCustomId (oldCustomId, newCustomId) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const isNewIdEsist = await User.findOne({custom_id: newUserId})
         if (isNewIdEsist) throw Error('user id has already used.')

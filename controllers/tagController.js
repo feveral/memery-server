@@ -6,7 +6,7 @@ module.exports = {
         const {name, limit=8, skip=0} = ctx.query
         if (!name) {
             ctx.response.status = 400
-            ctx.body = { message: 'query parameter "name" should be an integer.'}
+            ctx.body = { message: 'query parameter "name" should be an given.'}
             return
         }
         const tags = await Tag.find({name, limit, skip})

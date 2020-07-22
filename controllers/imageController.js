@@ -1,6 +1,4 @@
-const fs = require('fs')
-const shortUUID = require('short-uuid')
-const config = require('../config.js')
+const Image = require('../models/image.js')
 
 module.exports = {
     async upload (ctx) {
@@ -11,9 +9,22 @@ module.exports = {
             ctx.body = { message: 'query parameter ext should be "jpg" or "png"'}
             return
         }
+        if (!ctx.file) {
+            ctx.response.status = 400
+            ctx.body = { message: 'image file should be in body form-data.'}
+            return
+        }
+        const image = await Image.addToServer(ctx.file.buffer, ext)
+        ctx.body = image
+    },
 
-        const imageId = shortUUID().generate()
-        fs.writeFileSync(`images/${imageId}.${ext}`, ctx.file.buffer)
-        ctx.body = {image_url: `${config.serverBaseUrl}/${imageId}.${ext}`}
+    async getImageInfo (ctx) {
+        const {image_url} = ctx.query
+        const image = await Image.find({url: image_url})
+        ctx.body = image
+    },
+
+    async deleteImage(ctx) {
+        //TODO:
     }
 }
