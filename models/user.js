@@ -84,6 +84,13 @@ class User {
         return result
     }
 
+    static async findByIds(ids) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        const objIds = ids.map( (myId) => { return ObjectID(myId) })
+        const result = await collection.find({ _id: { '$in': objIds }}).toArray()
+        return result
+    }
+
     //TODO: not testing
     //TODO: should use transaction 
     static async updateCustomId (oldCustomId, newCustomId) {

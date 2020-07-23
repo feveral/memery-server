@@ -1,5 +1,6 @@
 const Meme = require('../models/meme.js')
 const Tag = require('../models/tag.js')
+const User = require('../models/user.js')
 
 module.exports = {
 
@@ -24,6 +25,19 @@ module.exports = {
         }
 
         const memes = await Meme.findTrending(15, skip) // limit should not be too big
+        const userIds = []
+        memes.forEach(meme => {
+            userIds.push(meme.user_id)
+        })
+        const users = await User.findByIds(userIds)
+        for (let i = 0; i < memes.length; i++) {
+            for (let j = 0; j < users.length; j++) {
+                if (users[j]._id.toString() === memes[i].user_id.toString()) {
+                    memes[i].user_custom_id = users[j].custom_id
+                    continue
+                }
+            }
+        }
         ctx.body = memes
     },
 
