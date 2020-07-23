@@ -29,9 +29,14 @@ class User {
             .find({is_default_id: true})
             .collation({locale: "en_US", numericOrdering: true}) // to keep sorting as number
             .sort({custom_id: -1}).limit(1).toArray()
-        const newCustomId = (result.length > 0) 
-                            ? parseInt(result[0].custom_id) + 1
-                            : parseInt(config.customIdStart) + 1
+        let newCustomId = parseInt(result.custom_id)
+        if (Number.isInteger(newCustomId)) {
+            newCustomId = (result.length > 0)
+                                ? parseInt(result[0].custom_id) + 1
+                                : parseInt(config.customIdStart) + 1
+        } else {
+            newCustomId = config.customIdStart
+        }
         const user = new User(customId || newCustomId.toString(), '', level, true, new Date(), [], [])
         await collectionUser.insertOne(user)
         return user
