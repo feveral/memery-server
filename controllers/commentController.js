@@ -5,21 +5,15 @@ module.exports = {
 
     async getComments (ctx) {
         const {meme_id} = ctx.query
-        let {limit=15, skip=0} = ctx.query
+        const limit = parseInt(ctx.query.limit) || 10
+        const skip = parseInt(ctx.query.skip) || 0
 
         if (!meme_id) {
             ctx.response.status = 400
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
             return
         }
-        try {
-            skip = parseInt(skip)
-            limit = parseInt(limit)
-        } catch (e) {
-            ctx.response.status = 400
-            ctx.body = { message: 'query parameter "skip" and "limit" should be an integer.'}
-            return
-        }
+
         const comments = await Comment.find({memeId: meme_id, limit, skip})
         ctx.body = comments
     },

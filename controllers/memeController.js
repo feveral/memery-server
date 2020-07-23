@@ -14,15 +14,7 @@ module.exports = {
 
     async getTrending (ctx) {
         const userId = ctx.user
-        let {skip} = ctx.query
-
-        try {
-            skip = parseInt(skip)
-        } catch (e) {
-            ctx.response.status = 400
-            ctx.body = { message: 'query parameter "skip" should be an integer.'}
-            return
-        }
+        const skip = parseInt(ctx.query.skip) || 0
 
         const memes = await Meme.findTrending(15, skip) // limit should not be too big
         const userIds = []
