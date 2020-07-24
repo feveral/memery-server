@@ -33,21 +33,21 @@ module.exports = {
         ctx.body = memes
     },
 
-    async vote (ctx) {
+    async like (ctx) {
         const {meme_id, action} = ctx.request.body
         if (!meme_id) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "meme_id" should be given.' }
             return
         }
-        if (!action || (action !== 'upvote' && action !== 'downvote' && action !== 'clearvote')) {
+        if (!action || (action !== 'like' && action !== 'dislike' && action !== 'clearlike')) {
             ctx.response.status = 400
-            ctx.body = { message: 'body parameter "action" should be "upvote", "downvote" or "clearvote". ' }
+            ctx.body = { message: 'body parameter "action" should be "like", "dislike" or "clearlike". ' }
             return
         }
-        if (action === 'upvote') await Meme.upvote(ctx.user, meme_id)
-        else if (action === 'downvote') await Meme.downvote(ctx.user, meme_id)
-        else if (action === 'clearvote') await Meme.clearvote(ctx.user, meme_id)
+        if (action === 'like') await Meme.like(ctx.user, meme_id)
+        else if (action === 'dislike') await Meme.dislike(ctx.user, meme_id)
+        else if (action === 'clearlike') await Meme.clearlike(ctx.user, meme_id)
         ctx.response.status = 204
         ctx.body = null
     },

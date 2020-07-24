@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const auth = require('../libs/auth.js')
 const config = require('../config.js')
-const constants = require('../constants.js')
 const User = require('../models/user.js')
 
 module.exports = {
@@ -37,15 +36,6 @@ module.exports = {
     },
 
     async login(ctx) {
-
-        if (process.env.NODE_ENV === 'development') {
-            let user = await User.findOne({customId: 'dev_user_id'})
-            if (!user) user = await User.add({customId: 'dev_user_id', level: constants.USER_LEVEL_REGULAR})
-            const meme_token = auth.obtainMemeToken(user)
-            ctx.body = {meme_token}
-            return
-        }
-
         const type  = ctx.request.body.type // should be 'google' or 'facebook'
         const token = ctx.request.body.token 
         const tokenType = ctx.request.body.token_type // 'id_token' or 'access_token'

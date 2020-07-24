@@ -10,15 +10,15 @@ class User {
      * @param {string} level can be 'anonymous', 'regular', 'admin'
      * @param {Date} registerTime 
      */
-    constructor (customId, name, avatar_url, level, isDefaultId, registerTime, upvoteMemeIds, downvoteMemeIds) {
+    constructor (customId, name, avatar_url, level, isDefaultId, registerTime, likeMemeIds, dislikeMemeIds) {
         this.custom_id = customId
         this.name = name
         this.avatar_url = avatar_url
         this.level = level
         this.is_default_id = isDefaultId
         this.register_time = registerTime
-        this.upvote_meme_ids = upvoteMemeIds
-        this.downvote_meme_ids = downvoteMemeIds
+        this.like_meme_ids = likeMemeIds
+        this.dislike_meme_ids = dislikeMemeIds
     }
 
     static async add ({customId, level, name='', avatar_url=''}) {
@@ -69,7 +69,7 @@ class User {
         return result
     }
 
-    static async findOne ({_id, customId, googleEmail, facebookEmail, getGoogleProfile=false, getFacebookProfile=false, getUpvoteMemeId=false, getDownvoteMemeId=false}) {
+    static async findOne ({_id, customId, googleEmail, facebookEmail, getGoogleProfile=false, getFacebookProfile=false, getLikeMemeIds=false, getDislikeMemeIds=false}) {
         const filter = {}
         if (_id) filter._id = ObjectID(_id)
         if (customId) filter.custom_id = customId
@@ -78,8 +78,8 @@ class User {
         const projection = {
             google_profile: getGoogleProfile,
             facebook_profile: getFacebookProfile,
-            upvote_meme_ids: getUpvoteMemeId,
-            downvote_meme_ids: getDownvoteMemeId,
+            like_meme_ids: getLikeMemeIds,
+            dislike_meme_ids: getDislikeMemeIds,
         }
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const result = await collection.findOne(filter, projection)
