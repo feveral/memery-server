@@ -26,6 +26,8 @@ module.exports = {
             for (let j = 0; j < users.length; j++) {
                 if (users[j]._id.toString() === memes[i].user_id.toString()) {
                     memes[i].user_custom_id = users[j].custom_id
+                    memes[i].user_name = users[j].name
+                    memes[i].user_avatar_url = users[j].avatar_url
                     continue
                 }
             }
