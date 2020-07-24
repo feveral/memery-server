@@ -4,8 +4,6 @@ module.exports = {
 
     async getProfile(ctx) {
         const user = await User.findOne({_id: ctx.user})
-        delete user.google_profile
-        delete user.facebook_profile
         if (user) {
             ctx.body = user
         } else {
