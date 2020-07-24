@@ -34,10 +34,10 @@ class Meme {
         return result
     }
 
-    static async findTrending (limit=15, skip=0) {
+    static async findTrending ({limit=8, skip=0}) {
         const filter = {}
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray()
+        const result = await collection.find(filter).sort({upload_time: -1}).limit(limit).skip(skip).toArray()
         return result
     }
 
