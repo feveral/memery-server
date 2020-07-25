@@ -14,7 +14,7 @@ module.exports = {
 
     async getTrending (ctx) {
         const skip = parseInt(ctx.query.skip) || 0
-        const memes = await Meme.findTrending({limit: 8, skip}) // limit should not be too big
+        const memes = await Meme.findTrending({limit: 20, skip}) // limit should not be too big
         const userIds = []
         memes.forEach(meme => {
             userIds.push(meme.user_id)
