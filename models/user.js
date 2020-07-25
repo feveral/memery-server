@@ -45,7 +45,7 @@ class User {
             {custom_id: user.custom_id},
             {'$set': {google_profile: googleProfile}},
             {upsert: true})
-        return await User.findOne({custom_id: user.custom_id})
+        return await User.findOne({customId: user.custom_id})
     }
 
     static async saveFacebook (facebookProfile) {
@@ -82,7 +82,7 @@ class User {
             dislike_meme_ids: getDislikeMemeIds,
         }
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const result = await collection.findOne(filter, projection)
+        const result = await collection.findOne(filter, {projection})
         return result
     }
 
