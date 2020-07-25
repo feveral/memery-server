@@ -69,17 +69,15 @@ class User {
         return result
     }
 
-    static async findOne ({_id, customId, googleEmail, facebookEmail, getGoogleProfile=false, getFacebookProfile=false, getLikeMemeIds=false, getDislikeMemeIds=false}) {
+    static async findOne ({_id, customId, googleEmail, facebookEmail, getLikeDislikeMemeIds=false}) {
         const filter = {}
         if (_id) filter._id = ObjectID(_id)
         if (customId) filter.custom_id = customId
         if (googleEmail) filter['google_profile.email'] = googleEmail
         if (facebookEmail) filter['facebook_profile.email'] = facebookEmail
         const projection = {
-            google_profile: getGoogleProfile,
-            facebook_profile: getFacebookProfile,
-            like_meme_ids: getLikeMemeIds,
-            dislike_meme_ids: getDislikeMemeIds,
+            like_meme_ids: getLikeDislikeMemeIds,
+            dislike_meme_ids: getLikeDislikeMemeIds,
         }
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const result = await collection.findOne(filter, {projection})
