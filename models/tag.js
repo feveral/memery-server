@@ -13,7 +13,7 @@ class Tag {
         for (let i = 0; i < names.length; i++) {
             await collection.updateOne(
                 {name: names[i]},
-                {'$push': {meme_ids: memeId}},
+                {'$addToSet': {meme_ids: memeId}},
                 {upsert: true}
             )
         }

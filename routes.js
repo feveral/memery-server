@@ -15,6 +15,7 @@ module.exports = (router) => {
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
 
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
+    router.get('/api/meme/search', memeController.search)
     router.get('/api/meme/trending', memeController.getTrending)
     router.post('/api/meme/like', authController.verifyMemeToken, memeController.like)
     router.delete('/api/meme', () => {})

@@ -23,12 +23,19 @@ class Meme {
         return meme
     }
 
-    static async find ({id, userId, imageUrl, description, limit=15, skip=0}) {
+    static async find ({id, userId, imageUrl, keyword, limit=15, skip=0}) {
         const filter = {}
         if (id) filter._id = id
         if (userId) filter.userid = userId
         if (imageUrl) filter.imageUrl = imageUrl
-        if (description) filter.description = RegExp(`${description}`,'i')
+        if (keyword) {
+            let regexString = ''
+            for (let i = 0; i < keyword.length; i++) {
+                regexString += `.*${keyword[i]}`
+            }
+            let regexFilter = {'$regex': `${regexString}.*`}
+            filter['$or'] = [{description: regexFilter}, {tags: regexFilter}]
+        }
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         const result = await collection.find(filter).limit(limit).skip(skip).toArray()
         return result

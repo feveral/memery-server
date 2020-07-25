@@ -33,6 +33,12 @@ module.exports = {
         ctx.body = memes
     },
 
+    async search (ctx) {
+        const keyword = ctx.query.keyword || ''
+        const memes = await Meme.find({keyword})
+        ctx.body = memes
+    },
+
     async like (ctx) {
         const {meme_id, action} = ctx.request.body
         if (!meme_id) {
@@ -48,7 +54,7 @@ module.exports = {
         if (action === 'like') await Meme.like(ctx.user, meme_id)
         else if (action === 'dislike') await Meme.dislike(ctx.user, meme_id)
         else if (action === 'clearlike') await Meme.clearlike(ctx.user, meme_id)
-        ctx.response.status = 204
-        ctx.body = null
+        ctx.response.status = 200
+        ctx.body = null // server will return 204 No Content
     },
 }
