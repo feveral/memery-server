@@ -9,6 +9,7 @@ module.exports = {
         const image_url = ctx.request.body.image_url 
         const description = ctx.request.body.description
         const tags = ctx.request.body.tags
+		console.log(tags)
         if (!image_url) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "image_url" should be given.'}
