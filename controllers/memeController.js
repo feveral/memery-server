@@ -6,7 +6,22 @@ module.exports = {
 
     async upload (ctx) {
         const userId = ctx.user
-        const {image_url, description, tags} = ctx.request.body
+        const image_url = ctx.request.body.image_url 
+        const description = ctx.request.body.description
+        const tags = ctx.request.body.tags
+        if (!image_url) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "image_url" should be given.'}
+            return
+        } else if (!description) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "description" should be given.'}
+            return
+        } else if (!tags || !tags.every(i => (typeof i === "string"))) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "tags" should be an array of string.'}
+            return
+        }
         const meme = await Meme.add(userId, image_url, description, tags)
         await Tag.addMany(tags, meme._id)
         ctx.body = meme
