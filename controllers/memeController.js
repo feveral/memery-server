@@ -8,8 +8,7 @@ module.exports = {
         const userId = ctx.user
         const image_url = ctx.request.body.image_url 
         const description = ctx.request.body.description
-        const tags = ctx.request.body.tags
-		console.log(tags)
+        let tags = ctx.request.body.tags
         if (!image_url) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "image_url" should be given.'}
@@ -18,10 +17,17 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "description" should be given.'}
             return
-        } else if (!tags || !Array.isArray(tags) || !tags.every(i => (typeof i === "string"))) {
+        } else if (!tags) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
+            return
+        } else if (Array.isArray(tags) && !tags.every(i => (typeof i === "string"))) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "tags" should be an array of string.'}
             return
+        }
+        if (!Array.isArray(tags)) {
+            tags = [tags]
         }
         const meme = await Meme.add(userId, image_url, description, tags)
         await Tag.addMany(tags, meme._id)
