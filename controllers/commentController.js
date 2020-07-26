@@ -1,4 +1,5 @@
 const Comment = require('../models/comment.js')
+const User = require('../models/user.js')
 
 
 module.exports = {
@@ -15,6 +16,22 @@ module.exports = {
         }
 
         const comments = await Comment.find({memeId: meme_id, limit, skip})
+        const userIds = []
+        comments.forEach(comment => {
+            userIds.push(comment.user_id)
+        })
+        const users = await User.findByIds(userIds)
+        for (let i = 0; i < comments.length; i++) {
+            delete comments[i].meme_id
+            for (let j = 0; j < users.length; j++) {
+                if (users[j]._id.toString() === comments[i].user_id.toString()) {
+                    comments[i].user_custom_id = users[j].custom_id
+                    comments[i].user_name = users[j].name
+                    comments[i].user_avatar_url = users[j].avatar_url
+                    continue
+                }
+            }
+        }
         ctx.body = comments
     },
 
