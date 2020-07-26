@@ -17,7 +17,7 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "description" should be given.'}
             return
-        } else if (!tags || !tags.every(i => (typeof i === "string"))) {
+        } else if (!tags || !Array.isArray(tags) || !tags.every(i => (typeof i === "string"))) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "tags" should be an array of string.'}
             return
