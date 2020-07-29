@@ -12,7 +12,7 @@ const router = new Router()
 require('./routes.js')(router)
 
 app.use(cors())
-app.use(koaBody())
+app.use(koaBody({strict:false})) // strict false is for parsing the body for DELETE, PUT method
 app.use(router.routes())
 app.use(router.allowedMethods())
 app.use(history())
