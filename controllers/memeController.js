@@ -61,6 +61,21 @@ module.exports = {
     async search (ctx) {
         const keyword = ctx.query.keyword || ''
         const memes = await Meme.find({keyword})
+        const userIds = []
+        memes.forEach(meme => {
+            userIds.push(meme.user_id)
+        })
+        const users = await User.findByIds(userIds)
+        for (let i = 0; i < memes.length; i++) {
+            for (let j = 0; j < users.length; j++) {
+                if (users[j]._id.toString() === memes[i].user_id.toString()) {
+                    memes[i].user_custom_id = users[j].custom_id
+                    memes[i].user_name = users[j].name
+                    memes[i].user_avatar_url = users[j].avatar_url
+                    continue
+                }
+            }
+        }
         ctx.body = memes
     },
 
