@@ -4,7 +4,7 @@ module.exports = {
     async upload (ctx) {
         const {ext} = ctx.query
 
-        if (ext !== 'jpg' && ext !== 'png') {
+        if (ext !== 'jpg' && ext !== 'png' && ext !== 'jpeg' && ext !== 'gif') {
             ctx.response.status = 400
             ctx.body = { message: 'query parameter ext should be "jpg" or "png"'}
             return
