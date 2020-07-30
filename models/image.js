@@ -9,6 +9,7 @@ class Image {
     constructor (url, usage) {
         this.url = url
         this.usage = usage
+        this.created_at = new Date()
     }
 
     static async addToServer (content, ext) {
