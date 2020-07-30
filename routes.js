@@ -5,6 +5,7 @@ const imageController = require('./controllers/imageController.js')
 const userController = require('./controllers/userController.js')
 const tagController = require('./controllers/tagController.js')
 const commentController = require('./controllers/commentController.js')
+const collectController = require('./controllers/collectController.js')
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
@@ -18,11 +19,14 @@ module.exports = (router) => {
     router.get('/api/meme/search', memeController.search)
     router.get('/api/meme/trending', memeController.getTrending)
     router.post('/api/meme/like', authController.verifyMemeToken, memeController.like)
-    router.delete('/api/meme', () => {})
+    router.delete('/api/meme', authController.verifyMemeToken, memeController.delete)
     
     router.get('/api/comment', commentController.getComments)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
     router.delete('/api/api/comment', () => {})
 
     router.get('/api/tag', tagController.getTags)
+
+    router.get('/api/collect', authController.verifyMemeToken, collectController.getUserCollect)
+    router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
 }

@@ -1,6 +1,7 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
 const ObjectID = require('mongodb').ObjectID
+const Image = require('./image.js')
 
 class Meme {
     /**
@@ -88,6 +89,14 @@ class Meme {
         if (resultDislike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {dislike: -1}})
         }
+    }
+
+    static async delete (memeId) {
+        const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
+        const meme = await collectionMeme.findOne({_id: ObjectID(memeId)})
+        const imageUrl = meme.image_url
+        await collectionMeme.deleteOne({_id: ObjectID(memeId)})
+        await Image.increaseUsage(imageUrl, -1)
     }
 }
 

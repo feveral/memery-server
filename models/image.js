@@ -13,8 +13,8 @@ class Image {
 
     static async addToServer (content, ext) {
         const imageId = shortUUID().generate()
-        fs.writeFileSync(`images/${imageId}.${ext}`, content)
-        const image = new Image(`${config.serverBaseUrl}/${imageId}.${ext}`, 1)
+        fs.writeFile(`images/${imageId}.${ext}`, content, () => {})
+        const image = new Image(`${config.serverBaseUrl}/${imageId}.${ext}`, 0)
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.insertOne(image)
         return image
@@ -34,8 +34,14 @@ class Image {
 
     static async increaseUsage(url, quantity) {
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
-        await collection.updateOne({url}, {'$inc': quantity})
-        return Image.find({url})
+        await collection.updateOne({url}, {'$inc': {usage: quantity}})
+        const image = await collection.findOne({url})
+        const urlSplit = image.url.split('/')
+        const filename = urlSplit[urlSplit.length-1]
+        if (image.usage === 0) {
+            await collection.deleteOne({url})
+            fs.unlink(`images/${filename}`, () => {})
+        }
     }
 }
 

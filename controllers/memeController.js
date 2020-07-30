@@ -1,4 +1,5 @@
 const Meme = require('../models/meme.js')
+const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
 
@@ -23,13 +24,14 @@ module.exports = {
             return
         } else if (Array.isArray(tags) && !tags.every(i => (typeof i === "string"))) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "tags" should be an array of string.'}
+            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
             return
         }
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
         const meme = await Meme.add(userId, image_url, description, tags)
+        await Image.increaseUsage(image_url, 1)
         await Tag.addMany(tags, meme._id)
         ctx.body = meme
     },
@@ -59,6 +61,21 @@ module.exports = {
     async search (ctx) {
         const keyword = ctx.query.keyword || ''
         const memes = await Meme.find({keyword})
+        const userIds = []
+        memes.forEach(meme => {
+            userIds.push(meme.user_id)
+        })
+        const users = await User.findByIds(userIds)
+        for (let i = 0; i < memes.length; i++) {
+            for (let j = 0; j < users.length; j++) {
+                if (users[j]._id.toString() === memes[i].user_id.toString()) {
+                    memes[i].user_custom_id = users[j].custom_id
+                    memes[i].user_name = users[j].name
+                    memes[i].user_avatar_url = users[j].avatar_url
+                    continue
+                }
+            }
+        }
         ctx.body = memes
     },
 
@@ -80,4 +97,16 @@ module.exports = {
         ctx.response.status = 200
         ctx.body = null // server will return 204 No Content
     },
+
+    async delete (ctx) {
+        const memeId = ctx.request.body.meme_id
+        if (!memeId) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "meme_id" should be given.' }
+            return
+        }
+        await Meme.delete(memeId)
+        ctx.status = 200
+        ctx.body = null
+    }
 }
