@@ -8,15 +8,11 @@ module.exports = {
     async upload (ctx) {
         const userId = ctx.user
         const image_url = ctx.request.body.image_url 
-        const description = ctx.request.body.description
+        const description = ctx.request.body.description || ''
         let tags = ctx.request.body.tags
         if (!image_url) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "image_url" should be given.'}
-            return
-        } else if (!description) {
-            ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "description" should be given.'}
             return
         } else if (!tags) {
             ctx.response.status = 400
