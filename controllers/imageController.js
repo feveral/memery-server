@@ -25,6 +25,6 @@ module.exports = {
     },
 
     async deleteImage(ctx) {
-        //TODO:
+        //TODO: This is only for admin user, must be handled carefully
     }
 }
