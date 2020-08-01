@@ -13,26 +13,26 @@ module.exports = {
 
     async addCollect(ctx) {
         const userId = ctx.user
-        const imageUrl = ctx.request.body.image_url
-        if (!imageUrl) {
+        const imageId = ctx.request.body.image_id
+        if (!imageId) {
             ctx.response.status = 400
-            ctx.body = { message: 'body parameter "image_url" should be given. ' }
+            ctx.body = { message: 'body parameter "image_id" should be given. ' }
             return
         }
-        await Collect.add(userId, imageUrl)
+        await Collect.add(userId, imageId)
         ctx.response.status = 200
         ctx.body = null
     },
 
     async deleteCollect (ctx) {
         const userId = ctx.user
-        const imageUrl = ctx.request.body.image_url
-        if (!imageUrl) {
+        const imageId = ctx.request.body.image_id
+        if (!imageId) {
             ctx.response.status = 400
-            ctx.body = { message: 'body parameter "image_url" should be given. ' }
+            ctx.body = { message: 'body parameter "image_id" should be given. ' }
             return
         }
-        await Collect.delete(userId, imageUrl)
+        await Collect.delete(userId, imageId)
         ctx.status = 200
         ctx.body = null
     }

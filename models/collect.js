@@ -5,17 +5,17 @@ const Image = require('../models/image.js')
 
 class Collect {
 
-    constructor (userId, imageUrl) {
+    constructor (userId, imageId) {
         this.user_id = ObjectID(userId)
-        this.image_url = imageUrl
+        this.image_id = ObjectID(imageId)
     }
 
     // TODO: should check is image exists
-    static async add (userId, imageUrl) {
-        const collect = new Collect(userId, imageUrl)
+    static async add (userId, imageId) {
+        const collect = new Collect(userId, imageId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
         await collection.updateOne(collect, {"$setOnInsert": {created_at: new Date()}}, {upsert: true})
-        await Image.increaseUsage(imageUrl, 1)
+        await Image.increaseUsage(imageId, 1)
     }
 
     static async find ({userId, limit=20, skip=0}) {
@@ -24,11 +24,11 @@ class Collect {
         return collects
     }
 
-    static async delete (userId, imageUrl) {
+    static async delete (userId, imageId) {
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
-        const result = await collection.deleteOne({user_id: ObjectID(userId), image_url: imageUrl})
+        const result = await collection.deleteOne({user_id: ObjectID(userId), image_id: ObjectID(imageId)})
         if (result.result.n === 1) {
-            await Image.increaseUsage(imageUrl, -1)
+            await Image.increaseUsage(imageId, -1)
         }
     }
 }
