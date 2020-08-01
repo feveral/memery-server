@@ -14,6 +14,7 @@
     "@koa/multer": "^3.0.0",
     "axios": "^0.19.2",
     "form-data": "^3.0.0",
+    "image-thumbnail": "^1.0.10",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",

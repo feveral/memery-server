@@ -3,16 +3,43 @@ const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
 
+async function memesAddUserAndImageInfo(memes) {
+    const userIds = []
+    const imageIds = []
+    memes.forEach(meme => {
+        userIds.push(meme.user_id)
+        imageIds.push(meme.image_id)
+    })
+    const users = await User.findByIds(userIds)
+    const images = await Image.findByIds(imageIds)
+    for (let i = 0; i < memes.length; i++) {
+        for (let j = 0; j < users.length; j++) {
+            if (users[j]._id.toString() === memes[i].user_id.toString()) {
+                memes[i].user_custom_id = users[j].custom_id
+                memes[i].user_name = users[j].name
+                memes[i].user_avatar_url = users[j].avatar_url
+            }
+        }
+        for (let j = 0; j < images.length; j++) {
+            if (images[j]._id.toString() === memes[i].image_id.toString()) {
+                memes[i].image_url = images[j].url
+                memes[i].image_thumbnail_url = images[j].thumbnail_url
+            }
+        }
+    }
+    return memes
+}
+
 module.exports = {
 
     async upload (ctx) {
         const userId = ctx.user
-        const image_url = ctx.request.body.image_url 
+        const image_id = ctx.request.body.image_id 
         const description = ctx.request.body.description || ''
         let tags = ctx.request.body.tags
-        if (!image_url) {
+        if (!image_id) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "image_url" should be given.'}
+            ctx.body = { messgae: 'body parameter "image_id" should be given.'}
             return
         } else if (!tags) {
             ctx.response.status = 400
@@ -26,8 +53,8 @@ module.exports = {
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
-        const meme = await Meme.add(userId, image_url, description, tags)
-        await Image.increaseUsage(image_url, 1)
+        const meme = await Meme.add(userId, image_id, description, tags)
+        await Image.increaseUsage(image_id, 1)
         await Tag.addMany(tags, meme._id)
         ctx.body = meme
     },
@@ -35,43 +62,15 @@ module.exports = {
     async getTrending (ctx) {
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
-        const memes = await Meme.findTrending({limit, skip}) // limit should not be too big
-        const userIds = []
-        memes.forEach(meme => {
-            userIds.push(meme.user_id)
-        })
-        const users = await User.findByIds(userIds)
-        for (let i = 0; i < memes.length; i++) {
-            for (let j = 0; j < users.length; j++) {
-                if (users[j]._id.toString() === memes[i].user_id.toString()) {
-                    memes[i].user_custom_id = users[j].custom_id
-                    memes[i].user_name = users[j].name
-                    memes[i].user_avatar_url = users[j].avatar_url
-                    continue
-                }
-            }
-        }
+        let memes = await Meme.findTrending({limit, skip}) // limit should not be too big
+        memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
 
     async search (ctx) {
         const keyword = ctx.query.keyword || ''
-        const memes = await Meme.find({keyword})
-        const userIds = []
-        memes.forEach(meme => {
-            userIds.push(meme.user_id)
-        })
-        const users = await User.findByIds(userIds)
-        for (let i = 0; i < memes.length; i++) {
-            for (let j = 0; j < users.length; j++) {
-                if (users[j]._id.toString() === memes[i].user_id.toString()) {
-                    memes[i].user_custom_id = users[j].custom_id
-                    memes[i].user_name = users[j].name
-                    memes[i].user_avatar_url = users[j].avatar_url
-                    continue
-                }
-            }
-        }
+        let memes = await Meme.find({keyword})
+        memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
 
@@ -101,7 +100,11 @@ module.exports = {
             ctx.body = { message: 'body parameter "meme_id" should be given.' }
             return
         }
+        const meme = await Meme.findOne(memeId)
         await Meme.delete(memeId)
+        for(let i = 0; i < meme.tags.length; i++) {
+            await Tag.deleteMemeId(meme.tags[i], memeId)
+        }
         ctx.status = 200
         ctx.body = null
     }

@@ -7,9 +7,9 @@ class Meme {
     /**
      * @param {string} userId user's object id string
      */
-    constructor (userId, imageUrl, description, tags, like, dislike, upload_time) {
+    constructor (userId, imageId, description, tags, like, dislike, upload_time) {
         this.user_id = ObjectID(userId)
-        this.image_url = imageUrl
+        this.image_id = ObjectID(imageId)
         this.description = description
         this.tags = tags
         this.like = like
@@ -17,18 +17,18 @@ class Meme {
         this.upload_time = upload_time
     }
 
-    static async add (userId, imageUrl, description, tags) {
-        const meme = new Meme(userId, imageUrl, description, tags, 0, 0, new Date())
+    static async add (userId, imageId, description, tags) {
+        const meme = new Meme(userId, imageId, description, tags, 0, 0, new Date())
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
         return meme
     }
 
-    static async find ({id, userId, imageUrl, keyword, limit=15, skip=0}) {
+    static async find ({id, userId, imageId, keyword, limit=15, skip=0}) {
         const filter = {}
-        if (id) filter._id = id
-        if (userId) filter.userid = userId
-        if (imageUrl) filter.imageUrl = imageUrl
+        if (id) filter._id = ObjectID(id)
+        if (userId) filter.user_id = userId
+        if (imageId) filter.image_id = imageId
         if (keyword) {
             let regexString = ''
             for (let i = 0; i < keyword.length; i++) {
@@ -40,6 +40,11 @@ class Meme {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         const result = await collection.find(filter).limit(limit).skip(skip).toArray()
         return result
+    }
+
+    static async findOne(id) {
+        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        return await collection.findOne({_id: ObjectID(id)})
     }
 
     static async findTrending ({limit=8, skip=0}) {
@@ -94,9 +99,9 @@ class Meme {
     static async delete (memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const meme = await collectionMeme.findOne({_id: ObjectID(memeId)})
-        const imageUrl = meme.image_url
+        const imageId = meme.image_id
         await collectionMeme.deleteOne({_id: ObjectID(memeId)})
-        await Image.increaseUsage(imageUrl, -1)
+        await Image.increaseUsage(imageId, -1)
     }
 }
 

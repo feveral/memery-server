@@ -19,8 +19,13 @@ module.exports = {
     },
 
     async getImageInfo (ctx) {
-        const {image_url} = ctx.query
-        const image = await Image.find({url: image_url})
+        const {image_id} = ctx.query
+        if (!image_id) {
+            ctx.response.status = 400
+            ctx.body = { message: 'query parameter "image_id" should be given.'}
+            return
+        }
+        const image = await Image.find({id: image_id})
         ctx.body = image
     },
 

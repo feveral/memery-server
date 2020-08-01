@@ -11,6 +11,7 @@ module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
+    router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
 
     router.get('/api/image', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
@@ -30,4 +31,6 @@ module.exports = (router) => {
     router.get('/api/collect', authController.verifyMemeToken, collectController.getUserCollect)
     router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
     router.delete('/api/collect', authController.verifyMemeToken, collectController.deleteCollect)
+
+    router.get('/api/notification', () => {})
 }

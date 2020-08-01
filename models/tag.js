@@ -1,5 +1,6 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
+const { ObjectID } = require('mongodb')
 
 class Tag {
 
@@ -30,15 +31,10 @@ class Tag {
         return result
     }
 
-    static async isTagExist (name) {
-        const filter = {name}
+    static async deleteMemeId (name, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        const result = await collection.find(filter).limit(1).skip(skip)
-        return result.length > 0
-    }
-
-    static async addMemeToTag (meme) {
-        const collection = await database.getCollection(constants.COLLECTION_TAG)
+        await collection.updateOne({name}, {'$pull': {meme_ids: ObjectID(memeId)}})
+        await collection.deleteOne({name, meme_ids: {'$size': 0}})
     }
 }
 
