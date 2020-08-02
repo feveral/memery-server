@@ -7,18 +7,19 @@ class Meme {
     /**
      * @param {string} userId user's object id string
      */
-    constructor (userId, imageId, description, tags, like, dislike, upload_time) {
+    constructor (userId, imageId, description, tags) {
         this.user_id = ObjectID(userId)
         this.image_id = ObjectID(imageId)
         this.description = description
         this.tags = tags
-        this.like = like
-        this.dislike = dislike
-        this.upload_time = upload_time
+        this.like = 0
+        this.dislike = 0
+        this.upload_time = new Date()
+        this.comment_number = 0
     }
 
     static async add (userId, imageId, description, tags) {
-        const meme = new Meme(userId, imageId, description, tags, 0, 0, new Date())
+        const meme = new Meme(userId, imageId, description, tags)
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
         return meme
@@ -97,11 +98,16 @@ class Meme {
     }
 
     static async delete (memeId) {
-        const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
-        const meme = await collectionMeme.findOne({_id: ObjectID(memeId)})
+        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        const meme = await collection.findOne({_id: ObjectID(memeId)})
         const imageId = meme.image_id
-        await collectionMeme.deleteOne({_id: ObjectID(memeId)})
+        await collection.deleteOne({_id: ObjectID(memeId)})
         await Image.increaseUsage(imageId, -1)
+    }
+
+    static async increaseCommentNumber(memeId, quantity) {
+        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        await collection.updateOne({_id: ObjectID(memeId)}, {'$inc': {comment_number: quantity}})
     }
 }
 

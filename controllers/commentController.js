@@ -42,12 +42,27 @@ module.exports = {
         if (!meme_id) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "meme_id" should be given.'}
+            return
         } else if (!content) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "content" should be given.'}
+            return
         }
 
         const comment = await Comment.add(meme_id, userId, content)
         ctx.body = comment
+    },
+
+    async deleteComment(ctx) {
+        const userId = ctx.user
+        const commentId = ctx.request.body.comment_id
+        if (!commentId) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "comment_id" should be given.'}
+            return
+        }
+        await Comment.delete(userId, commentId)
+        ctx.response.status = 200
+        ctx.body = null
     }
 }
