@@ -34,7 +34,6 @@ class Tag {
     static async deleteMemeId (name, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         await collection.updateOne({name}, {'$pull': {meme_ids: ObjectID(memeId)}})
-        await collection.deleteOne({name, meme_ids: {'$size': 0}})
     }
 }
 
