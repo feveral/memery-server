@@ -24,7 +24,7 @@ module.exports = (router) => {
     
     router.get('/api/comment', commentController.getComments)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
-    router.delete('/api/comment', () => {})
+    router.delete('/api/comment', authController.verifyMemeToken, commentController.deleteComment)
 
     router.get('/api/tag', tagController.getTags)
 
