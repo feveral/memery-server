@@ -2,9 +2,8 @@ const Meme = require('../models/meme.js')
 const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
-const Comment = require('../models/comment.js')
 
-async function memesAddUserAndImageAddCommentInfo(memes) {
+async function memesAddUserAndImageInfo(memes) {
     const userIds = []
     const imageIds = []
     memes.forEach(meme => {
@@ -64,14 +63,14 @@ module.exports = {
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
         let memes = await Meme.findTrending({limit, skip}) // limit should not be too big
-        memes = await memesAddUserAndImageAddCommentInfo(memes)
+        memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
 
     async search (ctx) {
         const keyword = ctx.query.keyword || ''
         let memes = await Meme.find({keyword})
-        memes = await memesAddUserAndImageAddCommentInfo(memes)
+        memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
 
