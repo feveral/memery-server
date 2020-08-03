@@ -53,9 +53,10 @@ module.exports = {
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
-        const meme = await Meme.add(userId, image_id, description, tags)
+        let meme = await Meme.add(userId, image_id, description, tags)
         await Image.increaseUsage(image_id, 1)
         await Tag.addMany(tags, meme._id)
+        meme = (await memesAddUserAndImageInfo([meme]))[0]
         ctx.body = meme
     },
 

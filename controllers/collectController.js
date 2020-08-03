@@ -37,9 +37,9 @@ module.exports = {
             ctx.body = { message: 'body parameter "image_id" should be given. ' }
             return
         }
-        await Collect.add(userId, imageId)
-        ctx.response.status = 200
-        ctx.body = null
+        let collect = await Collect.add(userId, imageId)
+        collect = (await collectAddImageInfo([collect]))[0]
+        ctx.body = collect
     },
 
     async deleteCollect (ctx) {
