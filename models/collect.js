@@ -36,6 +36,14 @@ class Collect {
             await Image.increaseUsage(imageId, -1)
         }
     }
+
+    static async count ({userId, ownerUserId}) {
+        const filter = {}
+        if (userId) filter.user_id = ObjectID(userId)
+        if (ownerUserId) filter.owner_user_id = ObjectID(ownerUserId)
+        const collection = await database.getCollection(constants.COLLECTION_COLLECT)
+        return await collection.countDocuments(filter)
+    }
 }
 
 module.exports = Collect
