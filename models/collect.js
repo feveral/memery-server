@@ -20,13 +20,16 @@ class Collect {
         return await collection.findOne(collect)
     }
 
-    static async find ({userId, ownerUserId, limit=20, skip=0}) {
+    static async find ({userId, ownerUserId, limit, skip}) {
         const filter = {}
         if (userId) filter.user_id = ObjectID(userId)
         if (ownerUserId) filter.owner_user_id = ObjectID(ownerUserId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
-        const collects = await collection.find(filter).limit(limit).skip(skip).toArray()
-        return collects
+        if (limit) {
+            return await collection.find(filter).limit(limit).skip(skip).toArray()
+        } else {
+            return await collection.find(filter).toArray()
+        }
     }
 
     static async delete (userId, imageId) {
