@@ -69,9 +69,9 @@ class User {
         return result
     }
 
-    static async findOne ({_id, customId, googleEmail, facebookEmail, getLikeDislikeMemeIds=false}) {
+    static async findOne ({id, customId, googleEmail, facebookEmail, getLikeDislikeMemeIds=false}) {
         const filter = {}
-        if (_id) filter._id = ObjectID(_id)
+        if (id) filter._id = ObjectID(id)
         if (customId) filter.custom_id = customId
         if (googleEmail) filter['google_profile.email'] = googleEmail
         if (facebookEmail) filter['facebook_profile.email'] = facebookEmail

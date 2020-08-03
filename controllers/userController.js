@@ -1,9 +1,17 @@
 const User = require('../models/user.js')
+const Meme = require('../models/meme.js')
 
 module.exports = {
 
     async getProfile(ctx) {
-        const user = await User.findOne({_id: ctx.user})
+        const userId = ctx.user
+        const user = await User.findOne({id: userId})
+        const memes = await Meme.find({userId})
+        let likes = 0
+        for (let i = 0; i < memes.length; i++) {
+            likes += memes[i].like
+        }
+        user.like_received = likes
         delete user.google_profile
         delete user.facebook_profile
         if (user) {
