@@ -1,5 +1,6 @@
 const Collect = require('../models/collect.js')
 const Image = require('../models/image.js')
+const Meme = require('../models/meme.js')
 
 async function collectAddImageInfo(collects) {
     const imageIds = []
@@ -31,13 +32,14 @@ module.exports = {
 
     async addCollect(ctx) {
         const userId = ctx.user
-        const imageId = ctx.request.body.image_id
-        if (!imageId) {
+        const memeId = ctx.request.body.meme_id
+        if (!memeId) {
             ctx.response.status = 400
-            ctx.body = { message: 'body parameter "image_id" should be given. ' }
+            ctx.body = { message: 'body parameter "memeId" should be given. ' }
             return
         }
-        let collect = await Collect.add(userId, imageId)
+        const meme = await Meme.findOne(memeId)
+        let collect = await Collect.add(userId, meme.user_id, meme.image_id)
         collect = (await collectAddImageInfo([collect]))[0]
         ctx.body = collect
     },
