@@ -68,8 +68,19 @@ module.exports = {
     },
 
     async search (ctx) {
+        const skip = parseInt(ctx.query.skip) || 0
+        const limit = parseInt(ctx.query.limit) || 20
         const keyword = ctx.query.keyword || ''
-        let memes = await Meme.find({keyword})
+        let memes = await Meme.find({keyword, skip, limit})
+        memes = await memesAddUserAndImageInfo(memes)
+        ctx.body = memes
+    },
+
+    async getUserMeme(ctx) {
+        const userId = ctx.user
+        const skip = parseInt(ctx.query.skip) || 0
+        const limit = parseInt(ctx.query.limit) || 20
+        let memes = await Meme.find({userId, skip, limit})
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
