@@ -8,14 +8,16 @@ class Collect {
     constructor (userId, imageId) {
         this.user_id = ObjectID(userId)
         this.image_id = ObjectID(imageId)
+        this.created_at = new Date()
     }
 
     // TODO: should check is image exists
     static async add (userId, imageId) {
         const collect = new Collect(userId, imageId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
-        await collection.updateOne(collect, {"$setOnInsert": {created_at: new Date()}}, {upsert: true})
+        await collection.insertOne(collect)
         await Image.increaseUsage(imageId, 1)
+        return collect
     }
 
     static async find ({userId, limit=20, skip=0}) {
