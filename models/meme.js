@@ -28,8 +28,8 @@ class Meme {
     static async find ({id, userId, imageId, keyword, limit=15, skip=0}) {
         const filter = {}
         if (id) filter._id = ObjectID(id)
-        if (userId) filter.user_id = userId
-        if (imageId) filter.image_id = imageId
+        if (userId) filter.user_id = ObjectID(userId)
+        if (imageId) filter.image_id = ObjectID(imageId)
         if (keyword) {
             let regexString = ''
             for (let i = 0; i < keyword.length; i++) {

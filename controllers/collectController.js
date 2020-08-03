@@ -1,5 +1,22 @@
 const Collect = require('../models/collect.js')
+const Image = require('../models/image.js')
 
+async function collectAddImageInfo(collects) {
+    const imageIds = []
+    collects.forEach(collect => {
+        imageIds.push(collect.image_id)
+    })
+    const images = await Image.findByIds(imageIds)
+    for (let i = 0; i < collects.length; i++) {
+        for (let j = 0; j < images.length; j++) {
+            if (images[j]._id.toString() === collects[i].image_id.toString()) {
+                collects[i].image_url = images[j].url
+                collects[i].image_thumbnail_url = images[j].thumbnail_url
+            }
+        }
+    }
+    return collects
+}
 
 module.exports = {
 
@@ -7,7 +24,8 @@ module.exports = {
         const userId = ctx.user
         const limit = parseInt(ctx.query.limit) || 20
         const skip = parseInt(ctx.query.skip) || 0
-        const collects = await Collect.find({userId, limit, skip})
+        let collects = await Collect.find({userId, limit, skip})
+        collects = await collectAddImageInfo(collects)
         ctx.body = collects
     },
 
