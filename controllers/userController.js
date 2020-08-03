@@ -1,5 +1,6 @@
 const User = require('../models/user.js')
 const Meme = require('../models/meme.js')
+const Collect = require('../models/collect.js')
 
 module.exports = {
 
@@ -12,6 +13,7 @@ module.exports = {
             likes += memes[i].like
         }
         user.like_received = likes
+        user.meme_collected = await Collect.count({ownerUserId: userId})
         delete user.google_profile
         delete user.facebook_profile
         if (user) {

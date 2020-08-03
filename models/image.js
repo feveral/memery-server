@@ -63,6 +63,12 @@ class Image {
             fs.unlink(`images/${thumbnailFilename}`, () => {})
         }
     }
+
+    static async isImageExist(id) {
+        const collection = await database.getCollection(constants.COLLECTION_IMAGE)
+        const result = await collection.findOne({_id: ObjectID(id)})
+        return result !== null
+    }
 }
 
 module.exports = Image

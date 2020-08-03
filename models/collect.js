@@ -5,24 +5,27 @@ const Image = require('../models/image.js')
 
 class Collect {
 
-    constructor (userId, imageId) {
+    constructor (userId, ownerUserId, imageId) {
         this.user_id = ObjectID(userId)
+        this.owner_user_id = ObjectID(ownerUserId)
         this.image_id = ObjectID(imageId)
-        this.created_at = new Date()
     }
 
     // TODO: should check is image exists
-    static async add (userId, imageId) {
-        const collect = new Collect(userId, imageId)
+    static async add (userId, ownerUserId, imageId) {
+        const collect = new Collect(userId, ownerUserId, imageId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
-        await collection.insertOne(collect)
+        await collection.updateOne(collect, {"$setOnInsert": {created_at: new Date()}}, {upsert: true})
         await Image.increaseUsage(imageId, 1)
-        return collect
+        return await collection.findOne(collect)
     }
 
-    static async find ({userId, limit=20, skip=0}) {
+    static async find ({userId, ownerUserId, limit=20, skip=0}) {
+        const filter = {}
+        if (userId) filter.user_id = ObjectID(userId)
+        if (ownerUserId) filter.owner_user_id = ObjectID(ownerUserId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
-        const collects = await collection.find({user_id: ObjectID(userId)}).limit(limit).skip(skip).toArray()
+        const collects = await collection.find(filter).limit(limit).skip(skip).toArray()
         return collects
     }
 
@@ -32,6 +35,14 @@ class Collect {
         if (result.result.n === 1) {
             await Image.increaseUsage(imageId, -1)
         }
+    }
+
+    static async count ({userId, ownerUserId}) {
+        const filter = {}
+        if (userId) filter.user_id = ObjectID(userId)
+        if (ownerUserId) filter.owner_user_id = ObjectID(ownerUserId)
+        const collection = await database.getCollection(constants.COLLECTION_COLLECT)
+        return await collection.countDocuments(filter)
     }
 }
 
