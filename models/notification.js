@@ -2,7 +2,7 @@ const database = require('../database/database.js')
 
 class Notification {
 
-    constructor () {
+    constructor ({memeId, type, userId, commentId, collecId}) {
 
     }
 
