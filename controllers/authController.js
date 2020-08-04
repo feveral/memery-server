@@ -7,7 +7,7 @@ module.exports = {
 
     async verifyMemeToken(ctx, next) {
         const authorization = ctx.headers.authorization
-        
+
         if (!authorization || authorization.substring(0, 7) !== 'Bearer ') {
             ctx.response.status = 401
             ctx.body = { message: 'token fromat should be "Bearer <jwt token>"' }
