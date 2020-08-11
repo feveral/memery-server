@@ -5,6 +5,7 @@ module.exports = {
     COLLECTION_IMAGE: 'image',
     COLLECTION_COMMENT: 'comment',
     COLLECTION_COLLECT: 'collect',
+    COLLECTION_NOTIFICATION: 'notification',
 
     USER_LEVEL_REGULAR: 'regular',
     USER_LEVEL_ADMIN: 'admin'

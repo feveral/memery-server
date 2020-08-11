@@ -1,6 +1,7 @@
 const Collect = require('../models/collect.js')
 const Image = require('../models/image.js')
 const Meme = require('../models/meme.js')
+const Notification = require('../models/notification.js')
 
 async function collectAddImageInfo(collects) {
     const imageIds = []
@@ -46,6 +47,7 @@ module.exports = {
         const meme = await Meme.findOne(memeId)
         let collect = await Collect.add(userId, meme.user_id, meme.image_id)
         collect = (await collectAddImageInfo([collect]))[0]
+        await Notification.addCollectMeme(meme)
         ctx.body = collect
     },
 

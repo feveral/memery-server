@@ -2,6 +2,7 @@ const Meme = require('../models/meme.js')
 const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
+const Notification = require('../models/notification.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -98,7 +99,11 @@ module.exports = {
             ctx.body = { message: 'body parameter "action" should be "like", "dislike" or "clearlike". ' }
             return
         }
-        if (action === 'like') await Meme.like(ctx.user, meme_id)
+        if (action === 'like') {
+            await Meme.like(ctx.user, meme_id)
+            const meme = await Meme.findOne(meme_id)
+            await Notification.addLikeMeme(meme)
+        }
         else if (action === 'dislike') await Meme.dislike(ctx.user, meme_id)
         else if (action === 'clearlike') await Meme.clearlike(ctx.user, meme_id)
         ctx.response.status = 200
