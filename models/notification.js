@@ -2,11 +2,11 @@ const database = require('../database/database.js')
 
 class Notification {
 
-    constructor ({memeId, type, userId, commentId, collecId}) {
-
+    constructor ({memeId, type, target, userId, commentId, collectId, targetId}) {
+        this.read = false
     }
 
-    static async find({limit=10, skip=0}) {
+    static async find({id, limit=10, skip=0}) {
 
     }
 }

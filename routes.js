@@ -12,6 +12,7 @@ module.exports = (router) => {
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
     router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
+    router.put('/api/user/id', authController.verifyMemeToken, userController.updateCustomId)
 
     router.get('/api/image', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
