@@ -34,61 +34,60 @@ class Notification {
         return notifications
     }
 
-    static async addLikeMeme (meme) {
-        const notification = new Notification({userId: meme.user_id, type: LIKE_MEME, memeId: meme._id})
+    static async add (notification) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         await collection.updateOne(
             notification,
             {'$set': {read: false, update_time: new Date()}},
             {upsert: true}
         )
+    }
+
+    static async addLikeMeme (meme) {
+        const notification = new Notification({
+            userId: meme.user_id,
+            type: LIKE_MEME,
+            memeId: meme._id
+        })
+        await Notification.add(notification)
     }
 
     static async addLikeComment (comment) {
         const notification = new Notification({
-            userId: comment.user_id, type: LIKE_COMMENT, commentId: comment._id})
-        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateOne(
-            notification,
-            {'$set': {read: false, update_time: new Date()}},
-            {upsert: true}
-        )
+            userId: comment.user_id,
+            type: LIKE_COMMENT,
+            commentId: comment._id
+        })
+        await Notification.add(notification)
     }
 
     static async addReplyMeme (actionUserId, meme) {
         const notification = new Notification({
-            userId: meme.user_id, type: REPLY_MEME,
-            actionUserId, memeId: meme._id
+            userId: meme.user_id,
+            type: REPLY_MEME,
+            actionUserId,
+            memeId: meme._id
         })
-        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateOne(
-            notification,
-            {'$set': {read: false, update_time: new Date()}},
-            {upsert: true}
-        )
+        await Notification.add(notification)
     }
 
     static async addReplyComment (actionUserId, comment) {
         const notification = new Notification({
-            userId: comment.user_id, type: REPLY_COMMENT,
-            actionUserId, commentId: comment._id
+            userId: comment.user_id,
+            type: REPLY_COMMENT,
+            actionUserId,
+            commentId: comment._id
         })
-        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateOne(
-            notification,
-            {'$set': {read: false, update_time: new Date()}},
-            {upsert: true}
-        )
+        await Notification.add(notification)
     }
 
     static async addCollectMeme (meme) {
-        const notification = new Notification({userId: meme.user_id, type: COLLECT_MEME, memeId: meme._id})
-        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateOne(
-            notification,
-            {'$set': {read: false, update_time: new Date()}},
-            {upsert: true}
-        )
+        const notification = new Notification({
+            userId: meme.user_id,
+            type: COLLECT_MEME,
+            memeId: meme._id
+        })
+        await Notification.add(notification)
     }
 
     static async read (userId) {
