@@ -53,15 +53,32 @@ module.exports = {
             return
         }
 
-        const googleProfile = await auth.verifyGoogleToken(token, tokenType)
-        if (googleProfile === null) {
-            ctx.response.status = 403
-            ctx.body = { message: 'google sign in fail: token invalid or token type invalid.' }
+        if (type === 'google') {
+            const googleProfile = await auth.verifyGoogleToken(token, tokenType)
+            if (googleProfile === null) {
+                ctx.response.status = 403
+                ctx.body = { message: 'google sign in fail: token invalid or token type invalid.' }
+                return
+            }
+            let user = await User.findOne({googleEmail: googleProfile.email})
+            if (!user) user = await User.saveGoogle(googleProfile)
+            const meme_token = auth.obtainMemeToken(user)
+            ctx.body = {meme_token}
+            return
+        } else if (type === 'facebook') {
+            const facebookProfile = await auth.verifyFacebookToken(token, tokenType)
+            if (facebookProfile === null) {
+                ctx.response.status = 403
+                ctx.body = { message: 'facebook sign in fail: token invalid or token type invalid.' }
+                return
+            }
+            let user = await User.findOne({facebookEmail: facebookProfile.email})
+            if (!user) user = await User.saveFacebook(facebookProfile)
+            const meme_token = auth.obtainMemeToken(user)
+            ctx.body = {meme_token}
             return
         }
-        let user = await User.findOne({googleEmail: googleProfile.email})
-        if (!user) user = await User.saveGoogle(googleProfile)
-        const meme_token = auth.obtainMemeToken(user)
-        ctx.body = {meme_token}
+        ctx.response.status = 403
+        ctx.body = { message: 'authentication fail: something wrong!' }
     },
 }
