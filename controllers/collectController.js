@@ -47,7 +47,6 @@ module.exports = {
         const meme = await Meme.findOne(memeId)
         let collect = await Collect.add(userId, meme.user_id, meme.image_id)
         collect = (await collectAddImageInfo([collect]))[0]
-        await Notification.addCollectMeme(meme)
         ctx.body = collect
     },
 
