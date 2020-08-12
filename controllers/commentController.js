@@ -1,5 +1,7 @@
 const Comment = require('../models/comment.js')
 const User = require('../models/user.js')
+const Notification = require('../models/notification.js')
+const Meme = require('../models/meme.js')
 
 
 module.exports = {
@@ -50,6 +52,8 @@ module.exports = {
         }
 
         const comment = await Comment.add(meme_id, userId, content)
+        const meme = await Meme.findOne(meme_id)
+        await Notification.addReplyMeme(userId, meme, comment)
         ctx.body = comment
     },
 

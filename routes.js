@@ -6,12 +6,14 @@ const userController = require('./controllers/userController.js')
 const tagController = require('./controllers/tagController.js')
 const commentController = require('./controllers/commentController.js')
 const collectController = require('./controllers/collectController.js')
+const notificationController = require('./controllers/notificationController.js')
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
     router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
+    router.put('/api/user/id', authController.verifyMemeToken, userController.updateCustomId)
 
     router.get('/api/image', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
@@ -25,6 +27,7 @@ module.exports = (router) => {
     
     router.get('/api/comment', commentController.getComments)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
+    router.post('/api/comment/like', authController.verifyMemeToken, () => {})
     router.delete('/api/comment', authController.verifyMemeToken, commentController.deleteComment)
 
     router.get('/api/tag', tagController.getTags)
@@ -33,5 +36,6 @@ module.exports = (router) => {
     router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
     router.delete('/api/collect', authController.verifyMemeToken, collectController.deleteCollect)
 
-    router.get('/api/notification', () => {})
+    router.get('/api/notification', authController.verifyMemeToken, notificationController.getNotifications)
+    router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotifications)
 }

@@ -6,9 +6,7 @@ const config = require('../config.js')
 class User {
 
     /**
-     * @param {string} id 
-     * @param {string} level can be 'anonymous', 'regular', 'admin'
-     * @param {Date} registerTime 
+     * @param {string} level 'regular' || 'admin'
      */
     constructor (customId, name, avatar_url, level, isDefaultId, registerTime, likeMemeIds, dislikeMemeIds) {
         this.custom_id = customId
@@ -22,8 +20,6 @@ class User {
     }
 
     static async add ({customId, level, name='', avatar_url=''}) {
-        //TODO: should block attack ip address
-        //TODO: should revise the way to find 'max id'
         //TODO: should use transaction
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const result = await collectionUser
@@ -91,16 +87,16 @@ class User {
         return result
     }
 
-    //TODO: not testing
-    //TODO: should use transaction 
-    static async updateCustomId (oldCustomId, newCustomId) {
+    //TODO: should use transaction
+    static async updateCustomId (userId, newCustomId) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const isNewIdEsist = await User.findOne({custom_id: newUserId})
+        const isNewIdEsist = await User.findOne({customId: newCustomId})
         if (isNewIdEsist) throw Error('user id has already used.')
-        await collection.updateOne(
-            {custom_id: oldUserId},
-            {'$set': {id: newUserId}
-        })
+        const result = await collection.findOneAndUpdate(
+            {_id: ObjectID(userId)},
+            {'$set': {custom_id: newCustomId}}
+        )
+        return result.value
     }
 }
 

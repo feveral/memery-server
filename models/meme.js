@@ -48,6 +48,13 @@ class Meme {
         return await collection.findOne({_id: ObjectID(id)})
     }
 
+    static async findByIds(ids) {
+        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        const objIds = ids.map( (myId) => { return ObjectID(myId) })
+        const result = await collection.find({ _id: { '$in': objIds }}).toArray()
+        return result
+    }
+
     static async findTrending ({limit=8, skip=0}) {
         const filter = {}
         const collection = await database.getCollection(constants.COLLECTION_MEME)
