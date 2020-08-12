@@ -19,7 +19,7 @@ class User {
         this.dislike_meme_ids = dislikeMemeIds
     }
 
-    static async add ({customId, level, name='', avatar_url=''}) {
+    static async add ({level, name='', avatar_url=''}) {
         //TODO: should use transaction
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const result = await collectionUser
@@ -29,7 +29,7 @@ class User {
         let newCustomId = (result.length > 0)
                                 ? parseInt(result[0].custom_id) + 1
                                 : parseInt(config.customIdStart) + 1
-        const user = new User(customId || newCustomId.toString(), name, avatar_url, level, true, new Date(), [], [])
+        const user = new User(newCustomId.toString(), name, avatar_url, level, true, new Date(), [], [])
         await collectionUser.insertOne(user)
         return user
     }
@@ -46,7 +46,7 @@ class User {
 
     static async saveFacebook (facebookProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const user = await User.add({level: constants.USER_LEVEL_REGULAR, name: facebookProfile.name})
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR, name: facebookProfile.name, avatar_url: facebookProfile.picture.data.url})
         await collection.updateOne(
             {custom_id: user.custom_id}, 
             {'$set': {facebook_profile: facebookProfile}},
@@ -94,7 +94,7 @@ class User {
         if (isNewIdEsist) throw Error('user id has already used.')
         const result = await collection.findOneAndUpdate(
             {_id: ObjectID(userId)},
-            {'$set': {custom_id: newCustomId}}
+            {'$set': {custom_id: newCustomId, is_default_id: false}}
         )
         return result.value
     }
