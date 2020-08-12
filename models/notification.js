@@ -56,17 +56,19 @@ class Notification {
         const notification = new Notification({
             userId: comment.user_id,
             type: LIKE_COMMENT,
+            memeId: comment.meme_id,
             commentId: comment._id
         })
         await Notification.add(notification)
     }
 
-    static async addReplyMeme (actionUserId, meme) {
+    static async addReplyMeme (actionUserId, meme, comment) {
         const notification = new Notification({
             userId: meme.user_id,
             type: REPLY_MEME,
             actionUserId,
-            memeId: meme._id
+            memeId: meme._id,
+            commentId: comment._id
         })
         await Notification.add(notification)
     }
@@ -76,6 +78,7 @@ class Notification {
             userId: comment.user_id,
             type: REPLY_COMMENT,
             actionUserId,
+            memeId: comment.meme_id,
             commentId: comment._id
         })
         await Notification.add(notification)

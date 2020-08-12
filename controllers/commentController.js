@@ -53,7 +53,7 @@ module.exports = {
 
         const comment = await Comment.add(meme_id, userId, content)
         const meme = await Meme.findOne(meme_id)
-        await Notification.addReplyMeme(userId, meme)
+        await Notification.addReplyMeme(userId, meme, comment)
         ctx.body = comment
     },
 
