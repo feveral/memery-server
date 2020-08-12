@@ -52,7 +52,7 @@ class User {
             {'$set': {facebook_profile: facebookProfile}},
             {upsert: true}
         )
-        return await User.findOne({custom_id: user.custom_id})
+        return await User.findOne({customId: user.custom_id})
     }
 
     static async find ({_id, customId, level, limit=20, skip=0}) {
