@@ -27,7 +27,7 @@ async function notificationsAddInfo(notifications) {
         }
         for (let j = 0; j < memes.length; j++) {
             if (notifications[i].meme_id.toString() === memes[j]._id.toString()) {
-                notifications[i].meme_like_number = memes[k].like
+                notifications[i].meme_like_number = memes[j].like
                 for (let k = 0; k < images.length; k++) {
                     if (memes[j].image_id.toString() === images[k]._id.toString()) {
                         notifications[i].meme_image_url = images[k].url
