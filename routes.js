@@ -10,6 +10,7 @@ const notificationController = require('./controllers/notificationController.js'
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
+    router.post('/api/auth/logout', authController.verifyMemeToken, authController.logout)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
     router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
