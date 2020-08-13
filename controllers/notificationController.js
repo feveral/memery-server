@@ -8,7 +8,7 @@ async function notificationsAddInfo(notifications) {
     const memeIds = []
     const imageIds = []
     notifications.forEach(n => {
-        if (n.action_user_id) actionUserIds.push(n.user_id)
+        if (n.action_user_id) actionUserIds.push(n.action_user_id)
         if (n.meme_id) memeIds.push(n.meme_id)
     })
     const users = await User.findByIds(actionUserIds)
