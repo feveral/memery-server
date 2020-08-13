@@ -98,6 +98,22 @@ class User {
         )
         return result.value
     }
+
+    static async addFirebaseDeviceToken(userId, token) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        await collection.findOneAndUpdate(
+            {_id: ObjectID(userId)},
+            {'$addToSet': {firebase_devices: token}}
+        )
+    }
+
+    static async removeFirebaseDeviceToken(userId, token) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        await collection.findOneAndUpdate(
+            {_id: ObjectID(userId)},
+            {'$pull': {firebase_devices: token}}
+        )
+    }
 }
 
 module.exports = User

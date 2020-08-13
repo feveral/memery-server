@@ -1,7 +1,9 @@
+const constants = require('../constants.js')
 const Comment = require('../models/comment.js')
 const User = require('../models/user.js')
 const Notification = require('../models/notification.js')
 const Meme = require('../models/meme.js')
+const pushService = require('../libs/push-service.js')
 
 
 module.exports = {
@@ -54,6 +56,15 @@ module.exports = {
         const comment = await Comment.add(meme_id, userId, content)
         const meme = await Meme.findOne(meme_id)
         await Notification.addReplyMeme(userId, meme, comment)
+        const userReceiveNotification = await User.findOne(meme.user_id)
+        if (userReceiveNotification.firebase_devices) {
+            const result = await pushService.sendComment(constants.OS_ANDROID, userReceiveNotification.firebase_devices, content)
+            if (result) {
+                result.failTokens.forEach(t => {
+                    User.removeFirebaseDeviceToken(meme.user_id, t)
+                })
+            }
+        }
         ctx.body = comment
     },
 
