@@ -81,4 +81,17 @@ module.exports = {
         ctx.response.status = 403
         ctx.body = { message: 'authentication fail: something wrong!' }
     },
+    
+	async logout(ctx) {
+        const userId = ctx.user
+        const firebaseToken = ctx.request.body.firebase_token
+        if (!firebaseToken) {
+            ctx.response.status = 403
+                ctx.body = { message: 'body parameter "firebase_token" should be given.' }
+                return
+        }
+        await User.removeFirebaseDeviceToken(userId, firebaseToken)
+        ctx.response.status = 200
+        ctx.body = null
+    }
 }
