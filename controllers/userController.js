@@ -43,5 +43,18 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = {message: 'this id has already been taken.'}
         }
+    },
+
+    async addFirebaseDeviceToken(ctx) {
+        const userId = ctx.user
+        const token = ctx.request.body.token
+        if (!token) {
+            ctx.response.status = 400
+            ctx.body = {message: 'body parameter "token" should be given.'}
+            return
+        }
+        await User.addFirebaseDeviceToken(userId, token)
+        ctx.response.status = 200
+        ctx.body = null
     }
 }

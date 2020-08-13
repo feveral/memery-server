@@ -8,5 +8,10 @@ module.exports = {
     COLLECTION_NOTIFICATION: 'notification',
 
     USER_LEVEL_REGULAR: 'regular',
-    USER_LEVEL_ADMIN: 'admin'
+    USER_LEVEL_ADMIN: 'admin',
+
+    OS_ANDROID: 'android',
+    OS_IOS: 'ios',
+
+    ANDROID_NOTIFICATION_CHANNEL_COMMENT: 'comment'
 }
