@@ -14,7 +14,8 @@ module.exports = {
             ctx.body = { message: 'image file should be in body form-data.'}
             return
         }
-        const image = await Image.addToServer(ctx.file.buffer, ext)
+        // const image = await Image.addToServer(ctx.file.buffer, ext)
+        const image = await Image.addToAWSS3(ctx.file.buffer, ext)
         ctx.body = image
     },
 

@@ -107,9 +107,11 @@ class Meme {
     static async delete (memeId) {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         const meme = await collection.findOne({_id: ObjectID(memeId)})
-        const imageId = meme.image_id
-        await collection.deleteOne({_id: ObjectID(memeId)})
-        await Image.increaseUsage(imageId, -1)
+        if (meme) {
+            const imageId = meme.image_id
+            await collection.deleteOne({_id: ObjectID(memeId)})
+            await Image.increaseUsage(imageId, -1)
+        }
     }
 
     static async increaseCommentNumber(memeId, quantity) {

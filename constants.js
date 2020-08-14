@@ -14,4 +14,5 @@ module.exports = {
     OS_IOS: 'ios',
 
     ANDROID_NOTIFICATION_CHANNEL_COMMENT: 'comment'
+
 }

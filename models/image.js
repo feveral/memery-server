@@ -4,6 +4,7 @@ const shortUUID = require('short-uuid')
 const database = require('../database/database.js')
 const config = require('../config.js')
 const constants = require('../constants.js')
+const awsS3Saver = require('../libs/aws-s3-saver.js')
 const { ObjectID } = require('mongodb')
 
 class Image {
@@ -28,7 +29,15 @@ class Image {
     }
 
     static async addToAWSS3 (content, ext) {
-
+        const imageId = shortUUID().generate()
+        const imageThumbnailId = shortUUID().generate()
+        const thumbnail = await imageThumbnail(content)
+        awsS3Saver.uploadMemeImage(`${imageId}.${ext}`, content)
+        awsS3Saver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
+        const image = new Image(`${config.awsS3MemeImageBaseUrl}/${imageId}.${ext}`, `${config.awsS3MemeImageBaseUrl}/${imageThumbnailId}.${ext}`)
+        const collection = await database.getCollection(constants.COLLECTION_IMAGE)
+        await collection.insertOne(image)
+        return image
     }
 
     static async find ({id, url, thumbnail_url, usage}) {
@@ -52,15 +61,23 @@ class Image {
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.updateOne({_id: ObjectID(id)}, {'$inc': {usage: quantity}})
         const image = await collection.findOne({_id: ObjectID(id)})
-        //TODO: should revise this if change to AWS S3
         const urlSplit = image.url.split('/')
         const thumbnailUrlSplit = image.thumbnail_url.split('/')
         const filename = urlSplit[urlSplit.length-1]
         const thumbnailFilename = thumbnailUrlSplit[thumbnailUrlSplit.length-1]
+
+        // These are for store image on server
+        // if (image.usage === 0) {
+        //     await collection.deleteOne({_id: ObjectID(id)})
+        //     fs.unlink(`images/${filename}`, () => {})
+        //     fs.unlink(`images/${thumbnailFilename}`, () => {})
+        // }
+
+        // These is fro AWS S3
         if (image.usage === 0) {
             await collection.deleteOne({_id: ObjectID(id)})
-            fs.unlink(`images/${filename}`, () => {})
-            fs.unlink(`images/${thumbnailFilename}`, () => {})
+            awsS3Saver.removeMemeImage(filename)
+            awsS3Saver.removeMemeImage(thumbnailFilename)
         }
     }
 

@@ -118,9 +118,11 @@ module.exports = {
             return
         }
         const meme = await Meme.findOne(memeId)
-        await Meme.delete(memeId)
-        for(let i = 0; i < meme.tags.length; i++) {
-            await Tag.deleteMemeId(meme.tags[i], memeId)
+        if (meme) {
+            await Meme.delete(memeId)
+            for(let i = 0; i < meme.tags.length; i++) {
+                await Tag.deleteMemeId(meme.tags[i], memeId)
+            }
         }
         ctx.status = 200
         ctx.body = null
