@@ -26,6 +26,23 @@ class AWSS3Saver {
         await this._remove(params)
     }
 
+    async uploadUserAvatar(name, content) {
+        const params = {
+            Bucket: config.awsS3UserAvatarBucket,
+            Key: name,
+            Body: content
+        }
+        await this._upload(params)
+    }
+
+    async removeUserAvatar(name) {
+        const params = {
+            Bucket: config.awsS3UserAvatarBucket,
+            Key: name,
+        }
+        await this._remove(params)
+    }
+
     async _upload(params) {
         const self = this
         return new Promise(function(resolve, reject) {

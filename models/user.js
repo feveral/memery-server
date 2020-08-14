@@ -1,7 +1,10 @@
 const ObjectID = require('mongodb').ObjectID
+const imageThumbnail = require('image-thumbnail')
+const shortUUID = require('short-uuid')
 const database = require('../database/database.js')
 const constants = require('../constants.js')
 const config = require('../config.js')
+const awsS3Saver = require('../libs/aws-s3-saver.js')
 
 class User {
 
@@ -129,6 +132,21 @@ class User {
             {_id: ObjectID(userId)},
             {'$pull': {firebase_devices: token}}
         )
+    }
+
+    static async updateAvatar(userId, avatarContent, ext) {
+        const user = await User.findOne({id: userId})
+        if (user) {
+            const imageId = shortUUID().generate()
+            const thumbnail = await imageThumbnail(avatarContent, {percentage: 25})
+            await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, thumbnail)
+            const newAvatarUrl = `${config.awsS3UserAvatarBaseUrl}/${imageId}.${ext}`
+            const oldAvatarUrlSplit = user.avatar_url.split('/')
+            const oldAvatarName = oldAvatarUrlSplit[oldAvatarUrlSplit.length-1]
+            await awsS3Saver.removeUserAvatar(oldAvatarName)
+            const collection = await database.getCollection(constants.COLLECTION_USER)
+            await collection.updateOne({_id: ObjectID(userId)}, {'$set': {avatar_url: newAvatarUrl}})
+        }
     }
 }
 

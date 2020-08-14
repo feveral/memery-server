@@ -1,5 +1,6 @@
 const User = require('../models/user.js')
 const Meme = require('../models/meme.js')
+const Image = require('../models/image.js')
 const Collect = require('../models/collect.js')
 
 module.exports = {
@@ -54,6 +55,24 @@ module.exports = {
             return
         }
         await User.addFirebaseDeviceToken(userId, token)
+        ctx.response.status = 200
+        ctx.body = null
+    },
+
+    async updateAvatar(ctx) {
+        const userId = ctx.user
+        const {ext} = ctx.query
+        if (ext !== 'jpg' && ext !== 'png' && ext !== 'jpeg' && ext !== 'gif') {
+            ctx.response.status = 400
+            ctx.body = { message: 'query parameter ext should be "jpg" or "png" or "jpeg" or "gif"'}
+            return
+        }
+        if (!ctx.file) {
+            ctx.response.status = 400
+            ctx.body = { message: 'image file should be in body form-data.'}
+            return
+        }
+        await User.updateAvatar(userId, ctx.file.buffer, ext)
         ctx.response.status = 200
         ctx.body = null
     }

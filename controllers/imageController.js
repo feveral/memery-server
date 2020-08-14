@@ -6,7 +6,7 @@ module.exports = {
 
         if (ext !== 'jpg' && ext !== 'png' && ext !== 'jpeg' && ext !== 'gif') {
             ctx.response.status = 400
-            ctx.body = { message: 'query parameter ext should be "jpg" or "png"'}
+            ctx.body = { message: 'query parameter ext should be "jpg" or "png" or "jpeg" or "gif"'}
             return
         }
         if (!ctx.file) {

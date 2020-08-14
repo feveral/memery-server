@@ -16,6 +16,7 @@ module.exports = (router) => {
     router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
     router.post('/api/user/firebase/device', authController.verifyMemeToken, userController.addFirebaseDeviceToken)
     router.put('/api/user/id', authController.verifyMemeToken, userController.updateCustomId)
+    router.put('/api/user/avatar', authController.verifyMemeToken, multer().single('image'), userController.updateAvatar)
 
     router.get('/api/image', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
