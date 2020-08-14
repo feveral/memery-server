@@ -16,7 +16,6 @@ class Comment {
         this.content = content
     }
 
-    //TODO: transaction
     static async add (memeId, userId, content) {
         const comment = new Comment(memeId, userId, content)
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
@@ -31,10 +30,10 @@ class Comment {
         return result
     }
 
-    static async delete (userId, commetId) {
+    static async delete (userId, commentId) {
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        const comment = await collection.findOne({_id: ObjectID(commetId), user_id: ObjectID(userId)})
-        const result = await collection.deleteOne({_id: ObjectID(commetId), user_id: ObjectID(userId)})
+        const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
+        const result = await collection.deleteOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         if (result.result.n === 1) {
             await Meme.increaseCommentNumber(comment.meme_id, -1)
         }

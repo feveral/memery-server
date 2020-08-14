@@ -20,18 +20,26 @@ class User {
     }
 
     static async add ({level, name='', avatar_url=''}) {
-        //TODO: should use transaction
-        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
-        const result = await collectionUser
-            .find({is_default_id: true})
-            .collation({locale: "en_US", numericOrdering: true}) // to keep sorting as number
-            .sort({custom_id: -1}).limit(1).toArray()
-        let newCustomId = (result.length > 0)
-                                ? parseInt(result[0].custom_id) + 1
-                                : parseInt(config.customIdStart) + 1
-        const user = new User(newCustomId.toString(), name, avatar_url, level, true, new Date(), [], [])
-        await collectionUser.insertOne(user)
-        return user
+        const client = await database.getClient()
+        const session = client.startSession()
+        let user
+        try {
+            await session.withTransaction(async () => {
+                const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+                const result = await collectionUser
+                    .find({is_default_id: true}, { session })
+                    .collation({locale: "en_US", numericOrdering: true}) // to keep sorting as number
+                    .sort({custom_id: -1}).limit(1).toArray()
+                let newCustomId = (result.length > 0)
+                                        ? parseInt(result[0].custom_id) + 1
+                                        : parseInt(config.customIdStart) + 1
+                user = new User(newCustomId.toString(), name, avatar_url, level, true, new Date(), [], [])
+                await collectionUser.insertOne(user, { session })
+            })
+        } finally {
+            await session.endSession()
+            return user
+        }
     }
 
     static async saveGoogle (googleProfile) {
@@ -87,16 +95,24 @@ class User {
         return result
     }
 
-    //TODO: should use transaction
     static async updateCustomId (userId, newCustomId) {
-        const collection = await database.getCollection(constants.COLLECTION_USER)
-        const isNewIdEsist = await User.findOne({customId: newCustomId})
-        if (isNewIdEsist) throw Error('user id has already used.')
-        const result = await collection.findOneAndUpdate(
-            {_id: ObjectID(userId)},
-            {'$set': {custom_id: newCustomId, is_default_id: false}}
-        )
-        return result.value
+        const client = await database.getClient()
+        const session = client.startSession()
+        let isNewIdExist
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_USER)
+            isNewIdExist = await User.findOne({customId: newCustomId}, {session})
+            if (isNewIdExist) throw Error('user id has already used.')
+            await collection.findOneAndUpdate(
+                {_id: ObjectID(userId)},
+                {'$set': {custom_id: newCustomId, is_default_id: false}},
+                {session}
+            )
+        } catch (e) {
+            throw Error('user id has already used.')
+        } finally {
+            await session.endSession()
+        }
     }
 
     static async addFirebaseDeviceToken(userId, token) {

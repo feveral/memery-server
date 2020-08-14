@@ -62,7 +62,6 @@ class Meme {
         return result
     }
 
-    //TODO: need transaction
     static async like (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
@@ -76,7 +75,6 @@ class Meme {
         }
     }
 
-    //TODO: need transaction
     static async dislike (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
@@ -90,7 +88,6 @@ class Meme {
         }
     }
 
-    //TODO: need transaction
     static async clearlike (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
