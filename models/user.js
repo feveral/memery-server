@@ -138,8 +138,8 @@ class User {
         const user = await User.findOne({id: userId})
         if (user) {
             const imageId = shortUUID().generate()
-            const thumbnail = await imageThumbnail(avatarContent, {percentage: 25})
-            await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, thumbnail)
+            // const thumbnail = await imageThumbnail(avatarContent, {percentage: 25})
+            await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
             const newAvatarUrl = `${config.awsS3UserAvatarBaseUrl}/${imageId}.${ext}`
             const oldAvatarUrlSplit = user.avatar_url.split('/')
             const oldAvatarName = oldAvatarUrlSplit[oldAvatarUrlSplit.length-1]
