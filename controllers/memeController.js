@@ -88,10 +88,10 @@ module.exports = {
     },
 
     async getMemeById(ctx) {
-        const memeId = ctx.params.id
+        const memeId = ctx.query.meme_id
         if (!memeId) {
             ctx.response.status = 400
-            ctx.body = { message: 'path parameter should be given.' }
+            ctx.body = { message: 'query parameter "meme_id" should be given.' }
             return            
         }
         const meme = await Meme.findOne(memeId)
