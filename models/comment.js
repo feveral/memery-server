@@ -1,7 +1,7 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
 const Meme = require('./meme.js')
-const { ObjectId } = require('mongodb')
+const User = require('./user.js')
 const ObjectID = require('mongodb').ObjectID
 
 class Comment {
@@ -14,6 +14,7 @@ class Comment {
         this.user_id = ObjectID(userId)
         this.created_at = new Date()
         this.content = content
+        this.like = 0
     }
 
     static async add (memeId, userId, content) {
@@ -38,6 +39,25 @@ class Comment {
             await Meme.increaseCommentNumber(comment.meme_id, -1)
         }
     }
+
+    static async like(userId, commentId) {
+        const collectionComment = await database.getCollection(constants.COLLECTION_COMMENT)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet':{like_comment_ids: commentId}})
+        if (result.result.nModified === 1) {
+            await collectionComment.updateOne({_id: ObjectID(commentId)}, {'$inc': {like: 1}})
+        }
+    }
+
+    static async clearlike(userId, commentId) {
+        const collectionComment = await database.getCollection(constants.COLLECTION_COMMENT)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull':{like_comment_ids: commentId}})
+        if (result.result.nModified === 1) {
+            await collectionComment.updateOne({_id: ObjectID(commentId)}, {'$inc': {like: -1}})
+        }
+    }
+
 }
 
 module.exports = Comment

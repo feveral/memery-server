@@ -11,15 +11,16 @@ class User {
     /**
      * @param {string} level 'regular' || 'admin'
      */
-    constructor (customId, name, avatar_url, level, isDefaultId, registerTime, likeMemeIds, dislikeMemeIds) {
+    constructor (customId, name, avatar_url, level, isDefaultId) {
         this.custom_id = customId
         this.name = name
         this.avatar_url = avatar_url
         this.level = level
         this.is_default_id = isDefaultId
-        this.register_time = registerTime
-        this.like_meme_ids = likeMemeIds
-        this.dislike_meme_ids = dislikeMemeIds
+        this.register_time = new Date()
+        this.like_meme_ids = []
+        this.dislike_meme_ids = []
+        this.like_comment_ids = []
     }
 
     static async add ({level, name='', avatar_url=''}) {
@@ -36,7 +37,7 @@ class User {
                 let newCustomId = (result.length > 0)
                                         ? parseInt(result[0].custom_id) + 1
                                         : parseInt(config.customIdStart) + 1
-                user = new User(newCustomId.toString(), name, avatar_url, level, true, new Date(), [], [])
+                user = new User(newCustomId.toString(), name, avatar_url, level, true)
                 await collectionUser.insertOne(user, { session })
             })
         } finally {
@@ -138,7 +139,6 @@ class User {
         const user = await User.findOne({id: userId})
         if (user) {
             const imageId = shortUUID().generate()
-            // const thumbnail = await imageThumbnail(avatarContent, {percentage: 25})
             await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
             const newAvatarUrl = `${config.awsS3UserAvatarBaseUrl}/${imageId}.${ext}`
             const oldAvatarUrlSplit = user.avatar_url.split('/')

@@ -5,7 +5,6 @@ const Notification = require('../models/notification.js')
 const Meme = require('../models/meme.js')
 const pushService = require('../libs/push-service.js')
 
-
 module.exports = {
 
     async getComments (ctx) {
@@ -66,6 +65,30 @@ module.exports = {
             }
         }
         ctx.body = comment
+    },
+
+    async likeComment(ctx) {
+        const userId = ctx.user
+        const commentId = ctx.request.body.comment_id
+        const action = ctx.request.body.action
+        if (!commentId) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "comment_id" should be given.'}
+            return
+        }
+        if (!action || (action!=='like' && action !== 'clearlike')) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "action" should be "like" or "clearlike".'}
+            return
+        }
+        if (action === 'like') {
+            await Comment.like(userId, commentId)
+            
+        } else if (action === 'clearlike') {
+            await Comment.clearlike(userId, commentId)
+        }
+        ctx.response.status = 200
+        ctx.body = null
     },
 
     async deleteComment(ctx) {
