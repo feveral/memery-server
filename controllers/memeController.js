@@ -87,6 +87,24 @@ module.exports = {
         ctx.body = memes
     },
 
+    async getMemeById(ctx) {
+        const memeId = ctx.params.id
+        if (!memeId) {
+            ctx.response.status = 400
+            ctx.body = { message: 'path parameter should be given.' }
+            return            
+        }
+        const meme = await Meme.findOne(memeId)
+        if (meme) {
+            const memes = await memesAddUserAndImageInfo([meme])
+            ctx.body = memes[0]
+        } else {
+            ctx.response.status = 400
+            ctx.body = { message: 'meme not found.' }
+            return     
+        }
+    },
+
     async like (ctx) {
         const {meme_id, action} = ctx.request.body
         if (!meme_id) {

@@ -45,7 +45,11 @@ class Meme {
 
     static async findOne(id) {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        return await collection.findOne({_id: ObjectID(id)})
+        try {
+            return await collection.findOne({_id: ObjectID(id)})
+        } catch (e) {
+            return null
+        }
     }
 
     static async findByIds(ids) {
