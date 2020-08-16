@@ -25,7 +25,7 @@ module.exports = {
     },
 
     async getUserLike(ctx) {
-        const user = await User.findOne({id: ctx.user, getLikeDislikeMemeIds: true})
+        const user = await User.findOne({id: ctx.user, getLikeIds: true})
         ctx.body = {like_meme_ids: user.like_meme_ids, dislike_meme_ids: user.dislike_meme_ids, like_comment_ids: user.like_comment_ids}
     },
 

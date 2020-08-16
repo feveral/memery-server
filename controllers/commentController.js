@@ -55,7 +55,7 @@ module.exports = {
         const comment = await Comment.add(meme_id, userId, content)
         const meme = await Meme.findOne(meme_id)
         await Notification.addReplyMeme(userId, meme, comment)
-        const userReceiveNotification = await User.findOne(meme.user_id)
+        const userReceiveNotification = await User.findOne({id: meme.user_id})
         if (userReceiveNotification.firebase_devices) {
             const result = await pushService.sendComment(constants.OS_ANDROID, userReceiveNotification.firebase_devices, content)
             if (result) {
