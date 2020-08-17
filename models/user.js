@@ -100,6 +100,7 @@ class User {
         return result
     }
 
+    //TODO: transaction
     static async updateCustomId (userId, newCustomId) {
         const client = await database.getClient()
         const session = client.startSession()
@@ -118,6 +119,14 @@ class User {
         } finally {
             await session.endSession()
         }
+    }
+
+    static async updateUserName (userId, newUserName) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        await collection.findOneAndUpdate(
+            {_id: ObjectID(userId)},
+            {'$set': {name: newUserName}}
+        )
     }
 
     static async addFirebaseDeviceToken(userId, token) {
