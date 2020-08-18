@@ -7,13 +7,14 @@ module.exports = {
         const userId = ctx.user
         const name = ctx.request.body.name
         const imageId = ctx.request.body.image_id
-        const isImageExist = await Image.isImageExist(imageId)
-        if (!isImageExist) {
+        const image = await Image.findOne(imageId)
+        if (!image || image.usage !== 0) {
             ctx.response.status = 400
-            ctx.body = {message: `the image id ${imageId} is not exist`}
+            ctx.body = { messgae: 'image_id not valid or image usage not 0.'}
             return
         }
         const template = await Template.add(userId, name, imageId)
+        await Image.increaseUsage(imageId, 1)
         ctx.body = template
     },
 

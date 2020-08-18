@@ -50,6 +50,16 @@ class Image {
         return await collection.findOne(filter)
     }
 
+    static async findOne(id) {
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_IMAGE)
+            return await collection.findOne({_id: ObjectID(id)})
+        } catch (e) {
+            // for ObjectId invalid
+            return null
+        }
+    }
+
     static async findByIds (ids) {
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         const objIds = ids.map( (myId) => { return ObjectID(myId) })

@@ -36,11 +36,11 @@ module.exports = {
 
     async upload (ctx) {
         const userId = ctx.user
-        const image_id = ctx.request.body.image_id 
+        const imageId = ctx.request.body.image_id 
         const description = ctx.request.body.description || ''
         const templateId = ctx.request.body.template_id
         let tags = ctx.request.body.tags
-        if (!image_id) {
+        if (!imageId) {
             ctx.response.status = 400
             ctx.body = { messgae: 'body parameter "image_id" should be given.'}
             return
@@ -56,9 +56,25 @@ module.exports = {
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
-        let meme = await Meme.add(userId, image_id, description, tags)
-        await Image.increaseUsage(image_id, 1)
+        const image = await Image.findOne(imageId)
+        if (!image || image.usage !== 0) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'image_id not valid or image usage not 0.'}
+            return
+        }
+        let meme
+        if (templateId) {
+            if (!(await Template.findOne(templateId))) {
+                ctx.response.status = 400
+                ctx.body = { messgae: 'template_id is invalid.'}
+                return
+            }
+            meme = await Meme.add(userId, imageId, description, tags, templateId)
+        }
+        else meme = await Meme.add(userId, imageId, description, tags)
+        await Image.increaseUsage(imageId, 1)
         await Tag.addMany(tags, meme._id)
+        await Template.addApplyMemeId(templateId, meme._id)
         meme = (await memesAddUserAndImageInfo([meme]))[0]
         ctx.body = meme
     },
@@ -143,6 +159,9 @@ module.exports = {
             for(let i = 0; i < meme.tags.length; i++) {
                 await Tag.deleteMemeId(meme.tags[i], memeId)
             }
+        }
+        if (meme.template_id) {
+            await Template.removeApplyMemeId(meme.template_id, memeId)
         }
         ctx.status = 200
         ctx.body = null

@@ -18,8 +18,9 @@ class Meme {
         this.comment_number = 0
     }
 
-    static async add (userId, imageId, description, tags) {
+    static async add (userId, imageId, description, tags, templateId=null) {
         const meme = new Meme(userId, imageId, description, tags)
+        if (templateId) meme.template_id = templateId
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
         return meme
