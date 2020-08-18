@@ -3,6 +3,7 @@ const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
 const Notification = require('../models/notification.js')
+const Template = require('../models/template.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -37,6 +38,7 @@ module.exports = {
         const userId = ctx.user
         const image_id = ctx.request.body.image_id 
         const description = ctx.request.body.description || ''
+        const templateId = ctx.request.body.template_id
         let tags = ctx.request.body.tags
         if (!image_id) {
             ctx.response.status = 400

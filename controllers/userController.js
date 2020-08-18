@@ -29,24 +29,6 @@ module.exports = {
         ctx.body = {like_meme_ids: user.like_meme_ids, dislike_meme_ids: user.dislike_meme_ids, like_comment_ids: user.like_comment_ids}
     },
 
-    async updateCustomId (ctx) {
-        const userId = ctx.user
-        const newCustomId = ctx.request.body.custom_id
-        if (!newCustomId) {
-            ctx.response.status = 400
-            ctx.body = {message: 'body parameter "custom_id" should be given.'}
-            return
-        }
-        try {
-            await User.updateCustomId(userId, newCustomId)
-            ctx.response.status = 200
-            ctx.body = null
-        } catch (e) {
-            ctx.response.status = 400
-            ctx.body = {message: 'this id has already been taken.'}
-        }
-    },
-
     async updateProfile (ctx) {
         const userId = ctx.user
         const newCustomId = ctx.request.body.custom_id

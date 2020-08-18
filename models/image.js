@@ -82,9 +82,15 @@ class Image {
     }
 
     static async isImageExist(id) {
-        const collection = await database.getCollection(constants.COLLECTION_IMAGE)
-        const result = await collection.findOne({_id: ObjectID(id)})
-        return result !== null
+        try { 
+            const collection = await database.getCollection(constants.COLLECTION_IMAGE)
+            await collection.find({_id: ObjectID(id)}, {_id: 1}).limit(1)
+            const result = await collection.findOne({_id: ObjectID(id)})
+            return result !== null
+        } catch (e) {
+            // for ObjectId illegal
+            return false
+        }
     }
 }
 

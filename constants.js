@@ -6,6 +6,7 @@ module.exports = {
     COLLECTION_COMMENT: 'comment',
     COLLECTION_COLLECT: 'collect',
     COLLECTION_NOTIFICATION: 'notification',
+    COLLECTION_TEMPLATE: 'template',
 
     USER_LEVEL_REGULAR: 'regular',
     USER_LEVEL_ADMIN: 'admin',

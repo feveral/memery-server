@@ -7,15 +7,14 @@ const tagController = require('./controllers/tagController.js')
 const commentController = require('./controllers/commentController.js')
 const collectController = require('./controllers/collectController.js')
 const notificationController = require('./controllers/notificationController.js')
+const templateController = require('./controllers/templateController.js')
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
     router.post('/api/auth/logout', authController.verifyMemeToken, authController.logout)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
-    router.get('/api/user/comment/like', authController.verifyMemeToken, () => {})
     router.post('/api/user/firebase/device', authController.verifyMemeToken, userController.addFirebaseDeviceToken)
-    router.put('/api/user/id', authController.verifyMemeToken, userController.updateCustomId)
     router.put('/api/user/profile', authController.verifyMemeToken, userController.updateProfile)
     router.put('/api/user/avatar', authController.verifyMemeToken, multer().single('image'), userController.updateAvatar)
 
@@ -36,6 +35,9 @@ module.exports = (router) => {
     router.delete('/api/comment', authController.verifyMemeToken, commentController.deleteComment)
 
     router.get('/api/tag', tagController.getTags)
+
+    router.get('/api/template', templateController.getTemplates)
+    router.post('/api/template', authController.verifyMemeToken, templateController.addTemplate)
 
     router.get('/api/collect', authController.verifyMemeToken, collectController.getUserCollect)
     router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
