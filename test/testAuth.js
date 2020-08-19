@@ -10,7 +10,7 @@ describe('AuthApi', function () {
     let authorization = `Bearer ${memeToken}`
 
     describe('#POST /api/auth/login', () => {
-        it('should return 400 if type not given', async () => {
+        it('should return 400, "type" not given', async () => {
             const req = axios.post(`${config.serverBaseUrl}/api/auth/login`, {})
             expect(req)
                 .to.eventually.be.rejectedWith(Error)
@@ -20,7 +20,7 @@ describe('AuthApi', function () {
                 })
         })
 
-        it('should return 400 if token not given', async () => {
+        it('should return 400, "token" not given', async () => {
             const req = axios.post(`${config.serverBaseUrl}/api/auth/login`, {
                 type: 'google'
             })
@@ -32,7 +32,7 @@ describe('AuthApi', function () {
                 })
         });
 
-        it('should return 400 if token_type invalid', async () => {
+        it('should return 400, "token_type" invalid', async () => {
             const req = axios.post(`${config.serverBaseUrl}/api/auth/login`, {
                 type: 'google',
                 token: 'client id_token'
@@ -45,7 +45,7 @@ describe('AuthApi', function () {
                 })
         });
 
-        it('should return meme_token if success', async () => {
+        it('should return "meme_token"', async () => {
             const res = await axios.post(`${config.serverBaseUrl}/api/auth/login`, {
                 type: 'google',
                 token: 'client id_token',
