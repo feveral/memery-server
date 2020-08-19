@@ -11,6 +11,8 @@ describe('UserApi', function () {
     let authorization = () => {return `Bearer ${memeToken}`}
     let axiosHeader = () => {return {headers: {Authorization: authorization()}}}
 
+    let imageId = ''
+
     before(async () => {
         memeToken = (await axios.post(`${config.serverBaseUrl}/api/auth/login`, {
             type: 'google',
@@ -22,8 +24,8 @@ describe('UserApi', function () {
     describe('#POST /api/image', () => {
 
         it('should return 400, ext not given', async () => {
-            const req = axios.post(`${config.serverBaseUrl}/api/image`, {}, axiosHeader()) 
-            expect(req)
+            const res = axios.post(`${config.serverBaseUrl}/api/image`, {}, axiosHeader()) 
+            expect(res)
                 .to.eventually.be.rejectedWith(Error)
                 .and.have.nested.include({
                     'response.status': 400,
@@ -32,8 +34,8 @@ describe('UserApi', function () {
         })
 
         it('should return 400, ext invalid', async () => {
-            const req = axios.post(`${config.serverBaseUrl}/api/image?ext=mp4`, {}, axiosHeader()) 
-            expect(req)
+            const res = axios.post(`${config.serverBaseUrl}/api/image?ext=mp4`, {}, axiosHeader()) 
+            expect(res)
                 .to.eventually.be.rejectedWith(Error)
                 .and.have.nested.include({
                     'response.status': 400,
@@ -61,6 +63,41 @@ describe('UserApi', function () {
                 }
             }
             const res = await axios.post(`${config.serverBaseUrl}/api/image?ext=jpeg`, formData, options)
+            const data = res.data
+            expect(res.status).to.be.equal(200)
+            expect(data._id).to.be.a('string')
+            expect(data.url).to.be.a('string')
+            expect(data.thumbnail_url).to.be.a('string')
+            expect(data.created_at).to.be.ISOString()
+            expect(data.usage).to.be.a('number')
+            imageId = data._id
+        })
+    })
+
+    describe('#GET /api/image', () => {
+
+        it('should return 400, image_id not given', async () => {
+            const res = axios.get(`${config.serverBaseUrl}/api/image`, axiosHeader())
+            expect(res)
+                .to.eventually.be.rejectedWith(Error)
+                .and.have.nested.include({
+                    'response.status': 400,
+                    'response.data.message': `query parameter "image_id" should be given.`
+                })
+        })
+
+        it('should return 400, image_id invalid', async () => {
+            const res = axios.get(`${config.serverBaseUrl}/api/image?image_id=invalidimageid`, axiosHeader())
+            expect(res)
+            .to.eventually.be.rejectedWith(Error)
+            .and.have.nested.include({
+                'response.status': 400,
+                'response.data.message': `image_id is invalid.`
+            })
+        })
+
+        it('should return image information', async () => {
+            const res = await axios.get(`${config.serverBaseUrl}/api/image?image_id=${imageId}`, axiosHeader())
             const data = res.data
             expect(res.status).to.be.equal(200)
             expect(data._id).to.be.a('string')

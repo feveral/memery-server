@@ -26,8 +26,13 @@ module.exports = {
             ctx.body = { message: 'query parameter "image_id" should be given.'}
             return
         }
-        const image = await Image.find({id: image_id})
-        ctx.body = image
+        const image = await Image.findOne(image_id)
+        if (image) ctx.body = image
+        else {
+            ctx.response.status = 400
+            ctx.body = { message: 'image_id is invalid.'}
+            return
+        }
     },
 
     async deleteImage(ctx) {
