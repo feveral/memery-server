@@ -46,6 +46,7 @@ module.exports = {
             } catch (e) {
                 ctx.response.status = 400
                 ctx.body = {message: 'this id has already been taken.'}
+                return
             }
         }
         if (newUserName) {

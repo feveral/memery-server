@@ -1,4 +1,5 @@
 const axios = require('axios')
+const shortUUID = require('short-uuid')
 const chai = require('./libs/chaiInitialize.js')
 const config = require('../config.js')
 const expect = chai.expect
@@ -44,6 +45,46 @@ describe('UserApi', function () {
             expect(data.like_meme_ids).to.be.a('array')
             expect(data.dislike_meme_ids).to.be.a('array')
             expect(data.like_comment_ids).to.be.a('array')
+        })
+    })
+
+    describe('#PUT /api/user/profile', () => {
+        it('should return 400, custom_id and name not given', async () => {
+            const res = axios.put(`${config.serverBaseUrl}/api/user/profile`, {}, axiosHeader()) 
+            expect(res)
+                .to.eventually.be.rejectedWith(Error)
+                .and.have.nested.include({
+                    'response.status': 400,
+                    'response.data.message': `body parameter "custom_id" or "name" should be given.`
+                })
+        })
+
+        // this case will pass if the database have this id.
+        it('should return 400, custom_id already used by other user', async () => {
+            let res = axios.put(`${config.serverBaseUrl}/api/user/profile`, 
+                {custom_id: "new_custom_id", name: 'new_name'},
+                axiosHeader()
+            ) 
+            expect(res)
+                .to.eventually.be.rejectedWith(Error)
+                .and.have.nested.include({
+                    'response.status': 400,
+                    'response.data.message': `this id has already been taken.`
+                })
+        })
+
+        it('should return nothing, success', async () => {
+            const newCustomId = shortUUID.generate()
+            let res = await axios.put(`${config.serverBaseUrl}/api/user/profile`, 
+                {custom_id: newCustomId, name: 'new_name'},
+                axiosHeader()
+            ) 
+            expect(res.status).to.be.equal(204)
+            res = await axios.get(`${config.serverBaseUrl}/api/user/profile`, axiosHeader()) 
+            expect(res.status).to.be.equal(200)
+            const data = res.data
+            expect(data.custom_id).to.be.equal(newCustomId)
+            expect(data.name).to.be.equal('new_name')
         })
     })
 })

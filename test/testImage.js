@@ -5,7 +5,7 @@ const fs = require('fs')
 const expect = chai.expect
 const FormData = require('form-data')
 
-describe('UserApi', function () {
+describe('ImageApi', function () {
 
     let memeToken = ''
     let authorization = () => {return `Bearer ${memeToken}`}

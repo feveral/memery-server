@@ -13,6 +13,7 @@ module.exports = {
             return {
                 name: 'testing-user',
                 email: `${shortUUID().generate()}@gmail.com`,
+                // email: `testing-email@gmail.com`,
                 picture: 'https://example-user-avatar.com'
             }
         }
