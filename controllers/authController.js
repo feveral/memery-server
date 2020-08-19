@@ -56,7 +56,7 @@ module.exports = {
         if (type === 'google') {
             const googleProfile = await auth.verifyGoogleToken(token, tokenType)
             if (googleProfile === null) {
-                ctx.response.status = 403
+                ctx.response.status = 401
                 ctx.body = { message: 'google sign in fail: token invalid or token type invalid.' }
                 return
             }
@@ -68,7 +68,7 @@ module.exports = {
         } else if (type === 'facebook') {
             const facebookProfile = await auth.verifyFacebookToken(token, tokenType)
             if (facebookProfile === null) {
-                ctx.response.status = 403
+                ctx.response.status = 401
                 ctx.body = { message: 'facebook sign in fail: token invalid or token type invalid.' }
                 return
             }
@@ -78,7 +78,7 @@ module.exports = {
             ctx.body = {meme_token}
             return
         }
-        ctx.response.status = 403
+        ctx.response.status = 401
         ctx.body = { message: 'authentication fail: something wrong!' }
     },
 
@@ -86,9 +86,9 @@ module.exports = {
         const userId = ctx.user
         const firebaseToken = ctx.request.body.firebase_token
         if (!firebaseToken) {
-            ctx.response.status = 403
-                ctx.body = { message: 'body parameter "firebase_token" should be given.' }
-                return
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "firebase_token" should be given.' }
+            return
         }
         await User.removeFirebaseDeviceToken(userId, firebaseToken)
         ctx.response.status = 200
