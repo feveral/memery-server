@@ -60,7 +60,7 @@ module.exports = {
                 ctx.body = { message: 'google sign in fail: token invalid or token type invalid.' }
                 return
             }
-            let user = await User.findOne({googleEmail: googleProfile.email})
+            let user = await User.findOne({email: googleProfile.email, loginType: 'google'})
             if (!user) user = await User.saveGoogle(googleProfile)
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}
@@ -72,7 +72,7 @@ module.exports = {
                 ctx.body = { message: 'facebook sign in fail: token invalid or token type invalid.' }
                 return
             }
-            let user = await User.findOne({facebookEmail: facebookProfile.email})
+            let user = await User.findOne({email: facebookProfile.email, loginType: 'facebook'})
             if (!user) user = await User.saveFacebook(facebookProfile)
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}

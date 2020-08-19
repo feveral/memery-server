@@ -10,20 +10,23 @@ class User {
 
     /**
      * @param {string} level 'regular' || 'admin'
+     * @param {string} loginType 'google' || 'facebook'
      */
-    constructor (customId, name, avatar_url, level, isDefaultId) {
+    constructor (customId, name, avatar_url, level, email, loginType) {
         this.custom_id = customId
         this.name = name
         this.avatar_url = avatar_url
         this.level = level
-        this.is_default_id = isDefaultId
+        this.is_default_id = true
+        this.email = email
+        this.login_type = loginType
         this.register_time = new Date()
         this.like_meme_ids = []
         this.dislike_meme_ids = []
         this.like_comment_ids = []
     }
 
-    static async add ({level, name='', avatar_url=''}) {
+    static async add ({level, name, avatar_url, email, loginType}) {
         const client = await database.getClient()
         const session = client.startSession()
         let user
@@ -37,7 +40,7 @@ class User {
                 let newCustomId = (result.length > 0)
                                         ? parseInt(result[0].custom_id) + 1
                                         : parseInt(config.customIdStart) + 1
-                user = new User(newCustomId.toString(), name, avatar_url, level, true)
+                user = new User(newCustomId.toString(), name, avatar_url, level, email, loginType)
                 await collectionUser.insertOne(user, { session })
             })
         } finally {
@@ -48,23 +51,27 @@ class User {
 
     static async saveGoogle (googleProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const user = await User.add({level: constants.USER_LEVEL_REGULAR, name: googleProfile.name, avatar_url: googleProfile.picture})
-        await collection.updateOne(
-            {custom_id: user.custom_id},
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR, 
+            name: googleProfile.name, avatar_url: googleProfile.picture,
+            email: googleProfile.email, loginType: 'google'})
+        const result = await collection.findOneAndUpdate(
+            {_id: ObjectID(user._id)},
             {'$set': {google_profile: googleProfile}},
             {upsert: true})
-        return await User.findOne({customId: user.custom_id})
+        return result.value
     }
 
     static async saveFacebook (facebookProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
-        const user = await User.add({level: constants.USER_LEVEL_REGULAR, name: facebookProfile.name, avatar_url: facebookProfile.picture.data.url})
-        await collection.updateOne(
-            {custom_id: user.custom_id}, 
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR, 
+            name: facebookProfile.name, avatar_url: facebookProfile.picture.data.url,
+            email: facebookProfile.email, loginType: 'facebook'})
+        const result = await collection.findOneAndUpdate(
+            {_id: ObjectID(user._id)},
             {'$set': {facebook_profile: facebookProfile}},
             {upsert: true}
         )
-        return await User.findOne({customId: user.custom_id})
+        return result.value
     }
 
     static async find ({_id, customId, level, limit=20, skip=0}) {
@@ -77,12 +84,12 @@ class User {
         return result
     }
 
-    static async findOne ({id, customId, googleEmail, facebookEmail, getLikeIds=false}) {
+    static async findOne ({id, customId, email, loginType, getLikeIds=false}) {
         const filter = {}
         if (id) filter._id = ObjectID(id)
         if (customId) filter.custom_id = customId
-        if (googleEmail) filter['google_profile.email'] = googleEmail
-        if (facebookEmail) filter['facebook_profile.email'] = facebookEmail
+        if (email) filter.email = email
+        if (loginType) filter.login_type = loginType
         const projection = {
             like_meme_ids: getLikeIds,
             dislike_meme_ids: getLikeIds,

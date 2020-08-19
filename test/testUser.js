@@ -27,6 +27,8 @@ describe('UserApi', function () {
             expect(data.name).to.be.equal('testing-user')
             expect(data.avatar_url).to.be.equal('https://example-user-avatar.com')
             expect(data.level).to.be.equal('regular')
+            expect(data.email).to.be.a('string')
+            expect(data.login_type).to.be.equal('google')
             expect(data.is_default_id).to.be.equal(true)
             expect(data.register_time).to.be.ISOString()
             expect(data.like_received).to.be.equal(0)
