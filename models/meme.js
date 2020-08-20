@@ -49,6 +49,7 @@ class Meme {
         try {
             return await collection.findOne({_id: ObjectID(id)})
         } catch (e) {
+            // for ObjectId invalid
             return null
         }
     }

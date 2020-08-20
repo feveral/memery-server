@@ -106,12 +106,7 @@ module.exports = {
     },
 
     async getMemeById(ctx) {
-        const memeId = ctx.query.meme_id
-        if (!memeId) {
-            ctx.response.status = 400
-            ctx.body = { message: 'query parameter "meme_id" should be given.' }
-            return            
-        }
+        const memeId = ctx.params.id
         const meme = await Meme.findOne(memeId)
         if (meme) {
             const memes = await memesAddUserAndImageInfo([meme])
