@@ -20,17 +20,12 @@ module.exports = {
     },
 
     async getImageInfo (ctx) {
-        const {image_id} = ctx.query
-        if (!image_id) {
-            ctx.response.status = 400
-            ctx.body = { message: 'query parameter "image_id" should be given.'}
-            return
-        }
+        const image_id = ctx.params.id
         const image = await Image.findOne(image_id)
         if (image) ctx.body = image
         else {
             ctx.response.status = 400
-            ctx.body = { message: 'image_id is invalid.'}
+            ctx.body = { message: 'image not found.'}
             return
         }
     },
