@@ -14,7 +14,7 @@ module.exports = {
             likes += memes[i].like
         }
         user.like_received = likes
-        user.meme_collected = await Collect.count({ownerUserId: userId})
+        user.collected_by_others = await Collect.count({ownerUserId: userId})
         delete user.google_profile
         delete user.facebook_profile
         if (user) {

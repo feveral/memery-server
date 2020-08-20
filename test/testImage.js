@@ -76,28 +76,18 @@ describe('ImageApi', function () {
 
     describe('#GET /api/image', () => {
 
-        it('should return 400, image_id not given', async () => {
-            const res = axios.get(`${config.serverBaseUrl}/api/image`, axiosHeader())
-            expect(res)
-                .to.eventually.be.rejectedWith(Error)
-                .and.have.nested.include({
-                    'response.status': 400,
-                    'response.data.message': `query parameter "image_id" should be given.`
-                })
-        })
-
         it('should return 400, image_id invalid', async () => {
-            const res = axios.get(`${config.serverBaseUrl}/api/image?image_id=invalidimageid`, axiosHeader())
+            const res = axios.get(`${config.serverBaseUrl}/api/image/invalidimageid`, axiosHeader())
             expect(res)
             .to.eventually.be.rejectedWith(Error)
             .and.have.nested.include({
                 'response.status': 400,
-                'response.data.message': `image_id is invalid.`
+                'response.data.message': `image not found.`
             })
         })
 
         it('should return image information', async () => {
-            const res = await axios.get(`${config.serverBaseUrl}/api/image?image_id=${imageId}`, axiosHeader())
+            const res = await axios.get(`${config.serverBaseUrl}/api/image/${imageId}`, axiosHeader())
             const data = res.data
             expect(res.status).to.be.equal(200)
             expect(data._id).to.be.a('string')
