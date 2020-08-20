@@ -40,6 +40,13 @@ class Comment {
         }
     }
 
+    static async findByIds(ids) {
+        const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+        const objIds = ids.map( (myId) => { return ObjectID(myId) })
+        const result = await collection.find({ _id: { '$in': objIds }}).toArray()
+        return result
+    }
+
     static async delete (userId, commentId) {
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})

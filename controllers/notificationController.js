@@ -2,15 +2,19 @@ const Notification = require("../models/notification")
 const Meme = require("../models/meme")
 const Image = require("../models/image")
 const User = require("../models/user")
+const Comment = require("../models/comment")
 
 async function notificationsAddInfo(notifications) {
     const actionUserIds = []
     const memeIds = []
     const imageIds = []
+    const commentIds = []
     notifications.forEach(n => {
         if (n.action_user_id) actionUserIds.push(n.action_user_id)
         if (n.meme_id) memeIds.push(n.meme_id)
+        if (n.comment_id) memeIds.push(n.comment_id)
     })
+    const comments = await Comment.findByIds(commentIds)
     const users = await User.findByIds(actionUserIds)
     const memes = await Meme.findByIds(memeIds)
     memes.forEach(meme => {
@@ -35,6 +39,9 @@ async function notificationsAddInfo(notifications) {
                     }
                 }
             }
+        }
+        for (let j = 0; j < comments.length; j++) {
+            notifications[i].comment_like_number = comments[j].like
         }
     }
     return notifications
