@@ -1,4 +1,3 @@
-const app = require('../app.js')
 const axios = require('axios')
 const chai = require('./libs/chaiInitialize.js')
 const config = require('../config.js')

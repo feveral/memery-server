@@ -90,18 +90,6 @@ class Image {
             awsS3Saver.removeMemeImage(thumbnailFilename)
         }
     }
-
-    static async isImageExist(id) {
-        try { 
-            const collection = await database.getCollection(constants.COLLECTION_IMAGE)
-            await collection.find({_id: ObjectID(id)}, {_id: 1}).limit(1)
-            const result = await collection.findOne({_id: ObjectID(id)})
-            return result !== null
-        } catch (e) {
-            // for ObjectId illegal
-            return false
-        }
-    }
 }
 
 module.exports = Image

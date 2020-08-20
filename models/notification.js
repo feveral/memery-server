@@ -17,13 +17,14 @@ class Notification {
      * @param {string} action_user_id the user who triggered this notification, might be undefined in like case
      * @param {string} target 'meme' || 'comment'
      */
-    constructor ({userId, actionUserId, type, memeId, commentId, read, update_time}) {
+    constructor ({userId, actionUserId, type, memeId, commentId, parentCommentId, read, update_time}) {
         this.user_id = ObjectID(userId)
         this.type = type
         if (read) this.read = read
         if (update_time) this.update_time = update_time
         if (memeId) this.meme_id = ObjectID(memeId)
         if (commentId) this.comment_id = ObjectID(commentId)
+        if (parentCommentId) this.parent_comment_id = ObjectID(parentCommentId)
         if (actionUserId) this.action_user_id = ObjectID(actionUserId)
     }
 
@@ -73,7 +74,7 @@ class Notification {
         await Notification.add(notification)
     }
 
-    static async addReplyComment (actionUserId, comment) {
+    static async addReplyComment (actionUserId, parentComment, comment) {
         const notification = new Notification({
             userId: comment.user_id,
             type: REPLY_COMMENT,

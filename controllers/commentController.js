@@ -38,6 +38,7 @@ module.exports = {
         ctx.body = comments
     },
 
+    //TODO: need to support child 
     async addComment(ctx) {
         const userId = ctx.user
         const {meme_id, content} = ctx.request.body
@@ -67,6 +68,7 @@ module.exports = {
         ctx.body = comment
     },
 
+    //TODO: need to support child 
     async likeComment(ctx) {
         const userId = ctx.user
         const commentId = ctx.request.body.comment_id
