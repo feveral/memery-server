@@ -82,8 +82,9 @@ module.exports = {
             return
         }
         if (action === 'like') {
+            const comment = await Comment.findOne(commentId)
             await Comment.like(userId, commentId)
-            
+            await Notification.addLikeComment(comment)
         } else if (action === 'clearlike') {
             await Comment.clearlike(userId, commentId)
         }

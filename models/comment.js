@@ -31,6 +31,15 @@ class Comment {
         return result
     }
 
+    static async findOne (id) {
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            return await collection.findOne({_id: ObjectID(id)})
+        } catch (e) {
+            return null
+        }
+    }
+
     static async delete (userId, commentId) {
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
