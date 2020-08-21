@@ -33,7 +33,7 @@ describe('UserApi', function () {
             expect(data.is_default_id).to.be.equal(true)
             expect(data.register_time).to.be.ISOString()
             expect(data.like_received).to.be.equal(0)
-            expect(data.meme_collected).to.be.equal(0)
+            expect(data.collected_by_others).to.be.equal(0)
         })
     })
 

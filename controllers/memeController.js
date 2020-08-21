@@ -42,31 +42,36 @@ module.exports = {
         let tags = ctx.request.body.tags
         if (!imageId) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "image_id" should be given.'}
+            ctx.body = { message: 'body parameter "image_id" should be given.'}
             return
         } else if (!tags) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
+            ctx.body = { message: 'body parameter "tags" should be an array of string or a string.'}
             return
         } else if (Array.isArray(tags) && !tags.every(i => (typeof i === "string"))) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
+            ctx.body = { message: 'body parameter "tags" should be an array of string or a string.'}
             return
         }
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
+        if (tags.length > 10) {
+            ctx.response.status = 400
+            ctx.body = { message: 'tags more then 10.'}
+            return
+        }
         const image = await Image.findOne(imageId)
         if (!image || image.usage !== 0) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'image_id not valid or image usage not 0.'}
+            ctx.body = { message: 'image_id not valid or image usage not 0.'}
             return
         }
         let meme
         if (templateId) {
             if (!(await Template.findOne(templateId))) {
                 ctx.response.status = 400
-                ctx.body = { messgae: 'template_id is invalid.'}
+                ctx.body = { message: 'template_id is invalid.'}
                 return
             }
             meme = await Meme.add(userId, imageId, description, tags, templateId)
