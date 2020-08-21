@@ -39,7 +39,7 @@ class Notification {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         await collection.updateOne(
             notification,
-            {'$set': {read: false, update_time: new Date()}},
+            {'$set': {read: false, create_at: new Date()}},
             {upsert: true}
         )
     }
@@ -76,11 +76,12 @@ class Notification {
 
     static async addReplyComment (actionUserId, parentComment, comment) {
         const notification = new Notification({
-            userId: comment.user_id,
+            userId: parentComment.user_id,
             type: REPLY_COMMENT,
             actionUserId,
-            memeId: comment.meme_id,
-            commentId: comment._id
+            memeId: parentComment.meme_id,
+            commentId: comment._id,
+            parentCommentId: parentComment._id
         })
         await Notification.add(notification)
     }

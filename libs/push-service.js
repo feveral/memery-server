@@ -11,7 +11,7 @@ class PushService {
         });
     }
 
-    async sendComment(os, registrationTokens, content) {
+    async sendComment(registrationTokens, content) {
         // another way:
         // const payload = {}
         // payload.notification = {
@@ -36,7 +36,7 @@ class PushService {
 
         const payload = {}
         payload.notification = {
-            title: 'this is title',
+            title: 'Someone has replied to your meme',
             body: content,
             android_channel_id: constants.ANDROID_NOTIFICATION_CHANNEL_COMMENT
         }
@@ -55,6 +55,30 @@ class PushService {
             return null
         }
     }
+
+    async sendReplayComment(registrationTokens, content) {
+        const payload = {}
+        payload.notification = {
+            title: 'Someone has replied to your comment',
+            body: content,
+            android_channel_id: constants.ANDROID_NOTIFICATION_CHANNEL_COMMENT
+        }
+        payload.data = {}
+        try {
+            const response = await admin.messaging().sendToDevice(registrationTokens, payload)
+            const successTokens = []
+            const failTokens = []
+            for (let i = 0; i < response.results.length; i++) {
+                if (response.results[i].error) failTokens.push(registrationTokens[i])
+                else successTokens.push(registrationTokens[i])
+            }
+            return {successTokens, failTokens}
+        } catch (e) {
+            console.log('firebase sending fail:', e)
+            return null
+        }
+    }
+
 }
 
 module.exports = new PushService()

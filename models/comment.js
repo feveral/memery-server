@@ -27,9 +27,11 @@ class Comment {
 
     static async addChild (parentCommentId, memeId, userId, content) {
         const comment = new Comment(memeId, userId, content)
+        comment._id = new ObjectID()
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        await collection.updateOne({_id: ObjectId(parentCommentId)}, {'$push': {children:{comment}}})
+        await collection.findOneAndUpdate({_id: ObjectID(parentCommentId)}, {'$push': {children:comment}})
         await Meme.increaseCommentNumber(memeId, 1)
+        return comment
     }
 
     static async find ({memeId, limit=20, skip=0}) {

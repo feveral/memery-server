@@ -41,9 +41,11 @@ module.exports = {
     //TODO: need to support child 
     async addComment(ctx) {
         const userId = ctx.user
-        const {meme_id, content} = ctx.request.body
+        const content = ctx.request.body.content
+        const memeId = ctx.request.body.meme_id
+        const parentCommentId = ctx.request.body.parent_comment_id
 
-        if (!meme_id) {
+        if (!memeId) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "meme_id" should be given.'}
             return
@@ -53,19 +55,35 @@ module.exports = {
             return
         }
 
-        const comment = await Comment.add(meme_id, userId, content)
-        const meme = await Meme.findOne(meme_id)
-        await Notification.addReplyMeme(userId, meme, comment)
-        const userReceiveNotification = await User.findOne({id: meme.user_id})
-        if (userReceiveNotification.firebase_devices) {
-            const result = await pushService.sendComment(constants.OS_ANDROID, userReceiveNotification.firebase_devices, content)
-            if (result) {
-                result.failTokens.forEach(t => {
-                    User.removeFirebaseDeviceToken(meme.user_id, t)
-                })
+        if (parentCommentId) {
+            const comment = await Comment.addChild(parentCommentId, memeId, userId, content)
+            const parentComment = await Comment.findOne(parentCommentId)
+            await Notification.addReplyComment(userId, parentComment, comment)
+            const userReceiveNotification = await User.findOne({id: parentComment.user_id})
+            if (userReceiveNotification.firebase_devices) {
+                const result = await pushService.sendReplayComment(userReceiveNotification.firebase_devices, content)
+                if (result) {
+                    result.failTokens.forEach(t => {
+                        User.removeFirebaseDeviceToken(meme.user_id, t)
+                    })
+                }
             }
+            ctx.body = comment
+        } else {
+            const comment = await Comment.add(memeId, userId, content)
+            const meme = await Meme.findOne(memeId)
+            await Notification.addReplyMeme(userId, meme, comment)
+            const userReceiveNotification = await User.findOne({id: meme.user_id})
+            if (userReceiveNotification.firebase_devices) {
+                const result = await pushService.sendComment(constants.OS_ANDROID, userReceiveNotification.firebase_devices, content)
+                if (result) {
+                    result.failTokens.forEach(t => {
+                        User.removeFirebaseDeviceToken(meme.user_id, t)
+                    })
+                }
+            }
+            ctx.body = comment
         }
-        ctx.body = comment
     },
 
     //TODO: need to support child 
