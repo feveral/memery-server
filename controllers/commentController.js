@@ -22,6 +22,11 @@ module.exports = {
         const userIds = []
         comments.forEach(comment => {
             userIds.push(comment.user_id)
+            if (comment.children) {
+                comment.children.forEach(c => {
+                    userIds.push(c.user_id)
+                })
+            }
         })
         const users = await User.findByIds(userIds)
         for (let i = 0; i < comments.length; i++) {
@@ -32,6 +37,18 @@ module.exports = {
                     comments[i].user_name = users[j].name
                     comments[i].user_avatar_url = users[j].avatar_url
                     continue
+                }
+            }
+            if (comments[i].children) {
+                for (let j = 0; j < comments[i].children.length; j++) {
+                    for (let k = 0; k < users.length; k++) {
+                        if (users[k]._id.toString() === comments[i].children[j].user_id.toString()) {
+                            comments[i].children[j].user_custom_id = users[k].custom_id
+                            comments[i].children[j].user_name = users[k].name
+                            comments[i].children[j].user_avatar_url = users[k].avatar_url
+                            continue
+                        }
+                    }
                 }
             }
         }
