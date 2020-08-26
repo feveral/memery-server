@@ -4,22 +4,27 @@ const Meme = require('./meme.js')
 const User = require('./user.js')
 const ObjectID = require('mongodb').ObjectID
 
+const COMMENT_NORMAL = 'normal'
+const COMMENT_REPLY = 'reply'
+
 class Comment {
 
     /**
      * @param {string} userId user's object id string
      */
-    constructor (memeId, userId, content) {
+    constructor (memeId, userId, content, mode) {
         this.meme_id = ObjectID(memeId)
         this.user_id = ObjectID(userId)
         this.created_at = new Date()
         this.content = content
         this.like = 0
+        if (mode === COMMENT_NORMAL) this.reply_number = 0
+        else if (mode === COMMENT_REPLY) this._id = new ObjectID()
     }
 
     static async add (memeId, userId, content) {
         try {
-            const comment = new Comment(memeId, userId, content)
+            const comment = new Comment(memeId, userId, content, COMMENT_NORMAL)
             const collection = await database.getCollection(constants.COLLECTION_COMMENT)
             const meme = await Meme.findOne(memeId)
             if (meme) {
@@ -34,13 +39,12 @@ class Comment {
     }
 
     static async addChild (parentCommentId, memeId, userId, content) {
-        const comment = new Comment(memeId, userId, content)
-        comment._id = new ObjectID()
+        const comment = new Comment(memeId, userId, content, COMMENT_REPLY)
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         try {
             const result = await collection.findOneAndUpdate(
                 {_id: ObjectID(parentCommentId), meme_id: ObjectID(memeId)},
-                {'$push': {children:comment}})
+                {'$push': {children:comment}, '$inc': {reply_number: 1}})
             if (result.lastErrorObject.n === 1) {
                 await Meme.increaseCommentNumber(memeId, 1)
                 return comment

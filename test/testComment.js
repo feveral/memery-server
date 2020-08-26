@@ -205,6 +205,7 @@ describe('CommentApi', function () {
             expect(data[0].content).to.be.equal('this is a comment to meme')
             expect(data[0].created_at).to.be.ISOString()
             expect(data[0].like).to.be.equal(0)
+            expect(data[0].reply_number).to.be.equal(0)
 
             expect(data[1]._id).to.be.a('string')
             expect(data[1].meme_id).to.be.equal(memeId)
@@ -215,6 +216,7 @@ describe('CommentApi', function () {
             expect(data[1].content).to.be.equal('this is a comment to be reply')
             expect(data[1].created_at).to.be.ISOString()
             expect(data[1].like).to.be.equal(0)
+            expect(data[1].reply_number).to.be.equal(1)
         })
     })
 })
