@@ -63,13 +63,28 @@ module.exports = {
         const parentCommentId = ctx.query.parent_comment_id
         const limit = parseInt(ctx.query.limit) || 3
         const skip = parseInt(ctx.query.skip) || 0
-        const comments = await Comment.findOne({id: parentCommentId, limit, skip})
+        const comment = await Comment.findOne({id: parentCommentId, limit, skip})
+        const comments = comment.children
+        const userIds = []
+        comments.forEach(comment => {
+            userIds.push(comment.user_id)
+        })
+        const users = await User.findByIds(userIds)
+        comments.forEach(comment => {
+            users.forEach(user => {
+                if (user._id.toString() === comment.user_id.toString()) {
+                    comment.user_custom_id = user.custom_id
+                    comment.user_name = user.name
+                    comment.user_avatar_url = user.avatar_url
+                }
+            })
+        })
         if (!comments) {
             ctx.response.status = 400
             ctx.body = { message: 'meme_id or parent_comment_id is invalid.'}
             return
         }
-        ctx.body = comments.children
+        ctx.body = comments
     },
 
     async addComment (ctx) {
