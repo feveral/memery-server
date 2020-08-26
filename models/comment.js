@@ -52,16 +52,28 @@ class Comment {
         }
     }
 
-    static async find ({memeId, limit=20, skip=0}) {
-        const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        const result = await collection.find({meme_id: ObjectID(memeId)}).sort({created_at: 1}).limit(limit).skip(skip).toArray()
-        return result
+    static async find ({memeId, limit=10, skip=0, getChildren=false}) {
+        try {
+            const filter = {}
+            if (memeId) filter.meme_id = ObjectID(memeId)
+            const projection = {children: getChildren}
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            const result = await collection.find(filter, {projection}).sort({created_at: 1}).limit(limit).skip(skip).toArray()
+            return result
+        } catch (e) {
+            return null
+        }
     }
 
-    static async findOne (id) {
+    /**
+     * @param {number} skip for children 
+     * @param {number} limit for children 
+     */
+    static async findOne ({id, limit=3, skip=0}) {
         try {
             const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-            return await collection.findOne({_id: ObjectID(id)})
+            const projection = {children: {'$slice': [skip, limit]}}
+            return await collection.findOne({_id: ObjectID(id)}, {projection})
         } catch (e) {
             return null
         }

@@ -17,16 +17,21 @@ module.exports = {
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
             return
         }
-
+        
         const comments = await Comment.find({memeId: meme_id, limit, skip})
+        if (!comments) {
+            ctx.response.status = 400
+            ctx.body = { message: 'meme_id is invalid.'}
+            return
+        }
         const userIds = []
         comments.forEach(comment => {
             userIds.push(comment.user_id)
-            if (comment.children) {
-                comment.children.forEach(c => {
-                    userIds.push(c.user_id)
-                })
-            }
+            // if (comment.children) {
+            //     comment.children.forEach(c => {
+            //         userIds.push(c.user_id)
+            //     })
+            // }
         })
         const users = await User.findByIds(userIds)
         for (let i = 0; i < comments.length; i++) {
@@ -38,23 +43,36 @@ module.exports = {
                     continue
                 }
             }
-            if (comments[i].children) {
-                for (let j = 0; j < comments[i].children.length; j++) {
-                    for (let k = 0; k < users.length; k++) {
-                        if (users[k]._id.toString() === comments[i].children[j].user_id.toString()) {
-                            comments[i].children[j].user_custom_id = users[k].custom_id
-                            comments[i].children[j].user_name = users[k].name
-                            comments[i].children[j].user_avatar_url = users[k].avatar_url
-                            continue
-                        }
-                    }
-                }
-            }
+            // if (comments[i].children) {
+            //     for (let j = 0; j < comments[i].children.length; j++) {
+            //         for (let k = 0; k < users.length; k++) {
+            //             if (users[k]._id.toString() === comments[i].children[j].user_id.toString()) {
+            //                 comments[i].children[j].user_custom_id = users[k].custom_id
+            //                 comments[i].children[j].user_name = users[k].name
+            //                 comments[i].children[j].user_avatar_url = users[k].avatar_url
+            //                 continue
+            //             }
+            //         }
+            //     }
+            // }
         }
         ctx.body = comments
     },
 
-    async addComment(ctx) {
+    async getCommentReply (ctx) {
+        const parentCommentId = ctx.query.parent_comment_id
+        const limit = parseInt(ctx.query.limit) || 3
+        const skip = parseInt(ctx.query.skip) || 0
+        const comments = await Comment.findOne({id: parentCommentId, limit, skip})
+        if (!comments) {
+            ctx.response.status = 400
+            ctx.body = { message: 'meme_id or parent_comment_id is invalid.'}
+            return
+        }
+        ctx.body = comments.children
+    },
+
+    async addComment (ctx) {
         const userId = ctx.user
         const content = ctx.request.body.content
         const memeId = ctx.request.body.meme_id
@@ -77,7 +95,7 @@ module.exports = {
                 ctx.body = { message: "parent_comment_id or meme_id invalid."}
                 return
             }
-            const parentComment = await Comment.findOne(parentCommentId)
+            const parentComment = await Comment.findOne({id: parentCommentId})
             await Notification.addReplyComment(userId, parentComment, comment)
             const userReceiveNotification = await User.findOne({id: parentComment.user_id})
             if (userReceiveNotification.firebase_devices) {
@@ -130,7 +148,7 @@ module.exports = {
         }
         if (!parentCommentId) {
             if (action === 'like') {
-                const comment = await Comment.findOne(commentId)
+                const comment = await Comment.findOne({id: commentId})
                 await Comment.like(userId, commentId)
                 await Notification.addLikeComment(comment)
             } else if (action === 'clearlike') {

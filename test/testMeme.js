@@ -30,7 +30,7 @@ describe('MemeApi', function () {
         userAvatarUrl = res.data.avatar_url
     })
 
-    describe('#POST /api/meme/ ', async () => {
+    describe('#POST /api/meme', async () => {
 
         it('should return 400, image_id not given', async () => {
             const res = axios.post(`${config.serverBaseUrl}/api/meme`, {}, axiosHeader()) 

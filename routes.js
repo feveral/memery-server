@@ -30,6 +30,7 @@ module.exports = (router) => {
     router.delete('/api/meme', authController.verifyMemeToken, memeController.delete)
     
     router.get('/api/comment', commentController.getComments)
+    router.get('/api/comment/reply', commentController.getCommentReply)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
     router.post('/api/comment/like', authController.verifyMemeToken, commentController.likeComment)
     router.delete('/api/comment', authController.verifyMemeToken, commentController.deleteComment)
