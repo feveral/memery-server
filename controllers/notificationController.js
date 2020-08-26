@@ -12,7 +12,7 @@ async function notificationsAddInfo(notifications) {
     notifications.forEach(n => {
         if (n.action_user_id) actionUserIds.push(n.action_user_id)
         if (n.meme_id) memeIds.push(n.meme_id)
-        if (n.comment_id) memeIds.push(n.comment_id)
+        if (!n.parent_comment_id && n.comment_id) memeIds.push(n.comment_id)
     })
     const comments = await Comment.findByIds(commentIds)
     const users = await User.findByIds(actionUserIds)
@@ -21,29 +21,26 @@ async function notificationsAddInfo(notifications) {
         imageIds.push(meme.image_id)
     })
     const images = await Image.findByIds(imageIds)
-    for (let i = 0; i < notifications.length; i++) {
-        for (let j = 0; j < users.length; j++) {
-            if (notifications[i].action_user_id && notifications[i].action_user_id.toString() === users[j]._id.toString()) {
-                notifications[i].action_user_avatar_url = users[j].avatar_url
-                notifications[i].action_user_name = users[j].name
-                notifications[i].action_user_custom_id = users[j].custom_id
+    notifications.forEach(notification => {
+        users.forEach(user => {
+            if (notification.action_user_id && notification.action_user_id.toString() === user._id.toString()) {
+                notification.action_user_avatar_url = user.avatar_url
+                notification.action_user_name = user.name
+                notification.action_user_custom_id = user.custom_id
             }
-        }
-        for (let j = 0; j < memes.length; j++) {
-            if (notifications[i].meme_id.toString() === memes[j]._id.toString()) {
-                notifications[i].meme_like_number = memes[j].like
-                for (let k = 0; k < images.length; k++) {
-                    if (memes[j].image_id.toString() === images[k]._id.toString()) {
-                        notifications[i].meme_image_url = images[k].url
-                        notifications[i].meme_image_thumbnail_url = images[k].thumbnail_url
+        })
+        memes.forEach(meme => {
+            if (notification.meme_id.toString() === meme._id.toString()) {
+                notification.meme_like_number = meme.like
+                images.forEach(image => {
+                    if (meme.image_id.toString() === image._id.toString()) {
+                        notification.meme_image_url = image.url
+                        notification.meme_image_thumbnail_url = image.thumbnail_url
                     }
-                }
+                })
             }
-        }
-        for (let j = 0; j < comments.length; j++) {
-            notifications[i].comment_like_number = comments[j].like
-        }
-    }
+        })
+    })
     return notifications
 }
 

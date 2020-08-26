@@ -18,20 +18,38 @@ class Comment {
     }
 
     static async add (memeId, userId, content) {
-        const comment = new Comment(memeId, userId, content)
-        const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        await collection.insertOne(comment)
-        await Meme.increaseCommentNumber(memeId, 1)
-        return comment
+        try {
+            const comment = new Comment(memeId, userId, content)
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            const meme = await Meme.findOne(memeId)
+            if (meme) {
+                await collection.insertOne(comment)
+                await Meme.increaseCommentNumber(memeId, 1)
+                return comment
+            } else return null
+        } catch (e) {
+            // for memeId or userId invalid ObjectID
+            return null
+        }
     }
 
     static async addChild (parentCommentId, memeId, userId, content) {
         const comment = new Comment(memeId, userId, content)
         comment._id = new ObjectID()
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        await collection.findOneAndUpdate({_id: ObjectID(parentCommentId)}, {'$push': {children:comment}})
-        await Meme.increaseCommentNumber(memeId, 1)
-        return comment
+        try {
+            const result = await collection.findOneAndUpdate(
+                {_id: ObjectID(parentCommentId), meme_id: ObjectID(memeId)},
+                {'$push': {children:comment}})
+            if (result.lastErrorObject.n === 1) {
+                await Meme.increaseCommentNumber(memeId, 1)
+                return comment
+            }
+            return null
+        } catch (e) {
+            // for parentCommentId or memeId invalid ObjectID
+            return null
+        }
     }
 
     static async find ({memeId, limit=20, skip=0}) {
@@ -83,6 +101,29 @@ class Comment {
         }
     }
 
+    static async likeReply(userId, parentCommentId, commentId) {
+        const collectionComment = await database.getCollection(constants.COLLECTION_COMMENT)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet':{like_comment_ids: commentId}})
+        if (result.result.nModified === 1) {
+            await collectionComment.updateOne(
+                {_id: ObjectID(parentCommentId), children: {_id: ObjectID(commentId)}},
+                {'$inc': {'children.$.like': 1}}
+            )
+        }
+    }
+
+    static async clearLikeReply(userId, parentCommentId, commentId) {
+        const collectionComment = await database.getCollection(constants.COLLECTION_COMMENT)
+        const collectionUser = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull':{like_comment_ids: commentId}})
+        if (result.result.nModified === 1) {
+            await collectionComment.updateOne(
+                {_id: ObjectID(parentCommentId), children: {_id: ObjectID(commentId)}},
+                {'$inc': {'children.$.like': -1}}
+            )
+        }
+    }
 }
 
 module.exports = Comment

@@ -7,7 +7,6 @@ const LIKE_MEME = 'like_meme'
 const LIKE_COMMENT = 'like_comment'
 const REPLY_MEME = 'reply_meme'
 const REPLY_COMMENT = 'reply_comment'
-const COLLECT_MEME = 'collect_meme'
 
 class Notification {
 
@@ -31,7 +30,7 @@ class Notification {
     static async find ({userId, limit=10, skip=0}) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         const notifications = await collection.find({user_id: ObjectID(userId)})
-                .sort({update_time: -1}).limit(limit).skip(skip).toArray()
+                .sort({create_at: -1}).limit(limit).skip(skip).toArray()
         return notifications
     }
 
@@ -63,6 +62,17 @@ class Notification {
         await Notification.add(notification)
     }
 
+    static async addLikeReplyComment (parentComment, comment) {
+        const notification = new Notification({
+            userId: comment.user_id,
+            type: LIKE_COMMENT,
+            memeId: parentComment.meme_id,
+            parentId: parentComment._id,
+            commentId: comment._id
+        })
+        await Notification.add(notification)
+    }
+
     static async addReplyMeme (actionUserId, meme, comment) {
         const notification = new Notification({
             userId: meme.user_id,
@@ -82,15 +92,6 @@ class Notification {
             memeId: parentComment.meme_id,
             commentId: comment._id,
             parentCommentId: parentComment._id
-        })
-        await Notification.add(notification)
-    }
-
-    static async addCollectMeme (meme) {
-        const notification = new Notification({
-            userId: meme.user_id,
-            type: COLLECT_MEME,
-            memeId: meme._id
         })
         await Notification.add(notification)
     }

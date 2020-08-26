@@ -30,7 +30,6 @@ module.exports = {
         })
         const users = await User.findByIds(userIds)
         for (let i = 0; i < comments.length; i++) {
-            delete comments[i].meme_id
             for (let j = 0; j < users.length; j++) {
                 if (users[j]._id.toString() === comments[i].user_id.toString()) {
                     comments[i].user_custom_id = users[j].custom_id
@@ -55,7 +54,6 @@ module.exports = {
         ctx.body = comments
     },
 
-    //TODO: need to support child 
     async addComment(ctx) {
         const userId = ctx.user
         const content = ctx.request.body.content
@@ -74,6 +72,11 @@ module.exports = {
 
         if (parentCommentId) {
             const comment = await Comment.addChild(parentCommentId, memeId, userId, content)
+            if (!comment) {
+                ctx.response.status = 400
+                ctx.body = { message: "parent_comment_id or meme_id invalid."}
+                return
+            }
             const parentComment = await Comment.findOne(parentCommentId)
             await Notification.addReplyComment(userId, parentComment, comment)
             const userReceiveNotification = await User.findOne({id: parentComment.user_id})
@@ -88,6 +91,11 @@ module.exports = {
             ctx.body = comment
         } else {
             const comment = await Comment.add(memeId, userId, content)
+            if (!comment) {
+                ctx.response.status = 400
+                ctx.body = { message: "meme_id invalid."}
+                return
+            }
             const meme = await Meme.findOne(memeId)
             await Notification.addReplyMeme(userId, meme, comment)
             const userReceiveNotification = await User.findOne({id: meme.user_id})
@@ -108,6 +116,8 @@ module.exports = {
         const userId = ctx.user
         const commentId = ctx.request.body.comment_id
         const action = ctx.request.body.action
+        const parentCommentId = ctx.request.body.parent_comment_id
+
         if (!commentId) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "comment_id" should be given.'}
@@ -118,17 +128,28 @@ module.exports = {
             ctx.body = { message: 'body parameter "action" should be "like" or "clearlike".'}
             return
         }
-        if (action === 'like') {
-            const comment = await Comment.findOne(commentId)
-            await Comment.like(userId, commentId)
-            await Notification.addLikeComment(comment)
-        } else if (action === 'clearlike') {
-            await Comment.clearlike(userId, commentId)
+        if (!parentCommentId) {
+            if (action === 'like') {
+                const comment = await Comment.findOne(commentId)
+                await Comment.like(userId, commentId)
+                await Notification.addLikeComment(comment)
+            } else if (action === 'clearlike') {
+                await Comment.clearlike(userId, commentId)
+            }
+        } else {
+            if (action === 'like') {
+                // const comment = await Comment.findOne(commentId)
+                await Comment.likeReply(userId, parentCommentId, commentId)
+                // await Notification.addLikeComment(comment)
+            } else if (action === 'clearlike') {
+                await Comment.clearLikeReply(userId, parentCommentId, commentId)
+            }
         }
         ctx.response.status = 200
         ctx.body = null
     },
 
+    // TODO: Need to support reply comment
     async deleteComment(ctx) {
         const userId = ctx.user
         const commentId = ctx.request.body.comment_id
