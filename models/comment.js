@@ -107,7 +107,7 @@ class Comment {
         const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet':{like_comment_ids: commentId}})
         if (result.result.nModified === 1) {
             await collectionComment.updateOne(
-                {_id: ObjectID(parentCommentId), children: {_id: ObjectID(commentId)}},
+                {_id: ObjectID(parentCommentId), 'children._id': ObjectID(commentId)},
                 {'$inc': {'children.$.like': 1}}
             )
         }
@@ -119,7 +119,7 @@ class Comment {
         const result = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull':{like_comment_ids: commentId}})
         if (result.result.nModified === 1) {
             await collectionComment.updateOne(
-                {_id: ObjectID(parentCommentId), children: {_id: ObjectID(commentId)}},
+                {_id: ObjectID(parentCommentId), 'children._id': ObjectID(commentId)},
                 {'$inc': {'children.$.like': -1}}
             )
         }
