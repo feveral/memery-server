@@ -85,9 +85,9 @@ module.exports = {
             ctx.body = { message: 'body parameter "content" should be given.'}
             return
         }
-
+        let comment
         if (parentCommentId) {
-            const comment = await Comment.addChild(parentCommentId, memeId, userId, content)
+            comment = await Comment.addChild(parentCommentId, memeId, userId, content)
             if (!comment) {
                 ctx.response.status = 400
                 ctx.body = { message: "parent_comment_id or meme_id invalid."}
@@ -104,9 +104,8 @@ module.exports = {
                     })
                 }
             }
-            ctx.body = comment
         } else {
-            const comment = await Comment.add(memeId, userId, content)
+            comment = await Comment.add(memeId, userId, content)
             if (!comment) {
                 ctx.response.status = 400
                 ctx.body = { message: "meme_id invalid."}
@@ -123,8 +122,12 @@ module.exports = {
                     })
                 }
             }
-            ctx.body = comment
         }
+        const user = await User.findOne(userId)
+        comment.user_custom_id = user.custom_id
+        comment.user_name = user.name
+        comment.user_avatar_url = user.avatar_url
+        ctx.body = comment
     },
 
     //TODO: need to support child 
