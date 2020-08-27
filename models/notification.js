@@ -5,6 +5,7 @@ const Meme = require('./meme.js')
 
 const LIKE_MEME = 'like_meme'
 const LIKE_COMMENT = 'like_comment'
+const LIKE_REPLY = 'like_reply'
 const REPLY_MEME = 'reply_meme'
 const REPLY_COMMENT = 'reply_comment'
 
@@ -65,7 +66,7 @@ class Notification {
     static async addLikeReplyComment (parentComment, comment) {
         const notification = new Notification({
             userId: comment.user_id,
-            type: LIKE_COMMENT,
+            type: LIKE_REPLY,
             memeId: parentComment.meme_id,
             parentId: parentComment._id,
             commentId: comment._id

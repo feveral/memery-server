@@ -90,6 +90,26 @@ class Comment {
         return result
     }
 
+    static async findChildComments(parentIds, childIds) {
+        const parentObjIds = parentIds.map( (myId) => { return ObjectID(myId) })
+        const childObjIds = childIds.map( (myId) => { return ObjectID(myId) })
+        const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+        const parentComments = await collection.find({ _id: { '$in': parentObjIds }}).toArray()
+        let childrenInEveryParent = []
+        const childComments = []
+        parentComments.forEach(p => {
+            if (p.children) childrenInEveryParent = childrenInEveryParent.concat(p.children)
+        })
+        childrenInEveryParent.forEach(c => {
+            childObjIds.forEach(objId => {
+                if (c._id.toString() === objId.toString()) {
+                    childComments.push(c)
+                }
+            })
+        })
+        return childComments
+    }
+
     static async delete (userId, commentId) {
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})

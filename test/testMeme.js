@@ -64,7 +64,7 @@ describe('MemeApi', function () {
                 })
         })
 
-        it('should return meme, not using template, multiple tags, success', async () => {
+        it('should return meme, not using template, multiple tags', async () => {
             const formData = new FormData()
             formData.append('image', fs.createReadStream('./test/images/small.jpeg'))
             let options = {
@@ -100,7 +100,7 @@ describe('MemeApi', function () {
             expect(data.image_thumbnail_url).to.be.equal(imageThumbnailUrl)
         })
 
-        it('should return meme, not using template, one tags, success', async () => {
+        it('should return meme, not using template, one tags', async () => {
             const formData = new FormData()
             formData.append('image', fs.createReadStream('./test/images/small.jpeg'))
             let options = {
@@ -136,8 +136,14 @@ describe('MemeApi', function () {
         })
 
         //TODO: using template id
-        it('should return meme, using template, success', async () => {
+        it('should return meme, using template', async () => {
 
+        })
+    })
+    
+    describe('#POST /api/meme/like', async () => {
+        it('should return nothing, check like number and user like update', async () => {
+            
         })
     })
 })
