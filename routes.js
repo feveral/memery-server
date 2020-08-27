@@ -13,6 +13,7 @@ module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
     router.post('/api/auth/logout', authController.verifyMemeToken, authController.logout)
     router.get('/api/user/profile', authController.verifyMemeToken, userController.getProfile)
+    router.get('/api/user/profile/:id', userController.getProfile)
     router.get('/api/user/like', authController.verifyMemeToken, userController.getUserLike)
     router.post('/api/user/firebase/device', authController.verifyMemeToken, userController.addFirebaseDeviceToken)
     router.put('/api/user/profile', authController.verifyMemeToken, userController.updateProfile)

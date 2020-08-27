@@ -85,19 +85,24 @@ class User {
     }
 
     static async findOne ({id, customId, email, loginType, getLikeIds=false}) {
-        const filter = {}
-        if (id) filter._id = ObjectID(id)
-        if (customId) filter.custom_id = customId
-        if (email) filter.email = email
-        if (loginType) filter.login_type = loginType
-        const projection = {
-            like_meme_ids: getLikeIds,
-            dislike_meme_ids: getLikeIds,
-            like_comment_ids: getLikeIds,
+        try {
+            const filter = {}
+            if (id) filter._id = ObjectID(id)
+            if (customId) filter.custom_id = customId
+            if (email) filter.email = email
+            if (loginType) filter.login_type = loginType
+            const projection = {
+                like_meme_ids: getLikeIds,
+                dislike_meme_ids: getLikeIds,
+                like_comment_ids: getLikeIds,
+            }
+            const collection = await database.getCollection(constants.COLLECTION_USER)
+            const result = await collection.findOne(filter, {projection})
+            return result
+        } catch (e) {
+            // for ObjectID invalid
+            return null
         }
-        const collection = await database.getCollection(constants.COLLECTION_USER)
-        const result = await collection.findOne(filter, {projection})
-        return result
     }
 
     static async findByIds(ids) {

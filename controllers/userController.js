@@ -6,8 +6,13 @@ const Collect = require('../models/collect.js')
 module.exports = {
 
     async getProfile(ctx) {
-        const userId = ctx.user
+        const userId = ctx.user || ctx.params.id
         const user = await User.findOne({id: userId})
+        if (!user) {
+            ctx.response.status = 400
+            ctx.body = {message: 'user not found'}
+            return
+        }
         const memes = await Meme.find({userId})
         let likes = 0
         for (let i = 0; i < memes.length; i++) {
@@ -19,8 +24,6 @@ module.exports = {
         delete user.facebook_profile
         if (user) {
             ctx.body = user
-        } else {
-            ctx.body = {message: 'user not found'}
         }
     },
 
