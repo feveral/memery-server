@@ -45,7 +45,8 @@ async function notificationsAddInfo(notifications) {
             if (notification.parent_comment_id
                 && notification.parent_comment_id.toString() === comment._id.toString()) {
                 notification.parent_comment_content = comment.content
-            } else if (notification.comment_id.toString() === comment._id.toString()) {
+            } else if (notification.comment_id
+                && notification.comment_id.toString() === comment._id.toString()) {
                 notification.comment_content = comment.content
             }
         });
