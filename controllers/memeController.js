@@ -102,7 +102,7 @@ module.exports = {
     },
 
     async getUserMeme(ctx) {
-        const userId = ctx.user
+        const userId = ctx.params.id
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
         let memes = await Meme.find({userId, skip, limit})

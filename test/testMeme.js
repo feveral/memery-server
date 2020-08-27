@@ -98,6 +98,7 @@ describe('MemeApi', function () {
             expect(data.user_avatar_url).to.be.equal(userAvatarUrl)
             expect(data.image_url).to.be.equal(imageUrl)
             expect(data.image_thumbnail_url).to.be.equal(imageThumbnailUrl)
+            memeId = data._id
         })
 
         it('should return meme, not using template, one tags', async () => {
@@ -140,7 +141,7 @@ describe('MemeApi', function () {
 
         })
     })
-    
+
     describe('#POST /api/meme/like', async () => {
         it('should return nothing, check like number and user like update', async () => {
             
