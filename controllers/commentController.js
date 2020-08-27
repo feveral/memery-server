@@ -123,7 +123,7 @@ module.exports = {
                 }
             }
         }
-        const user = await User.findOne(userId)
+        const user = await User.findOne({id: userId})
         comment.user_custom_id = user.custom_id
         comment.user_name = user.name
         comment.user_avatar_url = user.avatar_url
