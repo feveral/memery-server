@@ -12,7 +12,8 @@ async function notificationsAddInfo(notifications) {
     notifications.forEach(n => {
         if (n.action_user_id) actionUserIds.push(n.action_user_id)
         if (n.meme_id) memeIds.push(n.meme_id)
-        if (!n.parent_comment_id && n.comment_id) memeIds.push(n.comment_id)
+        if (!n.parent_comment_id && n.comment_id) commentIds.push(n.comment_id)
+        if (n.parent_comment_id && n.comment_id) commentIds.push(n.parent_comment_id)
     })
     const comments = await Comment.findByIds(commentIds)
     const users = await User.findByIds(actionUserIds)
@@ -40,6 +41,14 @@ async function notificationsAddInfo(notifications) {
                 })
             }
         })
+        comments.forEach(comment => {
+            if (notification.parent_comment_id
+                && notification.parent_comment_id.toString() === comment._id.toString()) {
+                notification.parent_comment_content = comment.content
+            } else if (notification.comment_id.toString() === comment._id.toString()) {
+                notification.comment_content = comment.content
+            }
+        });
     })
     return notifications
 }

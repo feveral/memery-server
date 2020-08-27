@@ -111,6 +111,7 @@ describe('NotificationApi', function () {
             expect(data[0]._id).to.be.a('string')
             expect(data[0].type).to.be.equal('reply_meme')
             expect(data[0].comment_id).to.be.equal(commentId)
+            expect(data[0].comment_content).to.be.equal('this is a comment to meme')
             expect(data[0].meme_id).to.be.equal(memeId)
             expect(data[0].user_id).to.be.equal(memeUserId)
             expect(data[0].create_at).to.be.ISOString()
@@ -123,7 +124,7 @@ describe('NotificationApi', function () {
             expect(data[0].meme_image_url).to.be.equal(imageUrl)
             expect(data[0].meme_image_thumbnail_url).to.be.equal(imageThumbnailUrl)
         })
-        
+
         it('should return notification list, test reply comment notification', async () => {
             res = await axios.post(`${config.serverBaseUrl}/api/comment`, {
                 meme_id: memeId, content: 'this is a comment to meme',
@@ -140,6 +141,7 @@ describe('NotificationApi', function () {
             expect(data[0].type).to.be.equal('reply_comment')
             expect(data[0].comment_id).to.be.equal(commentId)
             expect(data[0].parent_comment_id).to.be.equal(parentCommentId)
+            expect(data[0].parent_comment_content).to.be.equal('this is a comment to meme')
             expect(data[0].meme_id).to.be.equal(memeId)
             expect(data[0].user_id).to.be.equal(commentUserId)
             expect(data[0].create_at).to.be.ISOString()
