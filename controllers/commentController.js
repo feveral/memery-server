@@ -19,7 +19,7 @@ module.exports = {
         }
         
         const comments = await Comment.find({memeId: meme_id, limit, skip})
-        if (!comments) {
+        if (comments.length === 0) {
             ctx.response.status = 400
             ctx.body = { message: 'meme_id is invalid.'}
             return
@@ -47,6 +47,14 @@ module.exports = {
         const limit = parseInt(ctx.query.limit) || 3
         const skip = parseInt(ctx.query.skip) || 0
         const comment = await Comment.findOne({id: parentCommentId, limit, skip})
+        if (!comment) {
+            ctx.response.status = 400
+            ctx.body = { message: 'parent_comment_id is invalid.'}
+            return
+        } else if (!comment.children) {
+            ctx.body = []
+            return
+        }
         const comments = comment.children
         const userIds = []
         comments.forEach(comment => {

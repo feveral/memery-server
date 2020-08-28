@@ -160,6 +160,15 @@ class Comment {
             )
         }
     }
+
+    static async deleteByMemeId(memeId) {
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            await collection.deleteMany({meme_id: ObjectID(memeId)})
+        } catch (e) {
+            // for invalid ObjectID
+        }
+    }
 }
 
 module.exports = Comment

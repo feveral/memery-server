@@ -4,6 +4,7 @@ const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
 const Notification = require('../models/notification.js')
 const Template = require('../models/template.js')
+const Comment = require('../models/comment.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -155,13 +156,15 @@ module.exports = {
         }
         const meme = await Meme.findOne(memeId)
         if (meme) {
-            await Meme.delete(memeId)
+            await Meme.delete(meme._id)
             for(let i = 0; i < meme.tags.length; i++) {
-                await Tag.deleteMemeId(meme.tags[i], memeId)
+                await Tag.deleteMemeId(meme.tags[i], meme._id)
             }
+            await Notification.delete(meme._id)
+            await Comment.deleteByMemeId(meme._id)
         }
         if (meme.template_id) {
-            await Template.removeApplyMemeId(meme.template_id, memeId)
+            await Template.removeApplyMemeId(meme.template_id, meme._id)
         }
         ctx.status = 200
         ctx.body = null
