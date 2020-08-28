@@ -19,11 +19,6 @@ module.exports = {
         }
         
         const comments = await Comment.find({memeId: meme_id, limit, skip})
-        if (comments.length === 0) {
-            ctx.response.status = 400
-            ctx.body = { message: 'meme_id is invalid.'}
-            return
-        }
         const userIds = []
         comments.forEach(comment => {
             userIds.push(comment.user_id)
