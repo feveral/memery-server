@@ -150,6 +150,11 @@ module.exports = {
         if (!parentCommentId) {
             if (action === 'like') {
                 const comment = await Comment.findOne({id: commentId})
+                if (!comment) {
+                    ctx.response.status = 400
+                    ctx.body = { message: 'comment_id not found.'}
+                    return
+                }
                 await Comment.like(userId, commentId)
                 await Notification.addLikeComment(comment)
             } else if (action === 'clearlike') {
