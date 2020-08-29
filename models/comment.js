@@ -106,7 +106,7 @@ class Comment {
         return result
     }
 
-    static async findChildCommentsOrder (parentIds, childIds) {
+    static async findChildComments (parentIds, childIds) {
         const parentObjIds = parentIds.map( (myId) => { return ObjectID(myId) })
         const childObjIds = childIds.map( (myId) => { return ObjectID(myId) })
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
