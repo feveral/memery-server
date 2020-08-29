@@ -18,7 +18,7 @@ module.exports = {
             return
         }
         
-        const comments = await Comment.find({memeId: meme_id, limit, skip})
+        const comments = await Comment.findByOrder({memeId: meme_id, limit, skip})
         const userIds = []
         comments.forEach(comment => {
             userIds.push(comment.user_id)

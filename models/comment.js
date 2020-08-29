@@ -69,6 +69,22 @@ class Comment {
         }
     }
 
+    static async findByOrder ({memeId, limit=10, skip=0, getChildren=false}) {
+        try {
+            const filter = {}
+            if (memeId) filter.meme_id = ObjectID(memeId)
+            const projection = {children: getChildren}
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            const result = await collection
+                .find(filter, {projection})
+                .sort({like: -1, reply_number: -1, created_at: 1})
+                .limit(limit).skip(skip).toArray()
+            return result
+        } catch (e) {
+            return null
+        }
+    }
+
     /**
      * @param {number} skip for children 
      * @param {number} limit for children 
@@ -90,11 +106,14 @@ class Comment {
         return result
     }
 
-    static async findChildComments(parentIds, childIds) {
+    static async findChildCommentsOrder (parentIds, childIds) {
         const parentObjIds = parentIds.map( (myId) => { return ObjectID(myId) })
         const childObjIds = childIds.map( (myId) => { return ObjectID(myId) })
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
-        const parentComments = await collection.find({ _id: { '$in': parentObjIds }}).toArray()
+        const parentComments = await collection
+            .find({ _id: { '$in': parentObjIds }})
+            .sort({like: -1, created_at: 1})
+            .toArray()
         let childrenInEveryParent = []
         const childComments = []
         parentComments.forEach(p => {
