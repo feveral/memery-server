@@ -9,6 +9,7 @@ class Template {
         this.image_id = imageId
         this.create_at = new Date()
         this.apply_meme_id = []
+        this.apply_number = 0
     }
 
     static async add (userId, name, imageId) {
@@ -37,7 +38,10 @@ class Template {
     static async addApplyMemeId (templateId, memeId) {
         try {
             const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-            await collection.updateOne({_id: ObjectID(templateId)}, {'$addToSet': {apply_meme_id: memeId}})
+            const result = await collection.updateOne({_id: ObjectID(templateId)}, {'$addToSet': {apply_meme_id: memeId}})
+            if (result.result.nModified === 1) {
+                await collection.updateOne({_id: ObjectID(templateId)}, {'$inc': {apply_number: 1}})
+            }
         } catch (e) {
             // for ObjectId invalid
         }
@@ -46,24 +50,31 @@ class Template {
     static async removeApplyMemeId(templateId, memeId) {
         try {
             const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-            await collection.updateOne({_id: ObjectID(templateId)}, {'$pull': {apply_meme_id: memeId}})
+            const result = await collection.updateOne({_id: ObjectID(templateId)}, {'$pull': {apply_meme_id: memeId}})
+            if (result.result.nModified === 1) {
+                await collection.updateOne({_id: ObjectID(templateId)}, {'$inc': {apply_number: -1}})
+            }
         } catch (e) {
             // for ObjectId invalid
         }
     }
 
     //TODO: need a trend query policy
-    static async findTrend ({limit=15, skip=0}) {
+    static async findTrend ({limit=15, skip=0, getApplyMemeIds=false}) {
         const filter = {}
+        const projection = {apply_meme_ids: getApplyMemeIds}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-        return await collection.find(filter).limit(limit).skip(skip).toArray()
+        return await collection.find(filter, {projection}).limit(limit).skip(skip).toArray()
     }
 
     //TODO: need a new query policy
-    static async findNew ({limit=15, skip=0}) {
+    static async findNew ({limit=15, skip=0, getApplyMemeIds=false}) {
         const filter = {}
+        const projection = {apply_meme_ids: getApplyMemeIds}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-        return await collection.find(filter).limit(limit).skip(skip).toArray()
+        return await collection.find(filter, {projection})
+                .sort({create_at: -1}) // TODO: should not that simple
+                .limit(limit).skip(skip).toArray()
     }
 }
 
