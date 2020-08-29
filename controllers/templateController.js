@@ -1,6 +1,24 @@
 const Template = require('../models/template.js')
 const Image = require('../models/image.js')
 
+async function templateAddImageInfo(templates) {
+    const imageIds = []
+    templates.forEach(template => {
+        imageIds.push(template.image_id)
+    })
+    const images = await Image.findByIds(imageIds)
+    templates.forEach(template => {
+        images.forEach(image => {
+            if (image._id.toString() === template.image_id.toString()) {
+                template.image_url = image.url
+                template.image_thumbnail_url = image.thumbnail_url
+            }
+        });
+    })
+    return templates
+}
+
+
 module.exports = {
     
     async addTemplate (ctx) {
@@ -26,6 +44,6 @@ module.exports = {
         } else {
             templates = await Template.findNew({})
         }
-        ctx.body = templates
+        ctx.body = await templateAddImageInfo(templates)
     },
 }
