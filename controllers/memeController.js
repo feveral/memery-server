@@ -160,13 +160,13 @@ module.exports = {
             for(let i = 0; i < meme.tags.length; i++) {
                 await Tag.deleteMemeId(meme.tags[i], meme._id)
             }
-            await Notification.delete(meme._id)
+            await Notification.delete({memeId: meme._id})
             await Comment.deleteByMemeId(meme._id)
         }
         if (meme.template_id) {
             await Template.removeApplyMemeId(meme.template_id, meme._id)
         }
         ctx.status = 200
-        ctx.body = null
+        ctx.body = null // server will return 204 No Content
     }
 }

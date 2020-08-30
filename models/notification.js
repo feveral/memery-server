@@ -105,10 +105,13 @@ class Notification {
         )
     }
 
-    static async delete (memeId) {
+    static async delete ({memeId, commentId}) {
         try {
+            const filter = {}
+            if (memeId) filter.meme_id = ObjectID(memeId)
+            if (commentId) filter.comment_id = ObjectID(commentId)
             const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-            await collection.deleteMany({meme_id: ObjectID(memeId)})
+            await collection.deleteMany(filter)
         } catch (e) {
             // for invalid ObjectID
         }

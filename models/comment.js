@@ -2,6 +2,7 @@ const database = require('../database/database.js')
 const constants = require('../constants.js')
 const Meme = require('./meme.js')
 const User = require('./user.js')
+const Notification = require('./notification.js')
 const ObjectID = require('mongodb').ObjectID
 
 const COMMENT_NORMAL = 'normal'
@@ -135,6 +136,7 @@ class Comment {
         const result = await collection.deleteOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         if (result.result.n === 1) {
             await Meme.increaseCommentNumber(comment.meme_id, -1)
+            await Notification.delete({commentId})
         }
     }
 
