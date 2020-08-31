@@ -58,12 +58,19 @@ module.exports = {
     async getCommentReplyById (ctx) {
         const parentCommentId = ctx.query.parent_comment_id
         const commentId = ctx.params.id
+        if (!parentCommentId) {
+            ctx.response.status = 400
+            ctx.body = { message: 'query parameter "parent_comment_id" should be given.'}
+            return
+        }
         const comment = await Comment.findReplyCommentById(parentCommentId, commentId)
         if (!comment) {
             ctx.response.status = 400
             ctx.body = { message: 'comment not exists.'}
+            return
+        } else {
+            ctx.body = comment
         }
-        ctx.body = comment
     },
 
     async getCommentReply (ctx) {
