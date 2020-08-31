@@ -36,8 +36,9 @@ class Meme {
         return meme
     }
 
-    static async find ({id, userId, imageId, keyword, limit=15, skip=0}) {
+    static async find ({id, userId, imageId, keyword, limit=15, skip=0, orderTimeDesc=false}) {
         const filter = {}
+        const order = {}
         if (id) filter._id = ObjectID(id)
         if (userId) filter.user_id = ObjectID(userId)
         if (imageId) filter.image_id = ObjectID(imageId)
@@ -49,8 +50,9 @@ class Meme {
             let regexFilter = {'$regex': `${regexString}.*`}
             filter['$or'] = [{description: regexFilter}, {tags: regexFilter}]
         }
+        if (orderTimeDesc) order.upload_time = -1
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray()
+        const result = await collection.find(filter).sort(order).limit(limit).skip(skip).toArray()
         return result
     }
 

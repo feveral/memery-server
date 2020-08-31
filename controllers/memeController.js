@@ -106,7 +106,7 @@ module.exports = {
         const userId = ctx.params.id
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
-        let memes = await Meme.find({userId, skip, limit})
+        let memes = await Meme.find({userId, skip, limit, orderTimeDesc: true})
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
