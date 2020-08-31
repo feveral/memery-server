@@ -32,6 +32,7 @@ module.exports = (router) => {
     
     router.get('/api/comment', commentController.getComments)
     router.get('/api/comment/reply', commentController.getCommentReply)
+    router.get('/api/comment/reply/:id', commentController.getCommentReplyById)
     router.get('/api/comment/:id', commentController.getCommentById)
     router.post('/api/comment', authController.verifyMemeToken, commentController.addComment)
     router.post('/api/comment/like', authController.verifyMemeToken, commentController.likeComment)

@@ -55,6 +55,17 @@ module.exports = {
         ctx.body = comments
     },
 
+    async getCommentReplyById (ctx) {
+        const parentCommentId = ctx.query.parent_comment_id
+        const commentId = ctx.params.id
+        const comment = await Comment.findReplyCommentById(parentCommentId, commentId)
+        if (!comment) {
+            ctx.response.status = 400
+            ctx.body = { message: 'comment not exists.'}
+        }
+        ctx.body = comment
+    },
+
     async getCommentReply (ctx) {
         const parentCommentId = ctx.query.parent_comment_id
         const limit = parseInt(ctx.query.limit) || 3

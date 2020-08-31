@@ -108,6 +108,20 @@ class Comment {
         return result
     }
 
+    static async findReplyCommentById (parentCommentId, commentId) {
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_COMMENT)
+            const parentComment = await collection.findOne(
+                {_id: ObjectID(parentCommentId), 'children._id': ObjectID(commentId)},
+                {projection: {'children.$': 1}})
+            if (parentComment.children && parentComment.children.length > 0) {
+                return parentComment.children[0]
+            } else return null
+        } catch (e) {
+            return null
+        }
+    }
+
     static async findChildComments (parentIds, childIds) {
         const parentObjIds = parentIds.map( (myId) => { return ObjectID(myId) })
         const childObjIds = childIds.map( (myId) => { return ObjectID(myId) })
