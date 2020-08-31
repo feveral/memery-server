@@ -96,6 +96,7 @@ class Comment {
             const projection = {children: {'$slice': [skip, limit]}}
             return await collection.findOne({_id: ObjectID(id)}, {projection})
         } catch (e) {
+            console.log(e)
             return null
         }
     }

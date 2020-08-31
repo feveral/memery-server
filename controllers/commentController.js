@@ -5,7 +5,40 @@ const Notification = require('../models/notification.js')
 const Meme = require('../models/meme.js')
 const pushService = require('../libs/push-service.js')
 
+
+async function commentAddUserInfo(comments) {
+    const userIds = []
+    comments.forEach(comment => {
+        userIds.push(comment.user_id)
+    })
+    const users = await User.findByIds(userIds)
+    comments.forEach(comment => {
+        users.forEach(user => {
+            if (user._id.toString() === comment.user_id.toString()) {
+                comment.user_custom_id = user.custom_id
+                comment.user_name = user.name
+                comment.user_avatar_url = user.avatar_url
+            }
+        })
+    })
+    return comments
+}
+
+
 module.exports = {
+
+    async getCommentById (ctx) {
+        const commentId = ctx.params.id
+        const comment = await Comment.findOne({id: commentId})
+        if (comment) {
+            const comments = await commentAddUserInfo([comment])
+            ctx.body = comments[0]
+        } else {
+            ctx.response.status = 400
+            ctx.body = { message: 'comment not found.' }
+            return     
+        }
+    },
 
     async getComments (ctx) {
         const {meme_id} = ctx.query
@@ -17,23 +50,8 @@ module.exports = {
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
             return
         }
-        
-        const comments = await Comment.findByOrder({memeId: meme_id, limit, skip})
-        const userIds = []
-        comments.forEach(comment => {
-            userIds.push(comment.user_id)
-        })
-        const users = await User.findByIds(userIds)
-        for (let i = 0; i < comments.length; i++) {
-            for (let j = 0; j < users.length; j++) {
-                if (users[j]._id.toString() === comments[i].user_id.toString()) {
-                    comments[i].user_custom_id = users[j].custom_id
-                    comments[i].user_name = users[j].name
-                    comments[i].user_avatar_url = users[j].avatar_url
-                    continue
-                }
-            }
-        }
+        let comments = await Comment.findByOrder({memeId: meme_id, limit, skip})
+        comments = await commentAddUserInfo(comments)
         ctx.body = comments
     },
 
@@ -50,21 +68,8 @@ module.exports = {
             ctx.body = []
             return
         }
-        const comments = comment.children
-        const userIds = []
-        comments.forEach(comment => {
-            userIds.push(comment.user_id)
-        })
-        const users = await User.findByIds(userIds)
-        comments.forEach(comment => {
-            users.forEach(user => {
-                if (user._id.toString() === comment.user_id.toString()) {
-                    comment.user_custom_id = user.custom_id
-                    comment.user_name = user.name
-                    comment.user_avatar_url = user.avatar_url
-                }
-            })
-        })
+        let comments = comment.children
+        comments = await commentAddUserInfo(comments)
         if (!comments) {
             ctx.response.status = 400
             ctx.body = { message: 'meme_id or parent_comment_id is invalid.'}
