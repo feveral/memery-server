@@ -18,9 +18,19 @@ class Meme {
         this.comment_number = 0
     }
 
-    static async add (userId, imageId, description, tags, templateId=null) {
+    /**
+     * 
+     * @param {*} userId 
+     * @param {*} imageId 
+     * @param {*} description 
+     * @param {*} tags 
+     * @param {*} templateId 
+     * @param {string[]} imageTexts
+     */
+    static async add (userId, imageId, description, tags, templateId=null, imageTexts=null) {
         const meme = new Meme(userId, imageId, description, tags)
         if (templateId) meme.template_id = templateId
+        if (imageTexts) meme.image_texts = imageTexts
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
         return meme

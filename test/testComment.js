@@ -196,16 +196,18 @@ describe('CommentApi', function () {
             let data = res.data
             expect(res.status).to.be.equal(200)
             expect(data).to.be.a('array')
+
+            // reply_number have more priority to show on the top
             expect(data[0]._id).to.be.a('string')
             expect(data[0].meme_id).to.be.equal(memeId)
             expect(data[0].user_id).to.be.equal(commentUserId)
             expect(data[0].user_name).to.be.equal(commentUserName)
             expect(data[0].user_custom_id).to.be.equal(commentCustomId)
             expect(data[0].user_avatar_url).to.be.equal(commentUserAvatarUrl)
-            expect(data[0].content).to.be.equal('this is a comment to meme')
+            expect(data[0].content).to.be.equal('this is a comment to be reply')
             expect(data[0].created_at).to.be.ISOString()
             expect(data[0].like).to.be.equal(0)
-            expect(data[0].reply_number).to.be.equal(0)
+            expect(data[0].reply_number).to.be.equal(1)
 
             expect(data[1]._id).to.be.a('string')
             expect(data[1].meme_id).to.be.equal(memeId)
@@ -213,10 +215,10 @@ describe('CommentApi', function () {
             expect(data[1].user_name).to.be.equal(commentUserName)
             expect(data[1].user_custom_id).to.be.equal(commentCustomId)
             expect(data[1].user_avatar_url).to.be.equal(commentUserAvatarUrl)
-            expect(data[1].content).to.be.equal('this is a comment to be reply')
+            expect(data[1].content).to.be.equal('this is a comment to meme')
             expect(data[1].created_at).to.be.ISOString()
             expect(data[1].like).to.be.equal(0)
-            expect(data[1].reply_number).to.be.equal(1)
+            expect(data[1].reply_number).to.be.equal(0)
         })
     })
 })

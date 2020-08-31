@@ -41,15 +41,12 @@ module.exports = {
         const description = ctx.request.body.description || ''
         const templateId = ctx.request.body.template_id
         let tags = ctx.request.body.tags
+        let imageTexts = ctx.request.body.image_texts
         if (!imageId) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "image_id" should be given.'}
             return
         } else if (!tags) {
-            ctx.response.status = 400
-            ctx.body = { message: 'body parameter "tags" should be an array of string or a string.'}
-            return
-        } else if (Array.isArray(tags) && !tags.every(i => (typeof i === "string"))) {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "tags" should be an array of string or a string.'}
             return
@@ -61,6 +58,9 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = { message: 'tags more then 10.'}
             return
+        }
+        if (imageTexts && !Array.isArray(imageTexts)) {
+            imageTexts = [imageTexts]
         }
         const image = await Image.findOne(imageId)
         if (!image || image.usage !== 0) {
@@ -75,9 +75,9 @@ module.exports = {
                 ctx.body = { message: 'template_id is invalid.'}
                 return
             }
-            meme = await Meme.add(userId, imageId, description, tags, templateId)
-        }
-        else meme = await Meme.add(userId, imageId, description, tags)
+            if (imageTexts) meme = await Meme.add(userId, imageId, description, tags, templateId, imageTexts)
+            else meme = await Meme.add(userId, imageId, description, tags, templateId)
+        } else meme = await Meme.add(userId, imageId, description, tags)
         await Image.increaseUsage(imageId, 1)
         await Tag.addMany(tags, meme._id)
         await Template.addApplyMemeId(templateId, meme._id)
