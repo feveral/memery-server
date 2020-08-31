@@ -24,10 +24,14 @@ module.exports = {
 
     async getUserCollect(ctx) {
         const userId = ctx.user
-        let limit = parseInt(ctx.query.limit) || 20
-        const skip = parseInt(ctx.query.skip) || 0
         let collects
-        collects = await Collect.find({userId, limit, skip})
+        if (!ctx.query.limit || Number.isNaN(parseInt(ctx.query.limit))) {
+            collects = await Collect.find({userId})
+        } else {
+            let limit = parseInt(ctx.query.limit) || 20
+            const skip = parseInt(ctx.query.skip) || 0
+            collects = await Collect.find({userId, limit, skip})
+        }
         collects = await collectAddImageInfo(collects)
         ctx.body = collects
     },
