@@ -69,7 +69,8 @@ module.exports = {
             ctx.body = { message: 'comment not exists.'}
             return
         } else {
-            ctx.body = comment
+            const comments = await commentAddUserInfo([comment])
+            ctx.body = comments[0]
         }
     },
 
