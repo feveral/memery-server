@@ -1,3 +1,4 @@
+const shortUUID = require('short-uuid')
 const axios = require('axios')
 const config = require('../config.js')
 const jwt = require('jsonwebtoken')
@@ -8,6 +9,14 @@ module.exports = {
      * @return {object} google profile
      */
     async verifyGoogleToken (token, tokenType) {
+        if (process.env.NODE_ENV === 'test') {
+            return {
+                name: 'testing-user',
+                email: `${shortUUID().generate()}@gmail.com`,
+                // email: `testing-email@gmail.com`,
+                picture: 'https://example-user-avatar.com'
+            }
+        }
         try {
             const result = await axios.get(`${config.googleValidateTokenUrl}?${tokenType}=${token}`);
             return result.data;

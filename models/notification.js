@@ -5,9 +5,9 @@ const Meme = require('./meme.js')
 
 const LIKE_MEME = 'like_meme'
 const LIKE_COMMENT = 'like_comment'
+const LIKE_REPLY = 'like_reply'
 const REPLY_MEME = 'reply_meme'
 const REPLY_COMMENT = 'reply_comment'
-const COLLECT_MEME = 'collect_meme'
 
 class Notification {
 
@@ -17,20 +17,21 @@ class Notification {
      * @param {string} action_user_id the user who triggered this notification, might be undefined in like case
      * @param {string} target 'meme' || 'comment'
      */
-    constructor ({userId, actionUserId, type, memeId, commentId, read, update_time}) {
+    constructor ({userId, actionUserId, type, memeId, commentId, parentCommentId, read, update_time}) {
         this.user_id = ObjectID(userId)
         this.type = type
         if (read) this.read = read
         if (update_time) this.update_time = update_time
         if (memeId) this.meme_id = ObjectID(memeId)
         if (commentId) this.comment_id = ObjectID(commentId)
+        if (parentCommentId) this.parent_comment_id = ObjectID(parentCommentId)
         if (actionUserId) this.action_user_id = ObjectID(actionUserId)
     }
 
     static async find ({userId, limit=10, skip=0}) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         const notifications = await collection.find({user_id: ObjectID(userId)})
-                .sort({update_time: -1}).limit(limit).skip(skip).toArray()
+                .sort({create_at: -1}).limit(limit).skip(skip).toArray()
         return notifications
     }
 
@@ -38,7 +39,7 @@ class Notification {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         await collection.updateOne(
             notification,
-            {'$set': {read: false, update_time: new Date()}},
+            {'$set': {read: false, create_at: new Date()}},
             {upsert: true}
         )
     }
@@ -62,6 +63,17 @@ class Notification {
         await Notification.add(notification)
     }
 
+    static async addLikeReplyComment (parentComment, comment) {
+        const notification = new Notification({
+            userId: comment.user_id,
+            type: LIKE_REPLY,
+            memeId: parentComment.meme_id,
+            parentId: parentComment._id,
+            commentId: comment._id
+        })
+        await Notification.add(notification)
+    }
+
     static async addReplyMeme (actionUserId, meme, comment) {
         const notification = new Notification({
             userId: meme.user_id,
@@ -73,22 +85,14 @@ class Notification {
         await Notification.add(notification)
     }
 
-    static async addReplyComment (actionUserId, comment) {
+    static async addReplyComment (actionUserId, parentComment, comment) {
         const notification = new Notification({
-            userId: comment.user_id,
+            userId: parentComment.user_id,
             type: REPLY_COMMENT,
             actionUserId,
-            memeId: comment.meme_id,
-            commentId: comment._id
-        })
-        await Notification.add(notification)
-    }
-
-    static async addCollectMeme (meme) {
-        const notification = new Notification({
-            userId: meme.user_id,
-            type: COLLECT_MEME,
-            memeId: meme._id
+            memeId: parentComment.meme_id,
+            commentId: comment._id,
+            parentCommentId: parentComment._id
         })
         await Notification.add(notification)
     }
@@ -99,6 +103,18 @@ class Notification {
             {user_id: ObjectID(userId), read: false},
             {'$set': {read: true}}
         )
+    }
+
+    static async delete ({memeId, commentId}) {
+        try {
+            const filter = {}
+            if (memeId) filter.meme_id = ObjectID(memeId)
+            if (commentId) filter.comment_id = ObjectID(commentId)
+            const collection = await database.getCollection(COLLECTION_NOTIFICATION)
+            await collection.deleteMany(filter)
+        } catch (e) {
+            // for invalid ObjectID
+        }
     }
 }
 

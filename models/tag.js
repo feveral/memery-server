@@ -7,16 +7,20 @@ class Tag {
     constructor (name, memeIds) {
         this.name = name
         this.meme_ids = memeIds
+        this.meme_number = 0
     }
 
     static async addMany (names, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         for (let i = 0; i < names.length; i++) {
-            await collection.updateOne(
+            const result = await collection.updateOne(
                 {name: names[i]},
                 {'$addToSet': {meme_ids: memeId}},
                 {upsert: true}
             )
+            if (result.result.nModified === 1 || result.result.upserted) {
+                await collection.updateOne({name: names[i]}, {'$inc': {meme_number: 1}})
+            }
         }
     }
 
@@ -27,13 +31,19 @@ class Tag {
         }
         const filter = {name: {'$regex': `${nameRegex}.*`}}
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray()
+        const result = await collection
+            .find(filter)
+            .sort({meme_number:-1})
+            .limit(limit).skip(skip).toArray()
         return result
     }
 
     static async deleteMemeId (name, memeId) {
         const collection = await database.getCollection(constants.COLLECTION_TAG)
-        await collection.updateOne({name}, {'$pull': {meme_ids: ObjectID(memeId)}})
+        const result = await collection.updateOne({name}, {'$pull': {meme_ids: ObjectID(memeId)}})
+        if (result.result.nModified === 1) {
+            await collection.updateOne({name}, {'$inc': {meme_number: -1}})
+        }
     }
 }
 

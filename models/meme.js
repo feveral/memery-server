@@ -18,15 +18,27 @@ class Meme {
         this.comment_number = 0
     }
 
-    static async add (userId, imageId, description, tags) {
+    /**
+     * 
+     * @param {*} userId 
+     * @param {*} imageId 
+     * @param {*} description 
+     * @param {*} tags 
+     * @param {*} templateId 
+     * @param {string[]} imageTexts
+     */
+    static async add (userId, imageId, description, tags, templateId=null, imageTexts=null) {
         const meme = new Meme(userId, imageId, description, tags)
+        if (templateId) meme.template_id = templateId
+        if (imageTexts) meme.image_texts = imageTexts
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
         return meme
     }
 
-    static async find ({id, userId, imageId, keyword, limit=15, skip=0}) {
+    static async find ({id, userId, imageId, keyword, limit=15, skip=0, orderTimeDesc=false}) {
         const filter = {}
+        const order = {}
         if (id) filter._id = ObjectID(id)
         if (userId) filter.user_id = ObjectID(userId)
         if (imageId) filter.image_id = ObjectID(imageId)
@@ -38,14 +50,20 @@ class Meme {
             let regexFilter = {'$regex': `${regexString}.*`}
             filter['$or'] = [{description: regexFilter}, {tags: regexFilter}]
         }
+        if (orderTimeDesc) order.upload_time = -1
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray()
+        const result = await collection.find(filter).sort(order).limit(limit).skip(skip).toArray()
         return result
     }
 
     static async findOne(id) {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        return await collection.findOne({_id: ObjectID(id)})
+        try {
+            return await collection.findOne({_id: ObjectID(id)})
+        } catch (e) {
+            // for ObjectId invalid
+            return null
+        }
     }
 
     static async findByIds(ids) {
@@ -62,7 +80,6 @@ class Meme {
         return result
     }
 
-    //TODO: need transaction
     static async like (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
@@ -76,7 +93,6 @@ class Meme {
         }
     }
 
-    //TODO: need transaction
     static async dislike (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
@@ -90,7 +106,6 @@ class Meme {
         }
     }
 
-    //TODO: need transaction
     static async clearlike (userId, memeId) {
         const collectionMeme = await database.getCollection(constants.COLLECTION_MEME)
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
@@ -107,9 +122,11 @@ class Meme {
     static async delete (memeId) {
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         const meme = await collection.findOne({_id: ObjectID(memeId)})
-        const imageId = meme.image_id
-        await collection.deleteOne({_id: ObjectID(memeId)})
-        await Image.increaseUsage(imageId, -1)
+        if (meme) {
+            const imageId = meme.image_id
+            await collection.deleteOne({_id: ObjectID(memeId)})
+            await Image.increaseUsage(imageId, -1)
+        }
     }
 
     static async increaseCommentNumber(memeId, quantity) {

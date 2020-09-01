@@ -2,41 +2,69 @@ const Notification = require("../models/notification")
 const Meme = require("../models/meme")
 const Image = require("../models/image")
 const User = require("../models/user")
+const Comment = require("../models/comment")
 
 async function notificationsAddInfo(notifications) {
     const actionUserIds = []
     const memeIds = []
     const imageIds = []
+    const commentIds = []
+    const childCommentIds = []
+    const parentCommentIds = []
     notifications.forEach(n => {
         if (n.action_user_id) actionUserIds.push(n.action_user_id)
         if (n.meme_id) memeIds.push(n.meme_id)
+        if (!n.parent_comment_id && n.comment_id) commentIds.push(n.comment_id)
+        if (n.parent_comment_id && n.comment_id) {
+            parentCommentIds.push(n.parent_comment_id)
+            commentIds.push(n.parent_comment_id)
+            childCommentIds.push(n.comment_id)
+        }
     })
+    const comments = await Comment.findByIds(commentIds)
+    const childComments = await Comment.findChildComments(parentCommentIds, childCommentIds)
     const users = await User.findByIds(actionUserIds)
     const memes = await Meme.findByIds(memeIds)
     memes.forEach(meme => {
         imageIds.push(meme.image_id)
     })
     const images = await Image.findByIds(imageIds)
-    for (let i = 0; i < notifications.length; i++) {
-        for (let j = 0; j < users.length; j++) {
-            if (notifications[i].action_user_id && notifications[i].action_user_id.toString() === users[j]._id.toString()) {
-                notifications[i].action_user_avatar_url = users[j].avatar_url
-                notifications[i].action_user_name = users[j].name
-                notifications[i].action_user_custom_id = users[j].custom_id
+    notifications.forEach(notification => {
+        users.forEach(user => {
+            if (notification.action_user_id && notification.action_user_id.toString() === user._id.toString()) {
+                notification.action_user_avatar_url = user.avatar_url
+                notification.action_user_name = user.name
+                notification.action_user_custom_id = user.custom_id
             }
-        }
-        for (let j = 0; j < memes.length; j++) {
-            if (notifications[i].meme_id.toString() === memes[j]._id.toString()) {
-                notifications[i].meme_like_number = memes[j].like
-                for (let k = 0; k < images.length; k++) {
-                    if (memes[j].image_id.toString() === images[k]._id.toString()) {
-                        notifications[i].meme_image_url = images[k].url
-                        notifications[i].meme_image_thumbnail_url = images[k].thumbnail_url
+        })
+        memes.forEach(meme => {
+            if (notification.meme_id.toString() === meme._id.toString()) {
+                notification.meme_like_number = meme.like
+                images.forEach(image => {
+                    if (meme.image_id.toString() === image._id.toString()) {
+                        notification.meme_image_url = image.url
+                        notification.meme_image_thumbnail_url = image.thumbnail_url
                     }
-                }
+                })
             }
-        }
-    }
+        })
+        comments.forEach(comment => {
+            if (notification.parent_comment_id
+                && notification.parent_comment_id.toString() === comment._id.toString()) {
+                notification.parent_comment_content = comment.content
+            } else if (notification.comment_id
+                && notification.comment_id.toString() === comment._id.toString()) {
+                notification.comment_content = comment.content
+            }
+        })
+        childComments.forEach(comment => {
+            if (notification.comment_id
+                && notification.parent_comment_id
+                && notification.comment_id.toString() === comment._id.toString()) {
+                notification.comment_content = comment.content
+            }
+        })
+    })
     return notifications
 }
 
@@ -45,7 +73,8 @@ module.exports = {
     async getNotifications(ctx) {
         const userId = ctx.user
         const skip = parseInt(ctx.query.skip) || 0
-        const limit = parseInt(ctx.query.limit) || 20
+        let limit = parseInt(ctx.query.limit) || 10
+        if (limit > 10) limit = 10
         let notifications = await Notification.find({userId, limit, skip})
         notifications = await notificationsAddInfo(notifications)
         ctx.body = notifications

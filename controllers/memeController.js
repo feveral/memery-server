@@ -3,6 +3,8 @@ const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
 const User = require('../models/user.js')
 const Notification = require('../models/notification.js')
+const Template = require('../models/template.js')
+const Comment = require('../models/comment.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -35,28 +37,50 @@ module.exports = {
 
     async upload (ctx) {
         const userId = ctx.user
-        const image_id = ctx.request.body.image_id 
+        const imageId = ctx.request.body.image_id 
         const description = ctx.request.body.description || ''
+        const templateId = ctx.request.body.template_id
         let tags = ctx.request.body.tags
-        if (!image_id) {
+        let imageTexts = ctx.request.body.image_texts
+        if (!imageId) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "image_id" should be given.'}
+            ctx.body = { message: 'body parameter "image_id" should be given.'}
             return
         } else if (!tags) {
             ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
-            return
-        } else if (Array.isArray(tags) && !tags.every(i => (typeof i === "string"))) {
-            ctx.response.status = 400
-            ctx.body = { messgae: 'body parameter "tags" should be an array of string or a string.'}
+            ctx.body = { message: 'body parameter "tags" should be an array of string or a string.'}
             return
         }
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
-        let meme = await Meme.add(userId, image_id, description, tags)
-        await Image.increaseUsage(image_id, 1)
+        if (tags.length > 10) {
+            ctx.response.status = 400
+            ctx.body = { message: 'tags more then 10.'}
+            return
+        }
+        if (imageTexts && !Array.isArray(imageTexts)) {
+            imageTexts = [imageTexts]
+        }
+        const image = await Image.findOne(imageId)
+        if (!image || image.usage !== 0) {
+            ctx.response.status = 400
+            ctx.body = { message: 'image_id not valid or image usage not 0.'}
+            return
+        }
+        let meme
+        if (templateId) {
+            if (!(await Template.findOne(templateId))) {
+                ctx.response.status = 400
+                ctx.body = { message: 'template_id is invalid.'}
+                return
+            }
+            if (imageTexts) meme = await Meme.add(userId, imageId, description, tags, templateId, imageTexts)
+            else meme = await Meme.add(userId, imageId, description, tags, templateId)
+        } else meme = await Meme.add(userId, imageId, description, tags)
+        await Image.increaseUsage(imageId, 1)
         await Tag.addMany(tags, meme._id)
+        await Template.addApplyMemeId(templateId, meme._id)
         meme = (await memesAddUserAndImageInfo([meme]))[0]
         ctx.body = meme
     },
@@ -79,12 +103,25 @@ module.exports = {
     },
 
     async getUserMeme(ctx) {
-        const userId = ctx.user
+        const userId = ctx.params.id
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
-        let memes = await Meme.find({userId, skip, limit})
+        let memes = await Meme.find({userId, skip, limit, orderTimeDesc: true})
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
+    },
+
+    async getMemeById(ctx) {
+        const memeId = ctx.params.id
+        const meme = await Meme.findOne(memeId)
+        if (meme) {
+            const memes = await memesAddUserAndImageInfo([meme])
+            ctx.body = memes[0]
+        } else {
+            ctx.response.status = 400
+            ctx.body = { message: 'meme not found.' }
+            return     
+        }
     },
 
     async like (ctx) {
@@ -118,11 +155,18 @@ module.exports = {
             return
         }
         const meme = await Meme.findOne(memeId)
-        await Meme.delete(memeId)
-        for(let i = 0; i < meme.tags.length; i++) {
-            await Tag.deleteMemeId(meme.tags[i], memeId)
+        if (meme) {
+            await Meme.delete(meme._id)
+            for(let i = 0; i < meme.tags.length; i++) {
+                await Tag.deleteMemeId(meme.tags[i], meme._id)
+            }
+            await Notification.delete({memeId: meme._id})
+            await Comment.deleteByMemeId(meme._id)
+        }
+        if (meme.template_id) {
+            await Template.removeApplyMemeId(meme.template_id, meme._id)
         }
         ctx.status = 200
-        ctx.body = null
+        ctx.body = null // server will return 204 No Content
     }
 }
