@@ -48,7 +48,7 @@ class Meme {
                 regexString += `.*${keyword[i]}`
             }
             let regexFilter = {'$regex': `${regexString}.*`}
-            filter['$or'] = [{description: regexFilter}, {tags: regexFilter}]
+            filter['$or'] = [{description: regexFilter}, {tags: regexFilter}, {image_texts: regexFilter}]
         }
         if (orderTimeDesc) order.upload_time = -1
         const collection = await database.getCollection(constants.COLLECTION_MEME)
