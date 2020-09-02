@@ -38,11 +38,14 @@ module.exports = {
 
     async getTemplates (ctx) {
         const type = ctx.query.type || 'trending'
+        const skip = parseInt(ctx.query.skip) || 0
+        const limit = parseInt(ctx.query.limit) || 20
+        if (limit > 20) limit = 20
         let templates
         if (type === 'trending') {
-            templates = await Template.findTrend({})
+            templates = await Template.findTrend({limit, skip})
         } else {
-            templates = await Template.findNew({})
+            templates = await Template.findNew({limit, skip})
         }
         ctx.body = await templateAddImageInfo(templates)
     },

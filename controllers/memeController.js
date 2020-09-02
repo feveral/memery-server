@@ -88,6 +88,7 @@ module.exports = {
     async getTrending (ctx) {
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
+        if (limit > 20) limit = 20
         let memes = await Meme.findTrending({limit, skip}) // limit should not be too big
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
@@ -96,6 +97,7 @@ module.exports = {
     async search (ctx) {
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
+        if (limit > 20) limit = 20
         const keyword = ctx.query.keyword || ''
         let memes = await Meme.find({keyword, skip, limit})
         memes = await memesAddUserAndImageInfo(memes)
@@ -106,6 +108,7 @@ module.exports = {
         const userId = ctx.params.id
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
+        if (limit > 20) limit = 20
         let memes = await Meme.find({userId, skip, limit, orderTimeDesc: true})
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
