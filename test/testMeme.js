@@ -16,6 +16,7 @@ describe('MemeApi', function () {
     let userCustomId = ''
     let userName = ''
     let userAvatarUrl = ''
+    let image
 
     before(async () => {
         memeToken = (await axios.post(`${config.serverBaseUrl}/api/auth/login`, {
@@ -29,6 +30,19 @@ describe('MemeApi', function () {
         userName = res.data.name
         userAvatarUrl = res.data.avatar_url
     })
+
+    async function uploadImage () {
+        const formData = new FormData()
+        formData.append('image', fs.createReadStream('./test/images/small.jpeg'))
+        let options = {
+            headers: {
+                Authorization: authorization(),
+                ...formData.getHeaders()
+            }
+        }
+        let res = await axios.post(`${config.serverBaseUrl}/api/image?ext=jpeg`, formData, options)
+        return res.data
+    }
 
     describe('#POST /api/meme', async () => {
 
@@ -65,26 +79,15 @@ describe('MemeApi', function () {
         })
 
         it('should return meme, not using template, multiple tags', async () => {
-            const formData = new FormData()
-            formData.append('image', fs.createReadStream('./test/images/small.jpeg'))
-            let options = {
-                headers: {
-                    Authorization: authorization(),
-                    ...formData.getHeaders()
-                }
-            }
-            let res = await axios.post(`${config.serverBaseUrl}/api/image?ext=jpeg`, formData, options)
-            const imageId = res.data._id
-            const imageUrl = res.data.url
-            const imageThumbnailUrl = res.data.thumbnail_url
+            const image = await uploadImage()
             res = await axios.post(`${config.serverBaseUrl}/api/meme`, {
-                image_id: imageId, description: 'this is description',
+                image_id: image._id, description: 'this is description',
                 tags: ['atag', 'btag'],
             }, axiosHeader()) 
             const data = res.data
             expect(res.status).to.be.equal(200)
             expect(data._id).to.be.a('string')
-            expect(data.image_id).to.be.equal(imageId)
+            expect(data.image_id).to.be.equal(image._id)
             expect(data.user_id).to.be.equal(userId)
             expect(data.tags).to.have.lengthOf(2)
             expect(data.tags[0]).to.be.equal('atag')
@@ -96,32 +99,21 @@ describe('MemeApi', function () {
             expect(data.user_custom_id).to.be.equal(userCustomId)
             expect(data.user_name).to.be.equal(userName)
             expect(data.user_avatar_url).to.be.equal(userAvatarUrl)
-            expect(data.image_url).to.be.equal(imageUrl)
-            expect(data.image_thumbnail_url).to.be.equal(imageThumbnailUrl)
+            expect(data.image_url).to.be.equal(image.url)
+            expect(data.image_thumbnail_url).to.be.equal(image.thumbnail_url)
             memeId = data._id
         })
 
         it('should return meme, not using template, one tags', async () => {
-            const formData = new FormData()
-            formData.append('image', fs.createReadStream('./test/images/small.jpeg'))
-            let options = {
-                headers: {
-                    Authorization: authorization(),
-                    ...formData.getHeaders()
-                }
-            }
-            let res = await axios.post(`${config.serverBaseUrl}/api/image?ext=jpeg`, formData, options)
-            const imageId = res.data._id
-            const imageUrl = res.data.url
-            const imageThumbnailUrl = res.data.thumbnail_url
+            const image = await uploadImage()
             res = await axios.post(`${config.serverBaseUrl}/api/meme`, {
-                image_id: imageId,
+                image_id: image._id,
                 tags: 'onetag'
             }, axiosHeader()) 
             const data = res.data
             expect(res.status).to.be.equal(200)
             expect(data._id).to.be.a('string')
-            expect(data.image_id).to.be.equal(imageId)
+            expect(data.image_id).to.be.equal(image._id)
             expect(data.user_id).to.be.equal(userId)
             expect(data.tags).to.have.lengthOf(1)
             expect(data.tags[0]).to.be.equal('onetag')
@@ -132,8 +124,8 @@ describe('MemeApi', function () {
             expect(data.user_custom_id).to.be.equal(userCustomId)
             expect(data.user_name).to.be.equal(userName)
             expect(data.user_avatar_url).to.be.equal(userAvatarUrl)
-            expect(data.image_url).to.be.equal(imageUrl)
-            expect(data.image_thumbnail_url).to.be.equal(imageThumbnailUrl)
+            expect(data.image_url).to.be.equal(image.url)
+            expect(data.image_thumbnail_url).to.be.equal(image.thumbnail_url)
         })
 
         //TODO: using template id

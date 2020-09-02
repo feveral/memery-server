@@ -81,8 +81,8 @@ module.exports = {
         ctx.response.status = 401
         ctx.body = { message: 'authentication fail: something wrong!' }
     },
-
-    async logout(ctx) {
+    
+	async logout(ctx) {
         const userId = ctx.user
         const firebaseToken = ctx.request.body.firebase_token
         if (!firebaseToken) {
