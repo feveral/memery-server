@@ -55,6 +55,7 @@ async function notificationsAddInfo(notifications) {
             } else if (notification.comment_id
                 && notification.comment_id.toString() === comment._id.toString()) {
                 notification.comment_content = comment.content
+                notification.comment_like = comment.like
             }
         })
         childComments.forEach(comment => {
@@ -62,6 +63,7 @@ async function notificationsAddInfo(notifications) {
                 && notification.parent_comment_id
                 && notification.comment_id.toString() === comment._id.toString()) {
                 notification.comment_content = comment.content
+                notification.comment_like = comment.like
             }
         })
     })
@@ -80,9 +82,10 @@ module.exports = {
         ctx.body = notifications
     },
 
-    async readNotifications(ctx) {
+    async readNotification(ctx) {
         const userId = ctx.user
-        await Notification.read(userId)
+        const id = ctx.body.notification_id
+        await Notification.read(id, userId)
         ctx.response.status = 200
         ctx.body = null
     }

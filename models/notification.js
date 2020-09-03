@@ -1,13 +1,8 @@
 const database = require('../database/database.js')
-const { COLLECTION_NOTIFICATION } = require('../constants.js')
+const constants = require('../constants.js')
 const { ObjectID } = require('mongodb')
 const Meme = require('./meme.js')
-
-const LIKE_MEME = 'like_meme'
-const LIKE_COMMENT = 'like_comment'
-const LIKE_REPLY = 'like_reply'
-const REPLY_MEME = 'reply_meme'
-const REPLY_COMMENT = 'reply_comment'
+const { NOTIFICATION_TYPE_LIKE_COMMENT, NOTIFICATION_TYPE_REPLY_COMMENT, NOTIFICATION_TYPE_REPLY_MEME, NOTIFICATION_TYPE_LIKE_REPLY, NOTIFICATION_TYPE_LIKE_MEME, COLLECTION_NOTIFICATION } = require('../constants.js')
 
 class Notification {
 
@@ -47,7 +42,7 @@ class Notification {
     static async addLikeMeme (meme) {
         const notification = new Notification({
             userId: meme.user_id,
-            type: LIKE_MEME,
+            type: NOTIFICATION_TYPE_LIKE_MEME,
             memeId: meme._id
         })
         await Notification.add(notification)
@@ -56,7 +51,7 @@ class Notification {
     static async addLikeComment (comment) {
         const notification = new Notification({
             userId: comment.user_id,
-            type: LIKE_COMMENT,
+            type: NOTIFICATION_TYPE_LIKE_COMMENT,
             memeId: comment.meme_id,
             commentId: comment._id
         })
@@ -66,9 +61,9 @@ class Notification {
     static async addLikeReplyComment (parentComment, comment) {
         const notification = new Notification({
             userId: comment.user_id,
-            type: LIKE_REPLY,
+            type: NOTIFICATION_TYPE_LIKE_REPLY,
             memeId: parentComment.meme_id,
-            parentId: parentComment._id,
+            parentCommentId: parentComment._id,
             commentId: comment._id
         })
         await Notification.add(notification)
@@ -77,7 +72,7 @@ class Notification {
     static async addReplyMeme (actionUserId, meme, comment) {
         const notification = new Notification({
             userId: meme.user_id,
-            type: REPLY_MEME,
+            type: NOTIFICATION_TYPE_REPLY_MEME,
             actionUserId,
             memeId: meme._id,
             commentId: comment._id
@@ -88,7 +83,7 @@ class Notification {
     static async addReplyComment (actionUserId, parentComment, comment) {
         const notification = new Notification({
             userId: parentComment.user_id,
-            type: REPLY_COMMENT,
+            type: NOTIFICATION_TYPE_REPLY_COMMENT,
             actionUserId,
             memeId: parentComment.meme_id,
             commentId: comment._id,
@@ -97,19 +92,21 @@ class Notification {
         await Notification.add(notification)
     }
 
-    static async read (userId) {
+    static async read (id, userId) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateMany(
-            {user_id: ObjectID(userId), read: false},
+        await collection.updateOne(
+            {_id: ObjectID(id), user_id: ObjectID(userId), read: false},
             {'$set': {read: true}}
         )
     }
 
-    static async delete ({memeId, commentId}) {
+    static async delete ({type, memeId, parentCommentId, commentId}) {
         try {
             const filter = {}
+            if (type) filter.type = type
             if (memeId) filter.meme_id = ObjectID(memeId)
             if (commentId) filter.comment_id = ObjectID(commentId)
+            if (parentCommentId) filter.parent_comment_id = ObjectID(parentCommentId)
             const collection = await database.getCollection(COLLECTION_NOTIFICATION)
             await collection.deleteMany(filter)
         } catch (e) {

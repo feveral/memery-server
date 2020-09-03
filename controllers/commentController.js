@@ -186,14 +186,29 @@ module.exports = {
                 await Notification.addLikeComment(comment)
             } else if (action === 'clearlike') {
                 await Comment.clearlike(userId, commentId)
+                const comment = await Comment.findOne({id: commentId})
+                if (comment.like === 0) await Notification.delete({
+                    type: constants.NOTIFICATION_TYPE_LIKE_COMMENT,
+                    memeId: comment.meme_id, commentId: comment._id
+                })
             }
         } else {
             if (action === 'like') {
-                // const comment = await Comment.findOne(commentId)
+                const parentComment = await Comment.findOne({id: parentCommentId})
+                const replyComment = await Comment.findReplyCommentById(parentCommentId, commentId)
+                if (!parentComment || !replyComment) {
+                    ctx.response.status = 400
+                    ctx.body = { message: 'parent_comment_id or comment_id not found.'}
+                    return
+                }
                 await Comment.likeReply(userId, parentCommentId, commentId)
-                // await Notification.addLikeComment(comment)
+                await Notification.addLikeReplyComment(parentComment, replyComment)
             } else if (action === 'clearlike') {
                 await Comment.clearLikeReply(userId, parentCommentId, commentId)
+                const replyComment = await Comment.findReplyCommentById(parentCommentId, commentId)
+                if (replyComment.like === 0) await Notification.delete({
+                    type: constants.NOTIFICATION_TYPE_LIKE_REPLY,
+                    memeId: replyComment.meme_id, parentCommentId, commentId})
             }
         }
         ctx.response.status = 200

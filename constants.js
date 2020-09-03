@@ -14,6 +14,11 @@ module.exports = {
     OS_ANDROID: 'android',
     OS_IOS: 'ios',
 
-    ANDROID_NOTIFICATION_CHANNEL_COMMENT: 'comment'
+    ANDROID_NOTIFICATION_CHANNEL_COMMENT: 'comment',
 
+    NOTIFICATION_TYPE_LIKE_MEME: 'like_meme',
+    NOTIFICATION_TYPE_LIKE_COMMENT: 'like_comment',
+    NOTIFICATION_TYPE_LIKE_REPLY: 'like_reply',
+    NOTIFICATION_TYPE_REPLY_MEME: 'reply_meme',
+    NOTIFICATION_TYPE_REPLY_COMMENT: 'reply_comment'
 }

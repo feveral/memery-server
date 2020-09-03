@@ -1,4 +1,5 @@
 node_modules/
+dist/
 config.js
 test.js
 firebase-admin.json

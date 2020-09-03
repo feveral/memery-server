@@ -48,5 +48,5 @@ module.exports = (router) => {
     router.delete('/api/collect', authController.verifyMemeToken, collectController.deleteCollect)
 
     router.get('/api/notification', authController.verifyMemeToken, notificationController.getNotifications)
-    router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotifications)
+    router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotification)
 }
