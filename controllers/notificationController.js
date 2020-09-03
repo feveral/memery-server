@@ -55,7 +55,7 @@ async function notificationsAddInfo(notifications) {
             } else if (notification.comment_id
                 && notification.comment_id.toString() === comment._id.toString()) {
                 notification.comment_content = comment.content
-                notification.comment_like = comment.like
+                notification.comment_like_number = comment.like
             }
         })
         childComments.forEach(comment => {
@@ -63,7 +63,7 @@ async function notificationsAddInfo(notifications) {
                 && notification.parent_comment_id
                 && notification.comment_id.toString() === comment._id.toString()) {
                 notification.comment_content = comment.content
-                notification.comment_like = comment.like
+                notification.comment_like_number = comment.like
             }
         })
     })
