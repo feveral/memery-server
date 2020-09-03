@@ -102,7 +102,7 @@ class Notification {
 
     static async open (userId) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
-        await collection.updateOne(
+        await collection.updateMany(
             {user_id: ObjectID(userId), open: false},
             {'$set': {open: true}}
         )
