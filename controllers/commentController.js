@@ -157,7 +157,6 @@ module.exports = {
         ctx.body = comment
     },
 
-    //TODO: need to support child 
     async likeComment(ctx) {
         const userId = ctx.user
         const commentId = ctx.request.body.comment_id
@@ -189,6 +188,7 @@ module.exports = {
                 const comment = await Comment.findOne({id: commentId})
                 if (comment.like === 0) await Notification.delete({
                     type: constants.NOTIFICATION_TYPE_LIKE_COMMENT,
+                    userId: comment.user_id,
                     memeId: comment.meme_id, commentId: comment._id
                 })
             }
@@ -208,6 +208,7 @@ module.exports = {
                 const replyComment = await Comment.findReplyCommentById(parentCommentId, commentId)
                 if (replyComment.like === 0) await Notification.delete({
                     type: constants.NOTIFICATION_TYPE_LIKE_REPLY,
+                    userId: replyComment.user_id,
                     memeId: replyComment.meme_id, parentCommentId, commentId})
             }
         }
