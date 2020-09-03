@@ -5,6 +5,7 @@ const User = require('../models/user.js')
 const Notification = require('../models/notification.js')
 const Template = require('../models/template.js')
 const Comment = require('../models/comment.js')
+const constants = require('../constants.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -139,13 +140,26 @@ module.exports = {
             ctx.body = { message: 'body parameter "action" should be "like", "dislike" or "clearlike". ' }
             return
         }
+        const meme = await Meme.findOne(meme_id)
+        if (!meme) {
+            ctx.response.status = 400
+            ctx.body = { message: 'meme_id not found' }
+            return
+        }
         if (action === 'like') {
             await Meme.like(ctx.user, meme_id)
-            const meme = await Meme.findOne(meme_id)
             await Notification.addLikeMeme(meme)
         }
-        else if (action === 'dislike') await Meme.dislike(ctx.user, meme_id)
-        else if (action === 'clearlike') await Meme.clearlike(ctx.user, meme_id)
+        else if (action === 'dislike') {
+            await Meme.dislike(ctx.user, meme_id)
+            if (meme.like === 0) await Notification.delete(
+                {type: constants.NOTIFICATION_TYPE_LIKE_MEME, userId: meme.user_id, memeId: meme_id})
+        }
+        else if (action === 'clearlike') {
+            await Meme.clearlike(ctx.user, meme_id)
+            if (meme.like === 0) await Notification.delete(
+                {type: constants.NOTIFICATION_TYPE_LIKE_MEME, userId: meme.user_id, memeId: meme_id})
+        }
         ctx.response.status = 200
         ctx.body = null // server will return 204 No Content
     },

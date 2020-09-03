@@ -100,10 +100,11 @@ class Notification {
         )
     }
 
-    static async delete ({type, memeId, parentCommentId, commentId}) {
+    static async delete ({type, userId, memeId, parentCommentId, commentId}) {
         try {
             const filter = {}
             if (type) filter.type = type
+            if (userId) filter.user_id = ObjectID(userId)
             if (memeId) filter.meme_id = ObjectID(memeId)
             if (commentId) filter.comment_id = ObjectID(commentId)
             if (parentCommentId) filter.parent_comment_id = ObjectID(parentCommentId)
