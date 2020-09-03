@@ -34,7 +34,7 @@ class Notification {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         await collection.updateOne(
             notification,
-            {'$set': {read: false, create_at: new Date()}},
+            {'$set': {read: false, open: false, create_at: new Date()}},
             {upsert: true}
         )
     }
@@ -98,6 +98,19 @@ class Notification {
             {_id: ObjectID(id), user_id: ObjectID(userId), read: false},
             {'$set': {read: true}}
         )
+    }
+
+    static async open (userId) {
+        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
+        await collection.updateOne(
+            {user_id: ObjectID(userId), open: false},
+            {'$set': {open: true}}
+        )
+    }
+
+    static async findUnopenNumber (userId) {
+        const collection = await database.getCollection(COLLECTION_NOTIFICATION)
+        return await collection.countDocuments({user_id: ObjectID(userId), open: false})
     }
 
     static async delete ({type, userId, memeId, parentCommentId, commentId}) {

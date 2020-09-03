@@ -124,7 +124,7 @@ module.exports = {
             await Notification.addReplyComment(userId, parentComment, comment)
             const userReceiveNotification = await User.findOne({id: parentComment.user_id})
             if (userReceiveNotification.firebase_devices) {
-                const result = await pushService.sendReplayComment(userReceiveNotification.firebase_devices, content)
+                const result = await pushService.sendReplyComment(userReceiveNotification.firebase_devices, content)
                 if (result) {
                     result.failTokens.forEach(t => {
                         User.removeFirebaseDeviceToken(meme.user_id, t)
@@ -142,7 +142,7 @@ module.exports = {
             await Notification.addReplyMeme(userId, meme, comment)
             const userReceiveNotification = await User.findOne({id: meme.user_id})
             if (userReceiveNotification.firebase_devices) {
-                const result = await pushService.sendComment(constants.OS_ANDROID, userReceiveNotification.firebase_devices, content)
+                const result = await pushService.sendComment(userReceiveNotification.firebase_devices, content)
                 if (result) {
                     result.failTokens.forEach(t => {
                         User.removeFirebaseDeviceToken(meme.user_id, t)

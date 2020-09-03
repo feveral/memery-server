@@ -36,7 +36,7 @@ class PushService {
 
         const payload = {}
         payload.notification = {
-            title: 'Someone has replied to your meme',
+            title: 'Someone replied to your meme',
             body: content,
             android_channel_id: constants.ANDROID_NOTIFICATION_CHANNEL_COMMENT
         }
@@ -56,10 +56,10 @@ class PushService {
         }
     }
 
-    async sendReplayComment(registrationTokens, content) {
+    async sendReplyComment(registrationTokens, content) {
         const payload = {}
         payload.notification = {
-            title: 'Someone has replied to your comment',
+            title: 'Someone replied to your comment',
             body: content,
             android_channel_id: constants.ANDROID_NOTIFICATION_CHANNEL_COMMENT
         }

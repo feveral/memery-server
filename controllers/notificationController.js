@@ -72,21 +72,39 @@ async function notificationsAddInfo(notifications) {
 
 
 module.exports = {
-    async getNotifications(ctx) {
+    async getNotifications (ctx) {
         const userId = ctx.user
         const skip = parseInt(ctx.query.skip) || 0
         let limit = parseInt(ctx.query.limit) || 10
-        if (limit > 10) limit = 10
+        if (limit > 20) limit = 20
         let notifications = await Notification.find({userId, limit, skip})
         notifications = await notificationsAddInfo(notifications)
         ctx.body = notifications
     },
 
-    async readNotification(ctx) {
+    async readNotification (ctx) {
         const userId = ctx.user
         const id = ctx.body.notification_id
+        if (!id) {
+            ctx.response.status = 400
+            ctx.body = { message: 'query parameter "notification_id" should be given.'}
+            return
+        }
         await Notification.read(id, userId)
         ctx.response.status = 200
         ctx.body = null
+    },
+
+    async openNotification (ctx) {
+        const userId = ctx.user
+        await Notification.open(userId)
+        ctx.response.status = 200
+        ctx.body = null
+    }, 
+
+    async getUnopenNotificationCount (ctx) {
+        const userId = ctx.user
+        const unopenNumber = await Notification.findUnopenNumber(userId)
+        ctx.body = {unopen_number: unopenNumber}
     }
 }
