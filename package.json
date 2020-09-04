@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "NODE_ENV=development node app.js",
-    "test": "NODE_ENV=test mocha --timeout 50000 --grep '#POST /api/meme/like'"
+    "test": "NODE_ENV=test mocha --timeout 50000"
   },
   "author": "",
   "license": "ISC",

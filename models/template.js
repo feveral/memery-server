@@ -7,7 +7,7 @@ class Template {
         this.user_id = userId
         this.name = name
         this.image_id = imageId
-        this.create_at = new Date()
+        this.created_at = new Date()
         this.apply_meme_id = []
         this.apply_number = 0
     }

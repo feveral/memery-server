@@ -12,11 +12,10 @@ class Notification {
      * @param {string} action_user_id the user who triggered this notification, might be undefined in like case
      * @param {string} target 'meme' || 'comment'
      */
-    constructor ({userId, actionUserId, type, memeId, commentId, parentCommentId, read, update_time}) {
+    constructor ({userId, actionUserId, type, memeId, commentId, parentCommentId, read}) {
         this.user_id = ObjectID(userId)
         this.type = type
         if (read) this.read = read
-        if (update_time) this.update_time = update_time
         if (memeId) this.meme_id = ObjectID(memeId)
         if (commentId) this.comment_id = ObjectID(commentId)
         if (parentCommentId) this.parent_comment_id = ObjectID(parentCommentId)
@@ -26,7 +25,7 @@ class Notification {
     static async find ({userId, limit=10, skip=0}) {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         const notifications = await collection.find({user_id: ObjectID(userId)})
-                .sort({create_at: -1}).limit(limit).skip(skip).toArray()
+                .sort({updated_at: -1}).limit(limit).skip(skip).toArray()
         return notifications
     }
 
@@ -34,7 +33,7 @@ class Notification {
         const collection = await database.getCollection(COLLECTION_NOTIFICATION)
         await collection.updateOne(
             notification,
-            {'$set': {read: false, open: false, create_at: new Date()}},
+            {'$set': {read: false, open: false, updated_at: new Date()}},
             {upsert: true}
         )
     }
