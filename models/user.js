@@ -5,6 +5,7 @@ const database = require('../database/database.js')
 const constants = require('../constants.js')
 const config = require('../config.js')
 const awsS3Saver = require('../libs/aws-s3-saver.js')
+const gcpSaver = require('../libs/gcp-saver.js')
 
 class User {
 
@@ -161,11 +162,13 @@ class User {
         const user = await User.findOne({id: userId})
         if (user) {
             const imageId = shortUUID().generate()
-            await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
-            const newAvatarUrl = `${config.awsS3UserAvatarBaseUrl}/${imageId}.${ext}`
+            // await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
+            await gcpSaver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
+            const newAvatarUrl = `${config.gcpCloudStorageUserAvatarBaseUrl}/${imageId}.${ext}`
             const oldAvatarUrlSplit = user.avatar_url.split('/')
             const oldAvatarName = oldAvatarUrlSplit[oldAvatarUrlSplit.length-1]
-            await awsS3Saver.removeUserAvatar(oldAvatarName)
+            // await awsS3Saver.removeUserAvatar(oldAvatarName)
+            await gcpSaver.removeUserAvatar(oldAvatarName)
             const collection = await database.getCollection(constants.COLLECTION_USER)
             await collection.updateOne({_id: ObjectID(userId)}, {'$set': {avatar_url: newAvatarUrl}})
         }

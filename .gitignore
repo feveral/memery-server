@@ -3,3 +3,4 @@ dist/
 config.js
 test.js
 firebase-admin.json
+.env

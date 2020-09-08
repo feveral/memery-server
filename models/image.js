@@ -5,6 +5,7 @@ const database = require('../database/database.js')
 const config = require('../config.js')
 const constants = require('../constants.js')
 const awsS3Saver = require('../libs/aws-s3-saver.js')
+const gcpSaver = require('../libs/gcp-saver.js')
 const { ObjectID } = require('mongodb')
 
 class Image {
@@ -35,6 +36,18 @@ class Image {
         awsS3Saver.uploadMemeImage(`${imageId}.${ext}`, content)
         awsS3Saver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
         const image = new Image(`${config.awsS3MemeImageBaseUrl}/${imageId}.${ext}`, `${config.awsS3MemeImageBaseUrl}/${imageThumbnailId}.${ext}`)
+        const collection = await database.getCollection(constants.COLLECTION_IMAGE)
+        await collection.insertOne(image)
+        return image
+    }
+
+    static async addToGCPCloudStorage (content, ext) {
+        const imageId = shortUUID().generate()
+        const imageThumbnailId = shortUUID().generate()
+        const thumbnail = await imageThumbnail(content)
+        gcpSaver.uploadMemeImage(`${imageId}.${ext}`, content)
+        gcpSaver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
+        const image = new Image(`${config.gcpCloudStorageMemeImageBaseUrl}/${imageId}.${ext}`, `${config.gcpCloudStorageMemeImageBaseUrl}/${imageThumbnailId}.${ext}`)
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.insertOne(image)
         return image
@@ -86,8 +99,10 @@ class Image {
         // These is for AWS S3
         if (image.usage === 0) {
             await collection.deleteOne({_id: ObjectID(id)})
-            awsS3Saver.removeMemeImage(filename)
-            awsS3Saver.removeMemeImage(thumbnailFilename)
+            // awsS3Saver.removeMemeImage(filename)
+            // awsS3Saver.removeMemeImage(thumbnailFilename)
+            gcpSaver.removeMemeImage(filename)
+            gcpSaver.removeMemeImage(thumbnailFilename)
         }
     }
 }

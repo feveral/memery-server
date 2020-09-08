@@ -15,7 +15,7 @@ module.exports = {
             return
         }
         // const image = await Image.addToServer(ctx.file.buffer, ext)
-        const image = await Image.addToAWSS3(ctx.file.buffer, ext)
+        const image = await Image.addToGCPCloudStorage(ctx.file.buffer, ext)
         ctx.body = image
     },
 
