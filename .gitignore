@@ -4,3 +4,4 @@ config.js
 test.js
 firebase-admin.json
 .env
+gcp-key.json
