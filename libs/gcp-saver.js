@@ -27,7 +27,11 @@ class GCPSaver {
     }
 
     async removeMemeImage (name) {
-        await this.storage.bucket(config.gcpCloudStorageMemeImageBucket).file(name).delete()
+        try {
+            await this.storage.bucket(config.gcpCloudStorageMemeImageBucket).file(name).delete()
+        } catch (e) {
+            // ignore No such object Error
+        } 
     }
 
     async uploadUserAvatar (name, content) {
