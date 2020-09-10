@@ -164,7 +164,7 @@ class User {
             const imageId = shortUUID().generate()
             // await awsS3Saver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
             await gcpSaver.uploadUserAvatar(`${imageId}.${ext}`, avatarContent)
-            const newAvatarUrl = `${config.gcpCloudStorageUserAvatarBaseUrl}/${imageId}.${ext}`
+            const newAvatarUrl = `${config.gcpCloudStorageBaseUrl}/avatar/${imageId}.${ext}`
             const oldAvatarUrlSplit = user.avatar_url.split('/')
             const oldAvatarName = oldAvatarUrlSplit[oldAvatarUrlSplit.length-1]
             // await awsS3Saver.removeUserAvatar(oldAvatarName)

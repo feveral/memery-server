@@ -180,7 +180,7 @@ module.exports = {
             await Notification.delete({memeId: meme._id})
             await Comment.deleteByMemeId(meme._id)
         }
-        if (meme.template_id) {
+        if (meme && meme.template_id) {
             await Template.removeApplyMemeId(meme.template_id, meme._id)
         }
         ctx.status = 200

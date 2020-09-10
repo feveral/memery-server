@@ -1,25 +1,24 @@
-const {Storage} = require('@google-cloud/storage');
+const {Storage} = require('@google-cloud/storage')
 const config = require('../config.js')
 
 class GCPSaver {
 
     constructor () {
         this.storage = new Storage()
-        this.bucketMemeImage = this.storage.bucket(config.gcpCloudStorageMemeImageBucket)
-        this.bucketUserAvatar = this.storage.bucket(config.gcpCloudStorageUserAvatarBucket)
+        this.bucket = this.storage.bucket(config.gcpCloudStorageBucket)
     }
 
     async uploadMemeImage (name, content) {
         const self = this
         return new Promise(function(resolve, reject) {
-            const blob = self.bucketMemeImage.file(name)
+            const blob = self.bucket.file(name)
             const blobStream = blob.createWriteStream()
             blobStream.on('error', (err) => {
                 reject(err);
             })
             blobStream.on('finish', () => {
                 const publicUrl = 
-                    `${config.gcpCloudStorageMemeImageBaseUrl}/${name}`
+                    `${config.gcpCloudStorageBaseUrl}/${name}`
                 resolve(publicUrl)
             })
             blobStream.end(content)
@@ -28,8 +27,9 @@ class GCPSaver {
 
     async removeMemeImage (name) {
         try {
-            await this.storage.bucket(config.gcpCloudStorageMemeImageBucket).file(name).delete()
+            await this.bucket.file(name).delete()
         } catch (e) {
+            // console.log(e)
             // ignore No such object Error
         } 
     }
@@ -37,14 +37,14 @@ class GCPSaver {
     async uploadUserAvatar (name, content) {
         const self = this
         return new Promise(function(resolve, reject) {
-            const blob = self.bucketUserAvatar.file(name)
+            const blob = self.bucket.file(`avatar/${name}`)
             const blobStream = blob.createWriteStream()
             blobStream.on('error', (err) => {
                 reject(err);
             })
             blobStream.on('finish', () => {
                 const publicUrl = 
-                    `${config.gcpCloudStorageUserAvatarBaseUrl}/${name}`
+                    `${config.gcpCloudStorageBaseUrl}/${name}`
                 resolve(publicUrl)
             })
             blobStream.end(content)
@@ -53,8 +53,9 @@ class GCPSaver {
 
     async removeUserAvatar (name) {
         try {
-            await this.storage.bucket(config.gcpCloudStorageUserAvatarBucket).file(name).delete()
+            await this.bucket.file(`avatar/${name}`).delete()
         } catch (e) {
+            // console.log(e)
             // ignore No such object Error
         } 
     }
