@@ -43,10 +43,14 @@ class Image {
 
     static async addToGCPCloudStorage (content, ext) {
         const imageId = shortUUID().generate()
-        const imageThumbnailId = shortUUID().generate()
-        const thumbnail = await imageThumbnail(content)
-        gcpSaver.uploadMemeImage(`${imageId}.${ext}`, content)
-        gcpSaver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
+        const imageThumbnailId = shortUUID().generate();
+        (
+            async () => {
+                const thumbnail = await imageThumbnail(content)
+                gcpSaver.uploadMemeImage(`${imageId}.${ext}`, content)
+                gcpSaver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
+            }
+        )()
         const image = new Image(`${config.gcpCloudStorageBaseUrl}/${imageId}.${ext}`, `${config.gcpCloudStorageBaseUrl}/${imageThumbnailId}.${ext}`)
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.insertOne(image)
