@@ -151,13 +151,13 @@ module.exports = {
             await Notification.addLikeMeme(meme)
         }
         else if (action === 'dislike') {
-            await Meme.dislike(ctx.user, meme_id)
-            if (meme.like === 0) await Notification.delete(
+            const result = await Meme.dislike(ctx.user, meme_id)
+            if (meme.like - result === 0) await Notification.delete(
                 {type: constants.NOTIFICATION_TYPE_LIKE_MEME, userId: meme.user_id, memeId: meme_id})
         }
         else if (action === 'clearlike') {
-            await Meme.clearlike(ctx.user, meme_id)
-            if (meme.like === 0) await Notification.delete(
+            const result = await Meme.clearlike(ctx.user, meme_id)
+            if (meme.like - result === 0) await Notification.delete(
                 {type: constants.NOTIFICATION_TYPE_LIKE_MEME, userId: meme.user_id, memeId: meme_id})
         }
         ctx.response.status = 200

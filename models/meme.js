@@ -91,6 +91,7 @@ class Meme {
         if (resultDislike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {dislike: -1}})
         }
+        return resultDislike.result.nModified
     }
 
     static async dislike (userId, memeId) {
@@ -104,6 +105,7 @@ class Meme {
         if (resultDislike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {dislike: 1}})
         }
+        return resultDislike.result.nModified
     }
 
     static async clearlike (userId, memeId) {
@@ -117,6 +119,7 @@ class Meme {
         if (resultDislike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {dislike: -1}})
         }
+        return resultDislike.result.nModified
     }
 
     static async delete (memeId) {
