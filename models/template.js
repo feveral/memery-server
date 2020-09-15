@@ -19,11 +19,20 @@ class Template {
         return template
     }
 
-    static async find ({name, limit=15, skip=0}) {
+    static async find ({name, limit=15, skip=0, orderApplyNumber=false}) {
         const filter = {}
-        if (name) filter.name = name
+        const order = {}
+        if (name) {
+            let regexString = ''
+            for (let i = 0; i < name.length; i++) {
+                regexString += `.*${name[i]}`
+            }
+            let regexFilter = {'$regex': `${regexString}.*`}
+            filter['$or'] = [{name: regexFilter}]
+        }
+        if (orderApplyNumber) order.apply_number = -1
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-        return await collection.find(filter).limit(limit).skip(skip).toArray()
+        return await collection.find(filter).sort(order).limit(limit).skip(skip).toArray()
     }
 
     static async findOne(id) {
@@ -64,7 +73,7 @@ class Template {
         const filter = {}
         const projection = {apply_meme_ids: getApplyMemeIds}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-        return await collection.find(filter, {projection}).limit(limit).skip(skip).toArray()
+        return await collection.find(filter, {projection}).sort({apply_number: -1}).limit(limit).skip(skip).toArray()
     }
 
     //TODO: need a new query policy

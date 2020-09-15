@@ -37,15 +37,20 @@ module.exports = {
     },
 
     async getTemplates (ctx) {
-        const type = ctx.query.type || 'trending'
+        const type = ctx.query.type || 'search'
+        const keyword = ctx.query.keyword || ''
         const skip = parseInt(ctx.query.skip) || 0
         const limit = parseInt(ctx.query.limit) || 20
+        
         if (limit > 20) limit = 20
         let templates
+
         if (type === 'trending') {
             templates = await Template.findTrend({limit, skip})
-        } else {
+        } else if (type === 'new') {
             templates = await Template.findNew({limit, skip})
+        } else {
+            templates = await Template.find({name: keyword, orderApplyNumber: true})
         }
         ctx.body = await templateAddImageInfo(templates)
     },
