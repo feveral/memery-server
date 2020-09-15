@@ -50,7 +50,7 @@ module.exports = {
         } else if (type === 'new') {
             templates = await Template.findNew({limit, skip})
         } else {
-            templates = await Template.find({name: keyword, orderApplyNumber: true})
+            templates = await Template.find({name: keyword, limit, skip, orderApplyNumber: true})
         }
         ctx.body = await templateAddImageInfo(templates)
     },
