@@ -26,9 +26,9 @@ class Collect {
         if (ownerUserId) filter.owner_user_id = ObjectID(ownerUserId)
         const collection = await database.getCollection(constants.COLLECTION_COLLECT)
         if (limit) {
-            return await collection.find(filter).limit(limit).skip(skip).toArray()
+            return await collection.find(filter).sort({created_at: -1}).limit(limit).skip(skip).toArray()
         } else {
-            return await collection.find(filter).toArray()
+            return await collection.find(filter).sort({created_at: -1}).toArray()
         }
     }
 
