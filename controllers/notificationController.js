@@ -84,7 +84,7 @@ module.exports = {
 
     async readNotification (ctx) {
         const userId = ctx.user
-        const id = ctx.body.notification_id
+        const id = ctx.request.body.notification_id
         if (!id) {
             ctx.response.status = 400
             ctx.body = { message: 'query parameter "notification_id" should be given.'}
