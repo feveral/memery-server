@@ -148,7 +148,8 @@ module.exports = {
         }
         if (action === 'like') {
             await Meme.like(ctx.user, meme_id)
-            await Notification.addLikeMeme(meme)
+            if (!ctx.user === meme.user_id.toString()) 
+                await Notification.addLikeMeme(meme)
         }
         else if (action === 'dislike') {
             const result = await Meme.dislike(ctx.user, meme_id)

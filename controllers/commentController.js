@@ -121,14 +121,16 @@ module.exports = {
                 return
             }
             const parentComment = await Comment.findOne({id: parentCommentId})
-            await Notification.addReplyComment(userId, parentComment, comment)
-            const userReceiveNotification = await User.findOne({id: parentComment.user_id})
-            if (userReceiveNotification.firebase_devices) {
-                const result = await pushService.sendReplyComment(userReceiveNotification.firebase_devices, content)
-                if (result) {
-                    result.failTokens.forEach(t => {
-                        User.removeFirebaseDeviceToken(meme.user_id, t)
-                    })
+            if (!ctx.user === comment.user_id.toString()) {
+                await Notification.addReplyComment(userId, parentComment, comment)
+                const userReceiveNotification = await User.findOne({id: parentComment.user_id})
+                if (userReceiveNotification.firebase_devices) {
+                    const result = await pushService.sendReplyComment(userReceiveNotification.firebase_devices, content)
+                    if (result) {
+                        result.failTokens.forEach(t => {
+                            User.removeFirebaseDeviceToken(meme.user_id, t)
+                        })
+                    }
                 }
             }
         } else {
@@ -139,14 +141,16 @@ module.exports = {
                 return
             }
             const meme = await Meme.findOne(memeId)
-            await Notification.addReplyMeme(userId, meme, comment)
-            const userReceiveNotification = await User.findOne({id: meme.user_id})
-            if (userReceiveNotification.firebase_devices) {
-                const result = await pushService.sendComment(userReceiveNotification.firebase_devices, content)
-                if (result) {
-                    result.failTokens.forEach(t => {
-                        User.removeFirebaseDeviceToken(meme.user_id, t)
-                    })
+            if (!ctx.user === meme.user_id.toString()) {
+                await Notification.addReplyMeme(userId, meme, comment)
+                const userReceiveNotification = await User.findOne({id: meme.user_id})
+                if (userReceiveNotification.firebase_devices) {
+                    const result = await pushService.sendComment(userReceiveNotification.firebase_devices, content)
+                    if (result) {
+                        result.failTokens.forEach(t => {
+                            User.removeFirebaseDeviceToken(meme.user_id, t)
+                        })
+                    }
                 }
             }
         }
@@ -182,7 +186,9 @@ module.exports = {
                     return
                 }
                 await Comment.like(userId, commentId)
-                await Notification.addLikeComment(comment)
+                if (!ctx.user === comment.user_id.toString()) {
+                    await Notification.addLikeComment(comment)
+                }
             } else if (action === 'clearlike') {
                 await Comment.clearlike(userId, commentId)
                 const comment = await Comment.findOne({id: commentId})
@@ -202,7 +208,9 @@ module.exports = {
                     return
                 }
                 await Comment.likeReply(userId, parentCommentId, commentId)
-                await Notification.addLikeReplyComment(parentComment, replyComment)
+                if (!ctx.user === replyComment.user_id.toString()) {
+                    await Notification.addLikeReplyComment(parentComment, replyComment)
+                }
             } else if (action === 'clearlike') {
                 await Comment.clearLikeReply(userId, parentCommentId, commentId)
                 const replyComment = await Comment.findReplyCommentById(parentCommentId, commentId)
