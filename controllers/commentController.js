@@ -121,7 +121,7 @@ module.exports = {
                 return
             }
             const parentComment = await Comment.findOne({id: parentCommentId})
-            if (ctx.user !== comment.user_id.toString()) {
+            if (ctx.user !== parentComment.user_id.toString()) {
                 await Notification.addReplyComment(userId, parentComment, comment)
                 const userReceiveNotification = await User.findOne({id: parentComment.user_id})
                 if (userReceiveNotification.firebase_devices) {
