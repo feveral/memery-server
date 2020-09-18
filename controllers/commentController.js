@@ -121,7 +121,7 @@ module.exports = {
                 return
             }
             const parentComment = await Comment.findOne({id: parentCommentId})
-            if (!ctx.user === comment.user_id.toString()) {
+            if (ctx.user !== comment.user_id.toString()) {
                 await Notification.addReplyComment(userId, parentComment, comment)
                 const userReceiveNotification = await User.findOne({id: parentComment.user_id})
                 if (userReceiveNotification.firebase_devices) {
@@ -141,7 +141,7 @@ module.exports = {
                 return
             }
             const meme = await Meme.findOne(memeId)
-            if (!ctx.user === meme.user_id.toString()) {
+            if (ctx.user !== meme.user_id.toString()) {
                 await Notification.addReplyMeme(userId, meme, comment)
                 const userReceiveNotification = await User.findOne({id: meme.user_id})
                 if (userReceiveNotification.firebase_devices) {
@@ -186,7 +186,7 @@ module.exports = {
                     return
                 }
                 await Comment.like(userId, commentId)
-                if (!ctx.user === comment.user_id.toString()) {
+                if (ctx.user !== comment.user_id.toString()) {
                     await Notification.addLikeComment(comment)
                 }
             } else if (action === 'clearlike') {
@@ -208,7 +208,7 @@ module.exports = {
                     return
                 }
                 await Comment.likeReply(userId, parentCommentId, commentId)
-                if (!ctx.user === replyComment.user_id.toString()) {
+                if (ctx.user !== replyComment.user_id.toString()) {
                     await Notification.addLikeReplyComment(parentComment, replyComment)
                 }
             } else if (action === 'clearlike') {
