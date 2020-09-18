@@ -82,7 +82,7 @@ class Template {
         const projection = {apply_meme_ids: getApplyMemeIds}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
         return await collection.find(filter, {projection})
-                .sort({create_at: -1}) // TODO: should not that simple
+                .sort({created_at: -1}) // TODO: should not that simple
                 .limit(limit).skip(skip).toArray()
     }
 }
