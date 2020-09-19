@@ -44,7 +44,7 @@ module.exports = {
         const {meme_id} = ctx.query
         const limit = parseInt(ctx.query.limit) || 10
         const skip = parseInt(ctx.query.skip) || 0
-
+        if (limit > 20) limit = 20
         if (!meme_id) {
             ctx.response.status = 400
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
@@ -78,6 +78,7 @@ module.exports = {
         const parentCommentId = ctx.query.parent_comment_id
         const limit = parseInt(ctx.query.limit) || 3
         const skip = parseInt(ctx.query.skip) || 0
+        if (limit > 20) limit = 20
         const comment = await Comment.findOne({id: parentCommentId, limit, skip})
         if (!comment) {
             ctx.response.status = 400
