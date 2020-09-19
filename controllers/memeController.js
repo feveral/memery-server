@@ -100,7 +100,7 @@ module.exports = {
         const limit = parseInt(ctx.query.limit) || 20
         if (limit > 20) limit = 20
         const keyword = ctx.query.keyword || ''
-        let memes = await Meme.find({keyword, skip, limit})
+        let memes = await Meme.find({keyword, skip, limit, orderTimeDesc: true})
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
