@@ -74,9 +74,22 @@ class Meme {
     }
 
     static async findTrending ({limit=8, skip=0}) {
-        const filter = {}
+        const trendLimit = parseInt(limit * 0.2) !== 0 ? parseInt(limit * 0.2): 1 
+        const newLimit = parseInt(limit * 0.2) !== 0 ? parseInt(limit * 0.2) : 1
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        const result = await collection.find(filter).sort({upload_time: -1}).limit(limit).skip(skip).toArray()
+        const trendResult = await collection.find({})
+            .sort({like: -1})
+            .limit(trendLimit).skip(skip*0.2).toArray()
+        const newResult = await collection.find({})
+            .sort({upload_time: -1})
+            .limit(newLimit).skip(skip*0.2).toArray()
+        const randomResult = await collection
+            .aggregate([{ $sample: { size: limit-trendResult.length-newResult.length } }])
+            .toArray()
+        let result = []
+        result = result.concat(trendResult)
+        result = result.concat(newResult)
+        result = result.concat(randomResult)
         return result
     }
 
