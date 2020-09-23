@@ -1,5 +1,6 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
+const utility = require('../libs/utility')
 const ObjectID = require('mongodb').ObjectID
 const Image = require('./image.js')
 
@@ -90,6 +91,7 @@ class Meme {
         result = result.concat(trendResult)
         result = result.concat(newResult)
         result = result.concat(randomResult)
+        utility.shuffle(result)
         return result
     }
 
