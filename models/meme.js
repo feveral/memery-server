@@ -84,8 +84,19 @@ class Meme {
         const newResult = await collection.find({})
             .sort({upload_time: -1})
             .limit(newLimit).skip(skip*0.2).toArray()
+
+        const excludeIds = []
+        trendResult.forEach((m) => {
+            excludeIds.push(m._id)
+        })
+        newResult.forEach((m) => {
+            excludeIds.push(m._id)
+        })
+
         const randomResult = await collection
-            .aggregate([{ $sample: { size: limit-trendResult.length-newResult.length } }])
+            .aggregate([
+                { $match: {_id: {$nin: excludeIds}}},
+                { $sample: { size: limit-trendResult.length-newResult.length } }])
             .toArray()
         let result = []
         result = result.concat(trendResult)
