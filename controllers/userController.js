@@ -42,6 +42,11 @@ module.exports = {
             return
         }
         if (newCustomId) {
+            if (!isNaN(newCustomId)) {
+                ctx.response.status = 400
+                ctx.body = {message: 'custom id should not be a number'}
+                return                
+            }
             try {
                 await User.updateCustomId(userId, newCustomId)
                 ctx.response.status = 200
