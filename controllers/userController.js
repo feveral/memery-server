@@ -46,6 +46,10 @@ module.exports = {
                 ctx.response.status = 400
                 ctx.body = {message: 'custom id should not be a number'}
                 return                
+            } else if (newCustomId.includes(' ')) {
+                ctx.response.status = 400
+                ctx.body = {message: 'custom id should not have space character'}
+                return                
             }
             try {
                 await User.updateCustomId(userId, newCustomId)
