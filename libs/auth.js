@@ -27,7 +27,7 @@ module.exports = {
 
     async verifyFacebookToken (token, tokenType) {
         try {
-            const result = await axios.get(`${config.facebookValidateTokenUrl}?${tokenType}=${token}&fields=id,name,email,picture.type(small)`);
+            const result = await axios.get(`${config.facebookValidateTokenUrl}?${tokenType}=${token}&fields=id,name,email,picture.type(large)`);
             return result.data;
         } catch (e) {
             return null
