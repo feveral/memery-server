@@ -55,6 +55,12 @@ module.exports = {
         if (!Array.isArray(tags)) {
             tags = [tags]
         }
+        tags = tags.filter(w => w !== '')
+        if (tags.length == 0) {
+            ctx.response.status = 400
+            ctx.body = { message: 'tags should at least 1'}
+            return
+        }
         if (tags.length > 10) {
             ctx.response.status = 400
             ctx.body = { message: 'tags more then 10.'}
