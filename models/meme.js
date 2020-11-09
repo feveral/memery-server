@@ -86,9 +86,9 @@ class Meme {
             .limit(newLimit).skip(skip*0.2).toArray()
 
         const excludeIds = []
-        trendResult.forEach((m) => {
-            excludeIds.push(m._id)
-        })
+        // trendResult.forEach((m) => {
+        //     excludeIds.push(m._id)
+        // })
         newResult.forEach((m) => {
             excludeIds.push(m._id)
         })
@@ -99,7 +99,7 @@ class Meme {
                 { $sample: { size: limit-trendResult.length-newResult.length } }])
             .toArray()
         let result = []
-        result = result.concat(trendResult)
+        // result = result.concat(trendResult)
         result = result.concat(newResult)
         result = result.concat(randomResult)
         utility.shuffle(result)
