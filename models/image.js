@@ -51,7 +51,7 @@ class Image {
                 gcpSaver.uploadMemeImage(`${imageThumbnailId}.${ext}`, thumbnail)
             }
         )()
-        const image = new Image(`${config.gcpCloudStorageBaseUrl}/${imageId}.${ext}`, `${config.gcpCloudStorageBaseUrl}/${imageThumbnailId}.${ext}`)
+        const image = new Image(`${config.gcpCloudStorageImageBaseUrl}/${imageId}.${ext}`, `${config.gcpCloudStorageImageBaseUrl}/${imageThumbnailId}.${ext}`)
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.insertOne(image)
         return image

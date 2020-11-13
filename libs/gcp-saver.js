@@ -5,20 +5,20 @@ class GCPSaver {
 
     constructor () {
         this.storage = new Storage()
-        this.bucket = this.storage.bucket(config.gcpCloudStorageBucket)
+        this.imageBucket = this.storage.bucket(config.gcpCloudStorageImageBucket)
     }
 
     async uploadMemeImage (name, content) {
         const self = this
         return new Promise(function(resolve, reject) {
-            const blob = self.bucket.file(name)
+            const blob = self.imageBucket.file(name)
             const blobStream = blob.createWriteStream()
             blobStream.on('error', (err) => {
                 reject(err);
             })
             blobStream.on('finish', () => {
                 const publicUrl = 
-                    `${config.gcpCloudStorageBaseUrl}/${name}`
+                    `${config.gcpCloudStorageImageBaseUrl}/${name}`
                 resolve(publicUrl)
             })
             blobStream.end(content)
@@ -27,7 +27,7 @@ class GCPSaver {
 
     async removeMemeImage (name) {
         try {
-            await this.bucket.file(name).delete()
+            await this.imageBucket.file(name).delete()
         } catch (e) {
             // console.log(e)
             // ignore No such object Error
@@ -37,14 +37,14 @@ class GCPSaver {
     async uploadUserAvatar (name, content) {
         const self = this
         return new Promise(function(resolve, reject) {
-            const blob = self.bucket.file(`avatar/${name}`)
+            const blob = self.imageBucket.file(`avatar/${name}`)
             const blobStream = blob.createWriteStream()
             blobStream.on('error', (err) => {
                 reject(err);
             })
             blobStream.on('finish', () => {
                 const publicUrl = 
-                    `${config.gcpCloudStorageBaseUrl}/${name}`
+                    `${config.gcpCloudStorageImageBaseUrl}/${name}`
                 resolve(publicUrl)
             })
             blobStream.end(content)
@@ -53,7 +53,7 @@ class GCPSaver {
 
     async removeUserAvatar (name) {
         try {
-            await this.bucket.file(`avatar/${name}`).delete()
+            await this.imageBucket.file(`avatar/${name}`).delete()
         } catch (e) {
             // console.log(e)
             // ignore No such object Error
