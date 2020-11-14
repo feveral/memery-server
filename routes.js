@@ -2,6 +2,7 @@ const multer = require('@koa/multer')
 const authController = require('./controllers/authController.js')
 const memeController = require('./controllers/memeController.js')
 const imageController = require('./controllers/imageController.js')
+const videoController = require('./controllers/videoController.js')
 const userController = require('./controllers/userController.js')
 const tagController = require('./controllers/tagController.js')
 const commentController = require('./controllers/commentController.js')
@@ -21,6 +22,9 @@ module.exports = (router) => {
 
     router.get('/api/image/:id', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
+
+    router.get('/api/video', authController.verifyMemeToken, videoController.getVideos)
+    router.post('/api/video', authController.verifyMemeToken, multer().single('video'), videoController.upload)
 
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
     router.get('/api/meme', memeController.search)

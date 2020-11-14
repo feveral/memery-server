@@ -1,4 +1,6 @@
 const {Storage} = require('@google-cloud/storage')
+const fs = require('fs').promises
+const path = require('path')
 const config = require('../config.js')
 
 class GCPSaver {
@@ -6,6 +8,7 @@ class GCPSaver {
     constructor () {
         this.storage = new Storage()
         this.imageBucket = this.storage.bucket(config.gcpCloudStorageImageBucket)
+        this.videoBucket = this.storage.bucket(config.gcpCloudStorageVideoBucket)
     }
 
     async uploadMemeImage (name, content) {
@@ -58,6 +61,20 @@ class GCPSaver {
             // console.log(e)
             // ignore No such object Error
         } 
+    }
+
+    async uploadMemeVideo (name, directoryPath) {
+        const fileNames = await fs.readdir(directoryPath)
+        await Promise.all(
+            fileNames.map((n) => {
+                let destination = `${name}/${n}`
+                return this.videoBucket.upload(`${directoryPath}/${n}`, {destination})
+            })
+        )
+    }
+
+    async removeMemeVideo (name) {
+        // should remove the folder
     }
 }
 

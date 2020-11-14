@@ -3,6 +3,7 @@ module.exports = {
     COLLECTION_USER: 'user',
     COLLECTION_MEME: 'meme',
     COLLECTION_IMAGE: 'image',
+    COLLECTION_VIDEO: 'video',
     COLLECTION_COMMENT: 'comment',
     COLLECTION_COLLECT: 'collect',
     COLLECTION_NOTIFICATION: 'notification',
