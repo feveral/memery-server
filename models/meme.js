@@ -78,9 +78,9 @@ class Meme {
         const trendLimit = parseInt(limit * 0.2) !== 0 ? parseInt(limit * 0.2): 1 
         const newLimit = parseInt(limit * 0.2) !== 0 ? parseInt(limit * 0.2) : 1
         const collection = await database.getCollection(constants.COLLECTION_MEME)
-        const trendResult = await collection.find({})
-            .sort({like: -1})
-            .limit(trendLimit).skip(skip*0.2).toArray()
+        // const trendResult = await collection.find({})
+        //     .sort({like: -1})
+        //     .limit(trendLimit).skip(skip*0.2).toArray()
         const newResult = await collection.find({})
             .sort({upload_time: -1})
             .limit(newLimit).skip(skip*0.2).toArray()
@@ -96,7 +96,8 @@ class Meme {
         const randomResult = await collection
             .aggregate([
                 { $match: {_id: {$nin: excludeIds}}},
-                { $sample: { size: limit-trendResult.length-newResult.length } }])
+                // { $sample: { size: limit-trendResult.length-newResult.length } }])
+                { $sample: { size: limit-newResult.length } }])
             .toArray()
         let result = []
         // result = result.concat(trendResult)
