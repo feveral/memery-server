@@ -30,7 +30,7 @@ class Meme {
      */
     static async add (userId, imageId, description, tags, templateId=null, imageTexts=null) {
         const meme = new Meme(userId, imageId, description, tags)
-        if (templateId) meme.template_id = templateId
+        if (templateId) meme.template_id = ObjectID(templateId)
         if (imageTexts) meme.image_texts = imageTexts
         const collection = await database.getCollection(constants.COLLECTION_MEME)
         await collection.insertOne(meme)
