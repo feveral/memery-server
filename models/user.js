@@ -1,3 +1,4 @@
+const axios = require('axios')
 const ObjectID = require('mongodb').ObjectID
 const imageThumbnail = require('image-thumbnail')
 const shortUUID = require('short-uuid')
@@ -64,8 +65,14 @@ class User {
 
     static async saveFacebook (facebookProfile) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
+        const res = await axios.default.get(facebookProfile.picture.data.url, {responseType: 'arraybuffer'})
+        const avatarContent = res.data
+        const imageId = shortUUID().generate()
+        await gcpSaver.uploadUserAvatar(`${imageId}.jpeg`, avatarContent)
+        const avatarUrl = `${config.gcpCloudStorageImageBaseUrl}/avatar/${imageId}.jpeg`
+
         const user = await User.add({level: constants.USER_LEVEL_REGULAR, 
-            name: facebookProfile.name, avatar_url: facebookProfile.picture.data.url,
+            name: facebookProfile.name, avatar_url: avatarUrl,
             email: facebookProfile.email, loginType: 'facebook'})
         const result = await collection.findOneAndUpdate(
             {_id: ObjectID(user._id)},
