@@ -7,6 +7,7 @@ const constants = require('../constants.js')
 const config = require('../config.js')
 const awsS3Saver = require('../libs/aws-s3-saver.js')
 const gcpSaver = require('../libs/gcp-saver.js')
+const SlackNotify = require('../libs/slack-notify')
 
 class User {
 
@@ -44,6 +45,7 @@ class User {
                                         : parseInt(config.customIdStart) + 1
                 user = new User(newCustomId.toString(), name, avatar_url, level, email, loginType)
                 await collectionUser.insertOne(user, { session })
+                SlackNotify.sendUserNumber(await collectionUser.countDocuments({}))
             })
         } finally {
             await session.endSession()
