@@ -2,6 +2,7 @@ const database = require('../database/database.js')
 const constants = require('../constants.js')
 const Meme = require('./meme.js')
 const User = require('./user.js')
+const Image = require('./image.js')
 const Notification = require('./notification.js')
 const ObjectID = require('mongodb').ObjectID
 
@@ -21,7 +22,7 @@ class Comment {
         this.like = 0
         if (mode === COMMENT_NORMAL) this.reply_number = 0
         else if (mode === COMMENT_REPLY) this._id = new ObjectID()
-        if (imageId) this.image_id = imageId
+        if (imageId) this.image_id = ObjectID(imageId)
     }
 
     static async add (memeId, userId, content, imageId=null) {
@@ -32,6 +33,7 @@ class Comment {
             if (meme) {
                 await collection.insertOne(comment)
                 await Meme.increaseCommentNumber(memeId, 1)
+                if (imageId) Image.increaseUsage(imageId, 1)
                 return comment
             } else return null
         } catch (e) {
@@ -49,6 +51,7 @@ class Comment {
                 {'$push': {children:comment}, '$inc': {reply_number: 1}})
             if (result.lastErrorObject.n === 1) {
                 await Meme.increaseCommentNumber(memeId, 1)
+                if (imageId) Image.increaseUsage(imageId, 1)
                 return comment
             }
             return null

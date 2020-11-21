@@ -100,7 +100,7 @@ class Image {
         //     fs.unlink(`images/${thumbnailFilename}`, () => {})
         // }
 
-        // These is for AWS S3
+        // These is for GCP cloud storage
         if (image.usage === 0) {
             await collection.deleteOne({_id: ObjectID(id)})
             // awsS3Saver.removeMemeImage(filename)
