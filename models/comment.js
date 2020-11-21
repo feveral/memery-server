@@ -151,6 +151,7 @@ class Comment {
         const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         const result = await collection.deleteOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         if (result.result.n === 1) {
+            // TODO: forgot to calculated deleted reply comments
             await Meme.increaseCommentNumber(comment.meme_id, -1)
             await Notification.delete({commentId})
         }

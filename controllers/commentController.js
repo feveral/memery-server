@@ -1,6 +1,7 @@
 const constants = require('../constants.js')
 const Comment = require('../models/comment.js')
 const User = require('../models/user.js')
+const Image = require('../models/image.js')
 const Notification = require('../models/notification.js')
 const Meme = require('../models/meme.js')
 const pushService = require('../libs/push-service.js')
@@ -42,7 +43,7 @@ module.exports = {
 
     async getComments (ctx) {
         const {meme_id} = ctx.query
-        const limit = parseInt(ctx.query.limit) || 10
+        let limit = parseInt(ctx.query.limit) || 10
         const skip = parseInt(ctx.query.skip) || 0
         if (limit > 20) limit = 20
         if (!meme_id) {
@@ -50,7 +51,9 @@ module.exports = {
             ctx.body = { message: 'query parameter "meme_id" should be given.'}
             return
         }
+        
         let comments = await Comment.findByOrder({memeId: meme_id, limit, skip})
+        console.log(comments)
         comments = await commentAddUserInfo(comments)
         ctx.body = comments
     },
@@ -76,7 +79,7 @@ module.exports = {
 
     async getCommentReply (ctx) {
         const parentCommentId = ctx.query.parent_comment_id
-        const limit = parseInt(ctx.query.limit) || 3
+        let limit = parseInt(ctx.query.limit) || 3
         const skip = parseInt(ctx.query.skip) || 0
         if (limit > 20) limit = 20
         const comment = await Comment.findOne({id: parentCommentId, limit, skip})
@@ -103,6 +106,7 @@ module.exports = {
         const content = ctx.request.body.content
         const memeId = ctx.request.body.meme_id
         const parentCommentId = ctx.request.body.parent_comment_id
+        const imageId = ctx.request.body.image_id
 
         if (!memeId) {
             ctx.response.status = 400
@@ -113,9 +117,19 @@ module.exports = {
             ctx.body = { message: 'body parameter "content" should be given.'}
             return
         }
+        let image
+        if (imageId) {
+            image = await Image.findOne(imageId)
+            if (!image) {
+                ctx.response.status = 400
+                ctx.body = { message: 'body parameter "image_id", the image is not exist.'}
+                return
+            }
+        }
+        
         let comment
         if (parentCommentId) {
-            comment = await Comment.addChild(parentCommentId, memeId, userId, content)
+            comment = await Comment.addChild(parentCommentId, memeId, userId, content, imageId)
             if (!comment) {
                 ctx.response.status = 400
                 ctx.body = { message: "parent_comment_id or meme_id invalid."}
@@ -135,7 +149,7 @@ module.exports = {
                 }
             }
         } else {
-            comment = await Comment.add(memeId, userId, content)
+            comment = await Comment.add(memeId, userId, content, imageId)
             if (!comment) {
                 ctx.response.status = 400
                 ctx.body = { message: "meme_id invalid."}
