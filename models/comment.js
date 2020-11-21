@@ -13,7 +13,7 @@ class Comment {
     /**
      * @param {string} userId user's object id string
      */
-    constructor (memeId, userId, content, mode) {
+    constructor (mode, memeId, userId, content, imageId=null) {
         this.meme_id = ObjectID(memeId)
         this.user_id = ObjectID(userId)
         this.created_at = new Date()
@@ -21,11 +21,12 @@ class Comment {
         this.like = 0
         if (mode === COMMENT_NORMAL) this.reply_number = 0
         else if (mode === COMMENT_REPLY) this._id = new ObjectID()
+        if (imageId) this.image_id = imageId
     }
 
-    static async add (memeId, userId, content) {
+    static async add (memeId, userId, content, imageId=null) {
         try {
-            const comment = new Comment(memeId, userId, content, COMMENT_NORMAL)
+            const comment = new Comment(COMMENT_NORMAL, memeId, userId, content, imageId)
             const collection = await database.getCollection(constants.COLLECTION_COMMENT)
             const meme = await Meme.findOne(memeId)
             if (meme) {
@@ -39,8 +40,8 @@ class Comment {
         }
     }
 
-    static async addChild (parentCommentId, memeId, userId, content) {
-        const comment = new Comment(memeId, userId, content, COMMENT_REPLY)
+    static async addChild (parentCommentId, memeId, userId, content, imageId=null) {
+        const comment = new Comment(COMMENT_REPLY, memeId, userId, content, imageId)
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         try {
             const result = await collection.findOneAndUpdate(
