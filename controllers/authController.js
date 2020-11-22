@@ -60,6 +60,9 @@ module.exports = {
                 ctx.body = { message: 'google sign in fail: token invalid or token type invalid.' }
                 return
             }
+            if (process.env.NODE_ENV === 'production') {
+                console.log(`LoginType: google, Email: ${googleProfile.email}`)
+            }
             let user = await User.findOne({email: googleProfile.email, loginType: 'google'})
             if (!user) user = await User.saveGoogle(googleProfile)
             const meme_token = auth.obtainMemeToken(user)
@@ -71,6 +74,9 @@ module.exports = {
                 ctx.response.status = 401
                 ctx.body = { message: 'facebook sign in fail: token invalid or token type invalid.' }
                 return
+            }
+            if (process.env.NODE_ENV === 'production') {
+                console.log(`LoginType: facebook, Email: ${facebookProfile.email}`)
             }
             let user = await User.findOne({email: facebookProfile.email, loginType: 'facebook'})
             if (!user) user = await User.saveFacebook(facebookProfile)

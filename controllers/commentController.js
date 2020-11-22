@@ -53,7 +53,6 @@ module.exports = {
         }
         
         let comments = await Comment.findByOrder({memeId: meme_id, limit, skip})
-        console.log(comments)
         comments = await commentAddUserInfo(comments)
         ctx.body = comments
     },

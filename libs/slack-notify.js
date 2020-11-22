@@ -17,7 +17,7 @@ class SlackNotify {
                             "author_icon": "http://flickr.com/icons/bobby.jpg",
                             "title": "Memery User Stat",
                             // "title_link": "https://api.slack.com/",
-                            "text": `Wellcome to our \`${userNumber}th\` user !!!`,
+                            "text": `Welcome our \`${userNumber}th\` user !!!`,
                             // "image_url": "http://my-website.com/path/to/image.jpg",
                             // "thumb_url": "http://example.com/path/to/thumb.png",
                             "footer": "Memery App",
