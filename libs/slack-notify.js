@@ -11,7 +11,7 @@ class SlackNotify {
                 {
                     "attachments": [
                         {
-                            "fallback": "Required plain-text summary of the attachment.",
+                            "fallback": `Welcome our ${userNumber}th user !!!`,
                             "color": "#36a64f",
                             "author_link": "http://flickr.com/bobby/",
                             "author_icon": "http://flickr.com/icons/bobby.jpg",
