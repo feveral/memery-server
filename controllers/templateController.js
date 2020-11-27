@@ -40,7 +40,7 @@ module.exports = {
         const type = ctx.query.type || 'search'
         const keyword = ctx.query.keyword || ''
         const skip = parseInt(ctx.query.skip) || 0
-        const limit = parseInt(ctx.query.limit) || 20
+        let limit = parseInt(ctx.query.limit) || 20
         
         if (limit > 20) limit = 20
         let templates
