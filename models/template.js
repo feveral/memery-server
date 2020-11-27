@@ -4,9 +4,9 @@ const { ObjectID } = require('mongodb')
 
 class Template {
     constructor (userId, name, imageId) {
-        this.user_id = userId
+        this.user_id = ObjectID(userId)
         this.name = name
-        this.image_id = imageId
+        this.image_id = ObjectID(imageId)
         this.created_at = new Date()
         this.apply_meme_id = []
         this.apply_number = 0
