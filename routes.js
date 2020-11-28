@@ -46,6 +46,7 @@ module.exports = (router) => {
 
     router.get('/api/template', templateController.getTemplates)
     router.post('/api/template', authController.verifyMemeToken, templateController.addTemplate)
+    router.put('/api/template/hide/:id', authController.verifyMemeToken, templateController.setTemplateHide)
 
     router.get('/api/collect', authController.verifyMemeToken, collectController.getUserCollect)
     router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
