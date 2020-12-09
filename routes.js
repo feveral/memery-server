@@ -9,6 +9,7 @@ const commentController = require('./controllers/commentController.js')
 const collectController = require('./controllers/collectController.js')
 const notificationController = require('./controllers/notificationController.js')
 const templateController = require('./controllers/templateController.js')
+const analyticsController = require('./controllers/analyticsController.js')
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
@@ -56,4 +57,6 @@ module.exports = (router) => {
     router.get('/api/notification/open', authController.verifyMemeToken, notificationController.getUnopenNotificationCount)
     router.post('/api/notification/open', authController.verifyMemeToken, notificationController.openNotification)
     router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotification)
+
+    router.post('/api/analytics/slack', analyticsController.slackMemeTrending)
 }
