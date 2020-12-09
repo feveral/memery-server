@@ -6,6 +6,7 @@ const Notification = require('../models/notification.js')
 const Template = require('../models/template.js')
 const Comment = require('../models/comment.js')
 const constants = require('../constants.js')
+const analytics = require('../libs/analytics.js')
 
 async function memesAddUserAndImageInfo(memes) {
     const userIds = []
@@ -98,6 +99,7 @@ module.exports = {
         if (limit > 20) limit = 20
         let memes = await Meme.findTrending({limit, skip}) // limit should not be too big
         memes = await memesAddUserAndImageInfo(memes)
+        analytics.increaseTrending()
         ctx.body = memes
     },
 
