@@ -109,6 +109,31 @@ class Image {
             gcpSaver.removeMemeImage(thumbnailFilename)
         }
     }
+
+    /**
+     * Input: {
+     *     image_id: ""
+     * }
+     * 
+     * Output: {
+     *     image_url: "",
+     *     image_thumbnail_url: "",
+     * }
+     * @param {Array<object>} objs 
+     * @param {Array<User>} users 
+     * @return {Array<object>} objects with user info 
+     */
+    static expandImageInfo(objs, images) {
+        for (let i = 0; i < objs.length; i++) {
+            for (let j = 0; j < images.length; j++) {
+                if (images[j]._id.toString() === objs[i].image_id.toString()) {
+                    objs[i].image_url = images[j].url
+                    objs[i].image_thumbnail_url = images[j]._thumbnail_url
+                }
+            }
+        }
+        return objs
+    }
 }
 
 module.exports = Image

@@ -13,15 +13,16 @@ async function commentAddUserInfo(comments) {
         userIds.push(comment.user_id)
     })
     const users = await User.findByIds(userIds)
-    comments.forEach(comment => {
-        users.forEach(user => {
-            if (user._id.toString() === comment.user_id.toString()) {
-                comment.user_custom_id = user.custom_id
-                comment.user_name = user.name
-                comment.user_avatar_url = user.avatar_url
-            }
-        })
-    })
+    comments = User.expandUserInfo(comments, users)
+    // comments.forEach(comment => {
+    //     users.forEach(user => {
+    //         if (user._id.toString() === comment.user_id.toString()) {
+    //             comment.user_custom_id = user.custom_id
+    //             comment.user_name = user.name
+    //             comment.user_avatar_url = user.avatar_url
+    //         }
+    //     })
+    // })
     return comments
 }
 
