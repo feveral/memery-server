@@ -58,5 +58,5 @@ module.exports = (router) => {
     router.post('/api/notification/open', authController.verifyMemeToken, notificationController.openNotification)
     router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotification)
 
-    router.post('/api/analytics/meme/trending', authController.verifyMemeToken, analyticsController.slackMemeTrending)
+    router.post('/api/analytics/slack', analyticsController.slackMemeTrending)
 }
