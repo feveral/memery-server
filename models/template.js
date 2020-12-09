@@ -4,12 +4,13 @@ const { ObjectID } = require('mongodb')
 
 class Template {
     constructor (userId, name, imageId) {
-        this.user_id = userId
+        this.user_id = ObjectID(userId)
         this.name = name
-        this.image_id = imageId
+        this.image_id = ObjectID(imageId)
         this.created_at = new Date()
         this.apply_meme_id = []
         this.apply_number = 0
+        this.hide = false
     }
 
     static async add (userId, name, imageId) {
@@ -85,6 +86,20 @@ class Template {
                 .sort({created_at: -1}) // TODO: should not that simple
                 .limit(limit).skip(skip).toArray()
     }
+
+    static async setHide (id, hide) {
+        try {
+            const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
+            if (hide) {
+                await collection.updateOne({_id: ObjectID(id)}, {'$set': {hide: true}})
+            } else {
+                await collection.updateOne({_id: ObjectID(id)}, {'$set': {hide: false}})
+            }
+        } catch (e) {
+            // for ObjectId invalid
+        }
+    }
+
 }
 
 module.exports = Template

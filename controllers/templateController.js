@@ -1,3 +1,4 @@
+const User = require('../models/user.js')
 const Template = require('../models/template.js')
 const Image = require('../models/image.js')
 
@@ -40,7 +41,7 @@ module.exports = {
         const type = ctx.query.type || 'search'
         const keyword = ctx.query.keyword || ''
         const skip = parseInt(ctx.query.skip) || 0
-        const limit = parseInt(ctx.query.limit) || 20
+        let limit = parseInt(ctx.query.limit) || 20
         
         if (limit > 20) limit = 20
         let templates
@@ -54,4 +55,37 @@ module.exports = {
         }
         ctx.body = await templateAddImageInfo(templates)
     },
+
+    // Critical: Admin account only
+    async setTemplateHide (ctx) {
+        const user = await User.findOne({id: ctx.user})
+        if (user.level !== 'admin') {
+            ctx.response.status = 403
+            ctx.body = { messgae: 'forbidden: you have no permission to use this api.'}
+            return
+        }
+        const id = ctx.params.id
+        let hide = ctx.request.body.hide
+
+        if (!hide) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "hide" should be given.'}
+            return
+        }
+        if (!id) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "id" should be given.'}
+            return
+        }
+        if (typeof(hide) !== 'boolean' && hide !== 'true' && hide !== 'false') {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'body parameter "hide" should be a boolean value.'}
+            return
+        }
+        if (hide === 'true') hide = true
+        if (hide === 'false') hide = false
+        await Template.setHide(id, hide)
+        ctx.status = 204
+        ctx.body = null
+    }
 }

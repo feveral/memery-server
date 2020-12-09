@@ -2,6 +2,7 @@ const database = require('../database/database.js')
 const constants = require('../constants.js')
 const Meme = require('./meme.js')
 const User = require('./user.js')
+const Image = require('./image.js')
 const Notification = require('./notification.js')
 const ObjectID = require('mongodb').ObjectID
 
@@ -13,7 +14,7 @@ class Comment {
     /**
      * @param {string} userId user's object id string
      */
-    constructor (memeId, userId, content, mode) {
+    constructor (mode, memeId, userId, content, imageId=null) {
         this.meme_id = ObjectID(memeId)
         this.user_id = ObjectID(userId)
         this.created_at = new Date()
@@ -21,16 +22,18 @@ class Comment {
         this.like = 0
         if (mode === COMMENT_NORMAL) this.reply_number = 0
         else if (mode === COMMENT_REPLY) this._id = new ObjectID()
+        if (imageId) this.image_id = ObjectID(imageId)
     }
 
-    static async add (memeId, userId, content) {
+    static async add (memeId, userId, content, imageId=null) {
         try {
-            const comment = new Comment(memeId, userId, content, COMMENT_NORMAL)
+            const comment = new Comment(COMMENT_NORMAL, memeId, userId, content, imageId)
             const collection = await database.getCollection(constants.COLLECTION_COMMENT)
             const meme = await Meme.findOne(memeId)
             if (meme) {
                 await collection.insertOne(comment)
                 await Meme.increaseCommentNumber(memeId, 1)
+                if (imageId) Image.increaseUsage(imageId, 1)
                 return comment
             } else return null
         } catch (e) {
@@ -39,8 +42,8 @@ class Comment {
         }
     }
 
-    static async addChild (parentCommentId, memeId, userId, content) {
-        const comment = new Comment(memeId, userId, content, COMMENT_REPLY)
+    static async addChild (parentCommentId, memeId, userId, content, imageId=null) {
+        const comment = new Comment(COMMENT_REPLY, memeId, userId, content, imageId)
         const collection = await database.getCollection(constants.COLLECTION_COMMENT)
         try {
             const result = await collection.findOneAndUpdate(
@@ -48,6 +51,7 @@ class Comment {
                 {'$push': {children:comment}, '$inc': {reply_number: 1}})
             if (result.lastErrorObject.n === 1) {
                 await Meme.increaseCommentNumber(memeId, 1)
+                if (imageId) Image.increaseUsage(imageId, 1)
                 return comment
             }
             return null
@@ -150,6 +154,7 @@ class Comment {
         const comment = await collection.findOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         const result = await collection.deleteOne({_id: ObjectID(commentId), user_id: ObjectID(userId)})
         if (result.result.n === 1) {
+            // TODO: forgot to calculated deleted reply comments
             await Meme.increaseCommentNumber(comment.meme_id, -1)
             await Notification.delete({commentId})
         }
