@@ -53,7 +53,7 @@ module.exports = {
         } else {
             templates = await Template.find({name: keyword, limit, skip, orderApplyNumber: true})
         }
-        ctx.body = await templateAddImageInfo(templates)
+        ctx.body = (await templateAddImageInfo([template]))[0]
     },
 
     // Critical: Admin account only
