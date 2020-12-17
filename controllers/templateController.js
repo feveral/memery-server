@@ -34,7 +34,7 @@ module.exports = {
         }
         const template = await Template.add(userId, name, imageId)
         await Image.increaseUsage(imageId, 1)
-        ctx.body = template
+        ctx.body = (await templateAddImageInfo([template]))[0]
     },
 
     async getTemplates (ctx) {
@@ -53,7 +53,7 @@ module.exports = {
         } else {
             templates = await Template.find({name: keyword, limit, skip, orderApplyNumber: true})
         }
-        ctx.body = (await templateAddImageInfo([template]))[0]
+        ctx.body = await templateAddImageInfo(templates)
     },
 
     // Critical: Admin account only
