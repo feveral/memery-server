@@ -181,6 +181,34 @@ class User {
             const collection = await database.getCollection(constants.COLLECTION_USER)
             await collection.updateOne({_id: ObjectID(userId)}, {'$set': {avatar_url: newAvatarUrl}})
         }
+        User.expandUserInfo()
+    }
+
+    /**
+     * Input: {
+     *     user_id: ""
+     * }
+     * 
+     * Output: {
+     *     user_custom_id: "",
+     *     user_name: "",
+     *     user_avatar_url: ""
+     * }
+     * @param {Array<object>} objs 
+     * @param {Array<User>} users 
+     * @return {Array<object>} objects with user info 
+     */
+    static expandUserInfo(objs, users) {
+        for (let i = 0; i < objs.length; i++) {
+            for (let j = 0; j < users.length; j++) {
+                if (users[j]._id.toString() === objs[i].user_id.toString()) {
+                    objs[i].user_custom_id = users[j].custom_id
+                    objs[i].user_name = users[j].name
+                    objs[i].user_avatar_url = users[j].avatar_url
+                }
+            }
+        }
+        return objs
     }
 }
 
