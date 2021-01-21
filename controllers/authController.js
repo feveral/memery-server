@@ -18,6 +18,11 @@ module.exports = {
         
         try {
             const user = jwt.verify(meme_token, config.tokenSecret)
+            if (user._id === '5f6eeb30dcdddf465a4f39a7' && user.sign_timestamp < 1611240552838) {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: this token is not vaild anymore' }
+                return
+            }
             ctx.user = user._id
         } catch (e) {
             if (e.name === 'JsonWebTokenError' && e.message === 'invalid token') {
