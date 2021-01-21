@@ -115,6 +115,23 @@ class User {
         }
     }
 
+    static async findByFBProfile(profile) {
+        if (!profile || !profile.id){
+            return null
+        }
+        const filter = {}
+        filter.facebook_profile = {id: profile.id}
+        filter.login_type = 'facebook'
+        const projection = {
+            like_meme_ids: false,
+            dislike_meme_ids: false,
+            like_comment_ids: false,
+        }
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collection.findOne(filter, {projection})
+        return result
+    }
+
     static async findByIds(ids) {
         const collection = await database.getCollection(constants.COLLECTION_USER)
         const objIds = ids.map( (myId) => { return ObjectID(myId) })
