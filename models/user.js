@@ -120,7 +120,7 @@ class User {
             return null
         }
         const filter = {}
-        filter.facebook_profile = {id: profile.id}
+        filter['facebook_profile.id'] = profile.id
         filter.login_type = 'facebook'
         const projection = {
             like_meme_ids: false,
