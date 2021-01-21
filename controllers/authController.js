@@ -78,7 +78,7 @@ module.exports = {
             if (process.env.NODE_ENV === 'production') {
                 console.log(`LoginType: facebook, Email: ${facebookProfile.email}`)
             }
-            let user = await User.findOne({email: facebookProfile.email, loginType: 'facebook'})
+            let user = await User.findByFBProfile(facebookProfile)
             if (!user) user = await User.saveFacebook(facebookProfile)
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}
