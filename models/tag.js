@@ -1,5 +1,6 @@
 const database = require('../database/database.js')
 const constants = require('../constants.js')
+const utility = require('../libs/utility')
 const { ObjectID } = require('mongodb')
 
 class Tag {
@@ -35,6 +36,34 @@ class Tag {
             .find(filter)
             .sort({meme_number:-1})
             .limit(limit).skip(skip).toArray()
+        return result
+    }
+
+    static async findTrendAndRandom({limit=10, skip=0}) {
+        const trendLimit = parseInt(limit * 0.3)
+        const collection = await database.getCollection(constants.COLLECTION_TAG)
+        const trendResult = await collection.find({}, { projection:{meme_ids: false}})
+            .sort({upload_time: -1})
+            .limit(trendLimit).skip(skip*0.3).toArray()
+
+        const excludeIds = []
+
+        trendResult.forEach((m) => {
+            excludeIds.push(m._id)
+        })
+        
+        const randomResult = await collection
+            .aggregate([
+                { $match: {_id: {$nin: excludeIds}}},
+                { $project: {meme_ids: false}},
+                // { $sample: { size: limit-trendResult.length-newResult.length } }])
+                { $sample: { size: limit-trendResult.length } }])
+            .toArray()
+        console.log(randomResult)
+        let result = []
+        result = result.concat(trendResult)
+        result = result.concat(randomResult)
+        utility.shuffle(result)
         return result
     }
 

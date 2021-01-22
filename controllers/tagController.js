@@ -7,7 +7,8 @@ module.exports = {
         const limit = parseInt(ctx.query.limit) || 10
         const skip = parseInt(ctx.query.skip) || 0
 
-        const tags = await Tag.find({name, limit, skip})
+        // const tags = await Tag.find({name, limit, skip})
+        const tags = await Tag.findTrendAndRandom({limit, skip})
         ctx.body = tags
     }
 }
