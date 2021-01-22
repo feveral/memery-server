@@ -33,7 +33,7 @@ class Tag {
         const filter = {name: {'$regex': `${nameRegex}.*`}}
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         const result = await collection
-            .find(filter)
+            .find(filter, { projection:{meme_ids: false}})
             .sort({meme_number:-1})
             .limit(limit).skip(skip).toArray()
         return result
