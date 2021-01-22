@@ -59,7 +59,6 @@ class Tag {
                 // { $sample: { size: limit-trendResult.length-newResult.length } }])
                 { $sample: { size: limit-trendResult.length } }])
             .toArray()
-        console.log(randomResult)
         let result = []
         result = result.concat(trendResult)
         result = result.concat(randomResult)
