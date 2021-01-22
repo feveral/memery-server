@@ -43,7 +43,7 @@ class Tag {
         const trendLimit = parseInt(limit * 0.3)
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         const trendResult = await collection.find({}, { projection:{meme_ids: false}})
-            .sort({upload_time: -1})
+            .sort({meme_number: -1})
             .limit(trendLimit).skip(skip*0.3).toArray()
 
         const excludeIds = []
