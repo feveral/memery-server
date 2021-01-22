@@ -30,7 +30,7 @@ class Tag {
         for (let i = 0; i < name.length; i++) {
             nameRegex += `.*${name[i]}`
         }
-        const filter = {name: {'$regex': `${nameRegex}.*`}}
+        const filter = {name: {'$regex': `${nameRegex}.*`, $options: 'i'}}
         const collection = await database.getCollection(constants.COLLECTION_TAG)
         const result = await collection
             .find(filter, { projection:{meme_ids: false}})
