@@ -198,7 +198,6 @@ class User {
             const collection = await database.getCollection(constants.COLLECTION_USER)
             await collection.updateOne({_id: ObjectID(userId)}, {'$set': {avatar_url: newAvatarUrl}})
         }
-        User.expandUserInfo()
     }
 
     /**
