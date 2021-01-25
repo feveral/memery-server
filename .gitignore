@@ -1,6 +1,6 @@
 node_modules/
 dist/
-config.js
+config-old.js
 test.js
 firebase-admin.json
 .env
