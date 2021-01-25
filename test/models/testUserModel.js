@@ -49,7 +49,6 @@ describe('Model: User', () => {
             users[2]._id = objs[0].user_id
     
             const newobjs = User.expandUserInfo(objs, users)
-            console.log(newobjs)
             expect(newobjs[0].user_name).to.equal("username2")
             expect(newobjs[1].user_name).to.equal("username1")
             expect(newobjs[0].user_custom_id).to.equal("customid2")

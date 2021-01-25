@@ -7,7 +7,7 @@ class PushService {
     constructor () {
         this.firebaseAdmin = admin
         this.firebaseAdmin.initializeApp({
-            credential: admin.credential.cert(require(config.firebaseAdminKeyPath)),
+            credential: admin.credential.cert(require(`${process.cwd()}/${config.firebaseAdminKeyPath}`)),
         });
     }
 

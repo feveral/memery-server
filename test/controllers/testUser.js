@@ -1,7 +1,7 @@
 const axios = require('axios')
 const shortUUID = require('short-uuid')
-const chai = require('./libs/chaiInitialize.js')
-const config = require('../config.js')
+const chai = require('../libs/chaiInitialize.js')
+const config = require('../../config.js')
 const expect = chai.expect
 
 describe('UserApi', function () {
