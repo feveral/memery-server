@@ -25,6 +25,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - run: 'echo "$FIREBASE_ADMIN_DATA" > firebase-admin.json'
+      shell: bash
+      env:
+        FIREBASE_ADMIN_DATA: ${{secrets.FIREBASE_ADMIN}}
+    - run: 'echo "$GCP_KEY_DATA" > gcp-key.json'
+      shell: bash
+      env:
+        GCP_KEY_DATA: ${{secrets.GCP_KEY}}
+    - run: 'echo "$TEST_ENV_FILE_DATA" > .env'
+      shell: bash
+      env:
+        TEST_ENV_FILE_DATA: ${{secrets.TEST_ENV_FILE}}
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
