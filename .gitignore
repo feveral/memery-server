@@ -5,3 +5,4 @@ test.js
 firebase-admin.json
 .env
 gcp-key.json
+apple-sign-in-key.p8

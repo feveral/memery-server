@@ -84,6 +84,20 @@ class User {
         return result.value
     }
 
+    static async saveApple (name, appleProfile) {
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        const avatarUrl = `${config.gcpCloudStorageImageBaseUrl}/avatar/default.png`
+        const user = await User.add({level: constants.USER_LEVEL_REGULAR,
+            name: name, avatar_url: avatarUrl,
+            email: appleProfile.email, loginType: 'apple'})
+        const result = await collection.findOneAndUpdate(
+            {_id: ObjectID(user._id)},
+            {'$set': {apple_profile: appleProfile}},
+            {upsert: true}
+        )
+        return result.value
+    }
+
     static async find ({_id, customId, level, limit=20, skip=0}) {
         const filter = {}
         if (_id) filter._id = ObjectID(_id)
@@ -122,6 +136,23 @@ class User {
         const filter = {}
         filter['facebook_profile.id'] = profile.id
         filter.login_type = 'facebook'
+        const projection = {
+            like_meme_ids: false,
+            dislike_meme_ids: false,
+            like_comment_ids: false,
+        }
+        const collection = await database.getCollection(constants.COLLECTION_USER)
+        const result = await collection.findOne(filter, {projection})
+        return result
+    }
+
+    static async findByAppleProfile(profile) {
+        if (!profile || !profile.sub){
+            return null
+        }
+        const filter = {}
+        filter['apple_profile.sub'] = profile.sub
+        filter.login_type = 'apple'
         const projection = {
             like_meme_ids: false,
             dislike_meme_ids: false,

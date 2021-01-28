@@ -44,9 +44,10 @@ module.exports = {
         const type  = ctx.request.body.type // should be 'google' or 'facebook'
         const token = ctx.request.body.token 
         const tokenType = ctx.request.body.token_type // 'id_token' or 'access_token'
-        if (type !== 'google' && type !== 'facebook') {
+        const name = ctx.request.body.name
+        if (type !== 'google' && type !== 'facebook' && type !== 'apple') {
             ctx.response.status = 400
-            ctx.body = { message: 'body parameter "type" should be "google" or "facebook".' }
+            ctx.body = { message: 'body parameter "type" should be "google", "facebook" or "apple".' }
             return 
         } else if (!token) {
             ctx.response.status = 400
@@ -55,6 +56,10 @@ module.exports = {
         } else if (tokenType !== 'id_token' && tokenType !== 'access_token') {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "token_type" should be "id_token" or "access_token".' }
+            return
+        } else if (type === 'apple' && !name) {
+            ctx.response.status = 400
+            ctx.body = { message: 'body parameter "name" should be given when using apple sign in.' }
             return
         }
 
@@ -81,10 +86,25 @@ module.exports = {
                 return
             }
             if (process.env.NODE_ENV === 'production') {
-                console.log(`LoginType: facebook, Email: ${facebookProfile.email}`)
+                console.log(`LoginType: facebook, Id: ${facebookProfile.id}`)
             }
             let user = await User.findByFBProfile(facebookProfile)
             if (!user) user = await User.saveFacebook(facebookProfile)
+            const meme_token = auth.obtainMemeToken(user)
+            ctx.body = {meme_token}
+            return
+        } else if (type === 'apple') {
+            const appleProfile = await auth.verifyAppleIdentityToken(token)
+            if (appleProfile === null) {
+                ctx.response.status = 401
+                ctx.body = { message: 'apple sign in fail: identity token invalid or expire.' }
+                return
+            }
+            if (process.env.NODE_ENV === 'production') {
+                console.log(`LoginType: apple, Id: ${appleProfile.sub}`)
+            }
+            let user = await User.findByAppleProfile(appleProfile)
+            if (!user) user = await User.saveApple(name, appleProfile)
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}
             return

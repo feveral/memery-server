@@ -2,6 +2,14 @@ const shortUUID = require('short-uuid')
 const axios = require('axios')
 const config = require('../config.js')
 const jwt = require('jsonwebtoken')
+const nodeRSA = require('node-rsa')
+const fs = require('fs')
+const appleSignIn = require('./appleSignIn.js')
+
+let appleSignInKey = fs.readFileSync(`${process.cwd()}/apple-sign-in-key.p8`)
+let applePublicKey = null
+let appleClientId = ""
+let appleClientSecret = null
 
 module.exports = {
     /**
@@ -39,5 +47,9 @@ module.exports = {
         const options = {'algorithm': 'HS256'}
         const token = jwt.sign(payload, config.tokenSecret, options)
         return token
-    }
+    },
+
+    async verifyAppleIdentityToken (idToken) {
+        return await appleSignIn.verifyIdentityToken(idToken)
+    },
 }
