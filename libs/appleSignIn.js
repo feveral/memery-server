@@ -6,7 +6,7 @@ const fs = require('fs')
 
 class AppleSignIn {
     constructor () {
-        this.appleSignInKey = fs.readFileSync(`${process.cwd()}/apple-sign-in-key.p8`)
+        // this.appleSignInKey = fs.readFileSync(`${process.cwd()}/apple-sign-in-key.p8`)
         this.applePublicKey = null
         this.clientId = "com.memery"
         this.clientSecret = null
