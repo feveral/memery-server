@@ -40,7 +40,7 @@ class AppleSignIn {
             "scope": SCOPE
         };
         try {
-            const auth = new AppleAuth(configure, './apple-sign-in-key.p8');
+            const auth = new AppleAuth(configure, config.appleSignInKeyPath);
             const tokenResponse = (await auth.accessToken(authorizationCode))
             const jwtClaims = jwt.verify(tokenResponse.id_token, this.applePublicKey, { algorithms: 'RS256' })
             if (jwtClaims.iss === TOKEN_ISSUER
@@ -51,6 +51,25 @@ class AppleSignIn {
             }
         } catch (e) {
             console.log('[libs/appleSignIn]: verify authorization code failed')
+            console.log(e)
+            return null
+        }
+    }
+
+    async verifyIdentityToken (token) {
+        if (!this.applePublicKey) {
+            await this.refreshApplePublicKey()
+        }
+        try  {
+            const jwtClaims = jwt.verify(token, this.applePublicKey, { algorithms: 'RS256' })
+            if (jwtClaims.iss === TOKEN_ISSUER
+            && jwtClaims.aud === CLIENT_ID) {
+                return jwtClaims
+            } else {
+                return null
+            }
+        }  catch (e) {
+            console.log('[libs/appleSignIn]: verify identity token failed')
             console.log(e)
             return null
         }

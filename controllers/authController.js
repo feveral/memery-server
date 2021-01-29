@@ -90,7 +90,16 @@ module.exports = {
             ctx.body = {meme_token}
             return
         } else if (type === 'apple') {
-            const appleProfile = await auth.verifyAppleAuthorizationCode(token)
+            let appleProfile
+            if (tokenType === 'id_token') {
+                appleProfile = await auth.verifyAppleIdentityToken(token)
+            } else if (tokenType === 'code') {
+                appleProfile = await auth.verifyAppleAuthorizationCode(token)
+            } else {
+                ctx.response.status = 401
+                ctx.body = { message: 'apple sign in fail: token_type should be "id_token" or "code"' }
+                return
+            }
             if (appleProfile === null) {
                 ctx.response.status = 401
                 ctx.body = { message: 'apple sign in fail: authorization code invalid or expire.' }
