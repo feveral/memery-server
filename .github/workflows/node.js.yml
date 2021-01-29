@@ -33,6 +33,10 @@ jobs:
       shell: bash
       env:
         GCP_KEY_DATA: ${{secrets.GCP_KEY}}
+    - run: 'echo "$APPLE_SIGN_IN_KEY_DATA" > apple-sign-in-key.p8'
+      shell: bash
+      env:
+        APPLE_SIGN_IN_KEY_DATA: ${{secrets.APPLE_SIGN_IN_KEY}}
     - run: 'echo "$TEST_ENV_FILE_DATA" > .env'
       shell: bash
       env:
