@@ -23,4 +23,6 @@ module.exports = {
 
     slackWebHookUrl: process.env.SLACK_WEB_HOOK_URL,
     slackAnalyticsToken: process.env.SLACK_ANALYTICS_TOKEN,
+
+    appleSignInKeyPath: process.env.APPLE_SIGN_IN_KEY_PATH
 }

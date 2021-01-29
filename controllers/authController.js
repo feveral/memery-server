@@ -53,7 +53,7 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "token" should be given.' }
             return
-        } else if (tokenType !== 'id_token' && tokenType !== 'access_token') {
+        } else if (tokenType !== 'id_token' && tokenType !== 'access_token' && tokenType !== 'code') {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "token_type" should be "id_token" or "access_token".' }
             return
@@ -90,10 +90,10 @@ module.exports = {
             ctx.body = {meme_token}
             return
         } else if (type === 'apple') {
-            const appleProfile = await auth.verifyAppleIdentityToken(token)
+            const appleProfile = await auth.verifyAppleAuthorizationCode(token)
             if (appleProfile === null) {
                 ctx.response.status = 401
-                ctx.body = { message: 'apple sign in fail: identity token invalid or expire.' }
+                ctx.body = { message: 'apple sign in fail: authorization code invalid or expire.' }
                 return
             }
             if (process.env.NODE_ENV === 'production') {

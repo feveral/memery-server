@@ -42,7 +42,7 @@ module.exports = {
         return token
     },
 
-    async verifyAppleIdentityToken (idToken) {
-        return await appleSignIn.verifyIdentityToken(idToken)
+    async verifyAppleAuthorizationCode (authorizationCode) {
+        return await appleSignIn.verifyAuthorizationCode(authorizationCode)
     },
 }

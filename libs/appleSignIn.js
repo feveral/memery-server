@@ -4,17 +4,18 @@ const config = require('../config.js')
 const jwt = require('jsonwebtoken')
 const nodeRSA = require('node-rsa')
 const fs = require('fs')
+const AppleAuth = require('apple-auth')
 
 const ENDPOINT_URL = 'https://appleid.apple.com'
 const TOKEN_ISSUER = 'https://appleid.apple.com'
-const DEFAULT_SCOPE = 'name email'
+const SCOPE = 'name email'
 const CLIENT_ID = "com.memery"
 const TEAN_ID = "PY7NKJMQL8"
 const KEY_ID = '49F3MQ6BHQ'
 
 class AppleSignIn {
     constructor () {
-        // this.appleSignInKey = fs.readFileSync(`${process.cwd()}/apple-sign-in-key.p8`)
+        this.appleSignInKey = fs.readFileSync(`${process.cwd()}/${config.appleSignInKeyPath}`)
         this.applePublicKey = null
         this.refreshApplePublicKey()
     }
@@ -27,12 +28,21 @@ class AppleSignIn {
         this.applePublicKey = pubKey.exportKey(['public'])
     }
 
-    async verifyIdentityToken (idToken) {
+    async verifyAuthorizationCode (authorizationCode) {
         if (!this.applePublicKey) {
             await this.refreshApplePublicKey()
         }
+        const configure = {
+            "client_id": CLIENT_ID,
+            "team_id": TEAN_ID,
+            "key_id": KEY_ID,
+            "redirect_uri": "https://example.com/auth",
+            "scope": SCOPE
+        };
         try {
-            const jwtClaims = jwt.verify(idToken, this.applePublicKey, { algorithms: 'RS256' })
+            const auth = new AppleAuth(configure, './apple-sign-in-key.p8');
+            const tokenResponse = (await auth.accessToken(authorizationCode))
+            const jwtClaims = jwt.verify(tokenResponse.id_token, this.applePublicKey, { algorithms: 'RS256' })
             if (jwtClaims.iss === TOKEN_ISSUER
             && jwtClaims.aud === CLIENT_ID) {
                 return jwtClaims
