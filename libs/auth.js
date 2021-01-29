@@ -2,6 +2,7 @@ const shortUUID = require('short-uuid')
 const axios = require('axios')
 const config = require('../config.js')
 const jwt = require('jsonwebtoken')
+const appleSignIn = require('./appleSignIn.js')
 
 module.exports = {
     /**
@@ -39,5 +40,13 @@ module.exports = {
         const options = {'algorithm': 'HS256'}
         const token = jwt.sign(payload, config.tokenSecret, options)
         return token
-    }
+    },
+
+    async verifyAppleIdentityToken (token) {
+        return await appleSignIn.verifyIdentityToken(token)
+    },
+
+    async verifyAppleAuthorizationCode (authorizationCode) {
+        return await appleSignIn.verifyAuthorizationCode(authorizationCode)
+    },
 }
