@@ -57,10 +57,6 @@ module.exports = {
             ctx.response.status = 400
             ctx.body = { message: 'body parameter "token_type" should be "id_token" or "access_token".' }
             return
-        } else if (type === 'apple' && !name) {
-            ctx.response.status = 400
-            ctx.body = { message: 'body parameter "name" should be given when using apple sign in.' }
-            return
         }
 
         if (type === 'google') {
@@ -104,7 +100,14 @@ module.exports = {
                 console.log(`LoginType: apple, Id: ${appleProfile.sub}`)
             }
             let user = await User.findByAppleProfile(appleProfile)
-            if (!user) user = await User.saveApple(name, appleProfile)
+            if (!user) {
+                if (!name) {
+                    ctx.response.status = 400
+                    ctx.body = { message: 'body parameter "name" should be given when first time to sign in to Apple' }
+                    return
+                }
+                user = await User.saveApple(name, appleProfile)
+            }
             const meme_token = auth.obtainMemeToken(user)
             ctx.body = {meme_token}
             return
