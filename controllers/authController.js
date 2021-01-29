@@ -101,11 +101,12 @@ module.exports = {
             }
             let user = await User.findByAppleProfile(appleProfile)
             if (!user) {
-                if (!name) {
+                if (name === undefined) {
                     ctx.response.status = 400
                     ctx.body = { message: 'body parameter "name" should be given when first time to sign in to Apple' }
                     return
                 }
+                if (name === '') name = 'Memery User'
                 user = await User.saveApple(name, appleProfile)
             }
             const meme_token = auth.obtainMemeToken(user)
