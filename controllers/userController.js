@@ -22,6 +22,7 @@ module.exports = {
         user.collected_by_others = await Collect.count({ownerUserId: userId})
         delete user.google_profile
         delete user.facebook_profile
+        delete user.apple_profile
         if (!user.email) {
             user.email = ''
         }

@@ -5,6 +5,83 @@ const User = require('../models/user.js')
 
 module.exports = {
 
+    async verifyAdminMemeToken(ctx, next) {
+        const authorization = ctx.headers.authorization
+        
+        if (!authorization || authorization.substring(0, 6) !== 'Bearer') {
+            ctx.response.status = 401
+            ctx.body = { message: 'token format should be "Bearer <jwt token>"' }
+            return
+        }
+        
+        const meme_token = authorization.substring(7)
+        
+        try {
+            let user = jwt.verify(meme_token, config.tokenSecret)
+            if (user._id === '5f6eeb30dcdddf465a4f39a7' && user.sign_timestamp < 1611240552838) {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: this token is not vaild anymore' }
+                return
+            }
+            user = await User.findOne({id: user.id})
+            if (user.level === 'admin') {
+                ctx.user = user._id
+            } else {
+                ctx.response.status = 403
+                ctx.body = { message: 'permission denied' }
+                return
+            }
+        } catch (e) {
+            if (e.name === 'JsonWebTokenError' && e.message === 'invalid token') {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: invalid token' }
+            } else if (e.name === 'TokenExpiredError' && e.message === 'jwt expired') {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: the token is expired' }
+            } else {
+                ctx.response.status = 401
+                ctx.body = { message: `UnAuthorized: ${e.name}, ${e.message}` }
+            }
+            return
+        }
+        await next()
+    },
+
+    async verifyMemeToken(ctx, next) {
+        const authorization = ctx.headers.authorization
+        
+        if (!authorization || authorization.substring(0, 6) !== 'Bearer') {
+            ctx.response.status = 401
+            ctx.body = { message: 'token format should be "Bearer <jwt token>"' }
+            return
+        }
+        
+        const meme_token = authorization.substring(7)
+        
+        try {
+            const user = jwt.verify(meme_token, config.tokenSecret)
+            if (user._id === '5f6eeb30dcdddf465a4f39a7' && user.sign_timestamp < 1611240552838) {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: this token is not vaild anymore' }
+                return
+            }
+            ctx.user = user._id
+        } catch (e) {
+            if (e.name === 'JsonWebTokenError' && e.message === 'invalid token') {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: invalid token' }
+            } else if (e.name === 'TokenExpiredError' && e.message === 'jwt expired') {
+                ctx.response.status = 401
+                ctx.body = { message: 'UnAuthorized: the token is expired' }
+            } else {
+                ctx.response.status = 401
+                ctx.body = { message: `UnAuthorized: ${e.name}, ${e.message}` }
+            }
+            return
+        }
+        await next()
+    },
+
     async verifyMemeToken(ctx, next) {
         const authorization = ctx.headers.authorization
         

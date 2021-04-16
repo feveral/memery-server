@@ -1,6 +1,7 @@
 const database = require('../database/database.js')
 const constants = require('../constants')
 const { ObjectID } = require('mongodb')
+const Image = require('./image.js')
 
 class Template {
     constructor (userId, name, imageId) {
@@ -100,6 +101,25 @@ class Template {
         }
     }
 
+    static async deleteOne ({id, userId}) {
+        try {
+            const filter = {}
+            if (id) filter._id = ObjectID(id)
+            if (userId) filter.user_id = ObjectID(userId)
+            const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
+            const template = await collection.findOne(filter)
+            if (template) {
+                const result = await collection.deleteOne({_id: template._id})
+                if (result.deletedCount === 1) {
+                    await Image.increaseUsage(template.image_id, -1)
+                }
+                return result.deletedCount
+            } else return 0
+        } catch (e) {
+            // for ObjectId invalid
+            return 0
+        }
+    }
 }
 
 module.exports = Template

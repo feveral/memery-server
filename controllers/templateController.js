@@ -37,6 +37,17 @@ module.exports = {
         ctx.body = (await templateAddImageInfo([template]))[0]
     },
 
+    async getTemplate(ctx)  {
+        const id = ctx.params.id
+        const template = await Template.findOne(id)
+        if (template) ctx.body = template
+        else {
+            ctx.response.status = 400
+            ctx.body = { message: 'template not found.'}
+            return
+        }
+    },
+
     async getTemplates (ctx) {
         const type = ctx.query.type || 'search'
         const keyword = ctx.query.keyword || ''
@@ -87,5 +98,31 @@ module.exports = {
         await Template.setHide(id, hide)
         ctx.status = 204
         ctx.body = null
+    },
+
+    // Critical: Admin account only
+    async deleteTemplate(ctx) {
+        const id = ctx.params.id
+        const user = await User.findOne({id: ctx.user})
+        const template = await Template.findOne(id);
+
+        if (!template) {
+            ctx.response.status = 400
+            ctx.body = { messgae: 'template not found.'}
+            return
+        }
+
+        if (user.level !== 'admin' && template.user_id.toString() !== user._id.toString()) {
+            ctx.response.status = 403
+            ctx.body = { messgae: 'permission denied: you have no permission to delete this template.'}
+            return
+        }
+
+        if (user.level === 'admin') {
+            await Template.deleteOne({id})
+        } else {
+            await Template.deleteOne({id, userId: ctx.user})
+        }
+        ctx.body = {message: 'delete template successfully'}
     }
 }
