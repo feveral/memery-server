@@ -46,8 +46,10 @@ module.exports = (router) => {
     router.get('/api/tag', tagController.getTags)
 
     router.get('/api/template', templateController.getTemplates)
+    router.get('/api/template/:id', templateController.getTemplate)
     router.post('/api/template', authController.verifyMemeToken, templateController.addTemplate)
-    router.put('/api/template/hide/:id', authController.verifyMemeToken, templateController.setTemplateHide)
+    router.put('/api/template/hide/:id', authController.verifyAdminMemeToken, templateController.setTemplateHide)
+    router.delete('/api/template/:id', authController.verifyMemeToken, templateController.deleteTemplate)
 
     router.get('/api/collect', authController.verifyMemeToken, collectController.getUserCollect)
     router.post('/api/collect', authController.verifyMemeToken, collectController.addCollect)
