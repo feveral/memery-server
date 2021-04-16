@@ -21,7 +21,7 @@ class Template {
         return template
     }
 
-    static async find ({name, limit=15, skip=0, orderApplyNumber=false}) {
+    static async find ({name, limit=15, skip=0, orderApplyNumber=false, getApplyMemeId=false}) {
         const filter = {}
         const order = {}
         if (name) {
@@ -34,7 +34,8 @@ class Template {
         }
         if (orderApplyNumber) order.apply_number = -1
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-        return await collection.find(filter).sort(order).limit(limit).skip(skip).toArray()
+        const projection = {apply_meme_id: getApplyMemeId}
+        return await collection.find(filter, {projection}).sort(order).limit(limit).skip(skip).toArray()
     }
 
     static async findOne(id) {
@@ -71,17 +72,17 @@ class Template {
     }
 
     //TODO: need a trend query policy
-    static async findTrend ({limit=15, skip=0, getApplyMemeIds=false}) {
+    static async findTrend ({limit=15, skip=0, getApplyMemeId=false}) {
         const filter = {}
-        const projection = {apply_meme_ids: getApplyMemeIds}
+        const projection = {apply_meme_id: getApplyMemeId}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
         return await collection.find(filter, {projection}).sort({apply_number: -1}).limit(limit).skip(skip).toArray()
     }
 
     //TODO: need a new query policy
-    static async findNew ({limit=15, skip=0, getApplyMemeIds=false}) {
+    static async findNew ({limit=15, skip=0, getApplyMemeId=false}) {
         const filter = {}
-        const projection = {apply_meme_ids: getApplyMemeIds}
+        const projection = {apply_meme_id: getApplyMemeId}
         const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
         return await collection.find(filter, {projection})
                 .sort({created_at: -1}) // TODO: should not that simple
