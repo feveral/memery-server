@@ -38,10 +38,11 @@ class Template {
         return await collection.find(filter, {projection}).sort(order).limit(limit).skip(skip).toArray()
     }
 
-    static async findOne(id) {
+    static async findOne(id, getApplyMemeId=false) {
         try {
             const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-            return await collection.findOne({_id: ObjectID(id)})
+            const projection = {apply_meme_id: getApplyMemeId}
+            return await collection.findOne({_id: ObjectID(id)}, {projection})
         } catch (e) {
             // for ObjectId invalid
         }

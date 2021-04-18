@@ -136,6 +136,14 @@ module.exports = {
         }
     },
 
+    async getMemesByTemplateId (ctx) {
+        const templateId = ctx.params.id
+        const template = await Template.findOne(templateId, true)
+        let memes = await Meme.findByIds(template.apply_meme_id)
+        memes = await memesAddUserAndImageInfo(memes)
+        ctx.body = memes
+    },
+
     async like (ctx) {
         const {meme_id, action} = ctx.request.body
         if (!meme_id) {
