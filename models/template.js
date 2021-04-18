@@ -94,7 +94,7 @@ class Template {
             for (let i = 0; i < name.length; i++) {
                 regexString += `.*${name[i]}`
             }
-            let regexFilter = {'$regex': `${regexString}.*`}
+            let regexFilter = {'$regex': `${regexString}.*`, $options: 'i'}
             filter['$or'] = [{name: regexFilter}]
         }
         if (orderApplyNumber) order.apply_number = -1

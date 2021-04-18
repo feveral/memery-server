@@ -48,7 +48,7 @@ class Meme {
             for (let i = 0; i < keyword.length; i++) {
                 regexString += `.*${keyword[i]}`
             }
-            let regexFilter = {'$regex': `${regexString}.*`}
+            let regexFilter = {'$regex': `${regexString}.*`, $options: 'i'}
             filter['$or'] = [{description: regexFilter}, {tags: regexFilter}, {image_texts: regexFilter}]
         }
         if (orderTimeDesc) order.upload_time = -1

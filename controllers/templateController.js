@@ -100,7 +100,6 @@ module.exports = {
         ctx.body = null
     },
 
-    // Critical: Admin account only
     async deleteTemplate(ctx) {
         const id = ctx.params.id
         const user = await User.findOne({id: ctx.user})
