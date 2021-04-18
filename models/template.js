@@ -3,6 +3,71 @@ const constants = require('../constants')
 const { ObjectID } = require('mongodb')
 const Image = require('./image.js')
 
+const templateAggregateFlow = [
+    {
+        $lookup: 
+        {
+            from: constants.COLLECTION_USER,
+            localField: "user_id",
+            foreignField: "_id",
+            as: "userInfo"
+        },
+    },
+    {
+        $replaceRoot: { newRoot: { $mergeObjects: [ {u: { $arrayElemAt: [ "$userInfo", 0 ] }}, "$$ROOT" ] } }
+    },
+    { 
+        $project: { userInfo: 0 }
+    },
+    { 
+        $project: { 
+            user_id: 1,
+            name: 1,
+            image_id: 1,
+            created_at: 1,
+            apply_meme_id: 1,
+            apply_number: 1,
+            hide: 1,
+            userInfo: 1,
+            user_name: '$u.name',
+            user_custom_id: '$u.custom_id',
+            user_avatar_url: '$u.avatar_url',
+        }
+    },
+    {
+        $lookup: 
+        {
+            from: constants.COLLECTION_IMAGE,
+            localField: "image_id",
+            foreignField: "_id",
+            as: "imageInfo"
+        },
+    },
+    {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$imageInfo", 0 ] }, "$$ROOT" ] } }
+    },
+    { 
+        $project: { imageInfo: 0 }
+    },
+    { 
+        $project: { 
+            user_id: 1,
+            name: 1,
+            image_id: 1,
+            created_at: 1,
+            apply_meme_id: 1,
+            apply_number: 1,
+            hide: 1,
+            userInfo: 1,
+            user_name: 1,
+            user_custom_id: 1,
+            user_avatar_url: 1,
+            image_url: '$url',
+            image_thumbnail_url: '$thumbnail_url',
+        }
+    }
+]
+
 class Template {
     constructor (userId, name, imageId) {
         this.user_id = ObjectID(userId)
@@ -41,10 +106,19 @@ class Template {
     static async findOne(id, getApplyMemeId=false) {
         try {
             const collection = await database.getCollection(constants.COLLECTION_TEMPLATE)
-            const projection = {apply_meme_id: getApplyMemeId}
-            return await collection.findOne({_id: ObjectID(id)}, {projection})
+            const aggregateFlow = []
+            aggregateFlow.push({$match: {_id: ObjectID(id)}})
+            if (!getApplyMemeId) {
+                aggregateFlow.push({$project: { apply_meme_id: 0 }})
+            }
+            const templates = await collection.aggregate(
+                aggregateFlow.concat(templateAggregateFlow)
+            ).toArray()
+            const template = templates.length > 0 ? templates[0] : null
+            return template
         } catch (e) {
             // for ObjectId invalid
+            return null
         }
     }
 
