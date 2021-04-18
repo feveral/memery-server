@@ -30,6 +30,7 @@ module.exports = (router) => {
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
     router.get('/api/meme', memeController.search)
     router.get('/api/meme/trending', memeController.getTrending)
+    router.get('/api/meme/template/:id', memeController.getMemesByTemplateId)
     router.get('/api/meme/user/:id', memeController.getUserMeme)
     router.get('/api/meme/:id', memeController.getMemeById)
     router.post('/api/meme/like', authController.verifyMemeToken, memeController.like)
