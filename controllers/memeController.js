@@ -146,9 +146,7 @@ module.exports = {
             ctx.body = []
             return
         }
-        console.log("template apply memes length:", template.apply_meme_id.length)
         const memeIds = template.apply_meme_id.slice(skip, skip + limit)
-        console.log("return length:", memeIds.length)
         let memes = await Meme.findByIds(template.apply_meme_id)
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
