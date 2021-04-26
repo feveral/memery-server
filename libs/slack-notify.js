@@ -7,7 +7,7 @@ class SlackNotify {
 
     static async sendUserNumber(userNumber) {
         if (process.env.NODE_ENV === 'production') {
-            await axios.default.post(config.slackWebHookUrl, 
+            await axios.default.post(config.slackAppStatWebHookUrl, 
                 {
                     "attachments": [
                         {
@@ -30,6 +30,28 @@ class SlackNotify {
         }
     }
 
+    static async sendFeedback(user, email, feedback) {
+        await axios.default.post(config.slackFeedbackWebHookUrl,
+            {
+                "attachments": [
+                    {
+                        "fallback": `user feedback`,
+                        "color": "#61c2ff",
+                        "author_link": "http://flickr.com/bobby/",
+                        "author_icon": "http://flickr.com/icons/bobby.jpg",
+                        "title": "Memery Feedback",
+                        // "title_link": "https://api.slack.com/",
+                        "text": `User Id: ${user._id}\nName: ${user.name}\nCustom Id: ${user.custom_id}\nEmail: ${email}\n${feedback}`,
+                        // "image_url": "http://my-website.com/path/to/image.jpg",
+                        // "thumb_url": "http://example.com/path/to/thumb.png",
+                        "footer": "Memery App",
+                        // "footer_icon": "https:/p/platform.slack-edge.com/img/default_application_icon.png",
+                        "ts": Date.now()
+                    }
+                ]
+            }
+        )
+    }
 
 }
 
