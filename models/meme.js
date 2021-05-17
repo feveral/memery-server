@@ -112,7 +112,7 @@ class Meme {
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const user = await collectionUser.findOne({_id: ObjectID(userId)})
         const memeIds = user.like_meme_ids
-        const memes = await collectionMeme.find({_id: {$in: memeIds}}).limit(limit || 20).skip(skip || 0).toArray()
+        const memes = await collectionMeme.find({_id: {$in: memeIds}}).sort({upload_time: -1}).limit(limit || 20).skip(skip || 0).toArray()
         return memes
     }
 
