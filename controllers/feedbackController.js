@@ -5,12 +5,12 @@ const User = require("../models/user")
 module.exports = {
     async addFeedback (ctx) {
         const user = await User.findOne({id: ctx.user})
-        const email = ctx.request.body.email
         const content = ctx.request.body.content
-        
+        let email = ctx.request.body.email || user.email || null        
+
         if (!email) {
             ctx.response.status = 400
-            ctx.body = {message: 'body parameter "email" should be given.'}
+            ctx.body = {message: 'body parameter "email" should be given if user do not have email.'}
             return
         }
         if (!content) {
