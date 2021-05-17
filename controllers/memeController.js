@@ -123,6 +123,13 @@ module.exports = {
         ctx.body = memes
     },
 
+    async getLikeMemes(ctx) {
+        const skip = parseInt(ctx.query.skip) || 0
+        const limit = parseInt(ctx.query.limit) || 20
+        const memes = await Meme.findUserLikedMemes(ctx.user, limit, skip)
+        ctx.body = memes
+    },
+
     async getMemeById(ctx) {
         const memeId = ctx.params.id
         const meme = await Meme.findOne(memeId)
