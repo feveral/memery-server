@@ -10,6 +10,7 @@ const collectController = require('./controllers/collectController.js')
 const notificationController = require('./controllers/notificationController.js')
 const templateController = require('./controllers/templateController.js')
 const analyticsController = require('./controllers/analyticsController.js')
+const feedbackController = require('./controllers/feedbackController.js')
 
 module.exports = (router) => {
     router.post('/api/auth/login', authController.login)
@@ -29,6 +30,7 @@ module.exports = (router) => {
 
     router.post('/api/meme', authController.verifyMemeToken, memeController.upload)
     router.get('/api/meme', memeController.search)
+    router.get('/api/meme/like', authController.verifyMemeToken, memeController.getLikeMemes)
     router.get('/api/meme/trending', memeController.getTrending)
     router.get('/api/meme/template/:id', memeController.getMemesByTemplateId)
     router.get('/api/meme/user/:id', memeController.getUserMeme)
@@ -62,4 +64,5 @@ module.exports = (router) => {
     router.post('/api/notification/read', authController.verifyMemeToken, notificationController.readNotification)
 
     router.post('/api/analytics/slack', analyticsController.slackMemeTrending)
+    router.post('/api/feedback', authController.verifyMemeToken, feedbackController.addFeedback)
 }

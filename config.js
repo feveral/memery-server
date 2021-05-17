@@ -21,7 +21,8 @@ module.exports = {
     gcpCloudStorageVideoBucket: process.env.GCP_CLOUD_STORAGE_VIDEO_BUCKET,
     gcpCloudStorageVideoBaseUrl: process.env.GCP_CLOUD_STORAGE_VIDEO_BASE_URL,
 
-    slackWebHookUrl: process.env.SLACK_WEB_HOOK_URL,
+    slackAppStatWebHookUrl: process.env.SLACK_APP_STAT_WEB_HOOK_URL,
+    slackFeedbackWebHookUrl: process.env.SLACK_FEEDBACK_WEB_HOOK_URL,
     slackAnalyticsToken: process.env.SLACK_ANALYTICS_TOKEN,
 
     appleSignInKeyPath: process.env.APPLE_SIGN_IN_KEY_PATH

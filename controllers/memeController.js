@@ -123,6 +123,14 @@ module.exports = {
         ctx.body = memes
     },
 
+    async getLikeMemes(ctx) {
+        const skip = parseInt(ctx.query.skip) || 0
+        const limit = parseInt(ctx.query.limit) || 20
+        let memes = await Meme.findUserLikedMemes(ctx.user, limit, skip)
+        memes = await memesAddUserAndImageInfo(memes)
+        ctx.body = memes
+    },
+
     async getMemeById(ctx) {
         const memeId = ctx.params.id
         const meme = await Meme.findOne(memeId)
@@ -146,9 +154,7 @@ module.exports = {
             ctx.body = []
             return
         }
-        console.log("template apply memes length:", template.apply_meme_id.length)
         const memeIds = template.apply_meme_id.slice(skip, skip + limit)
-        console.log("return length:", memeIds.length)
         let memes = await Meme.findByIds(template.apply_meme_id)
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
