@@ -24,7 +24,11 @@ class ImageInfo {
             s.push(imageContent);
             s.push(null)
             let result = await probe(s)
-            return new ImageInfo(result.width, result.height, result.type)
+            if (result.orientation >= 5) {
+                return new ImageInfo(result.height, result.width, result.type)
+            } else {
+                return new ImageInfo(result.width, result.height, result.type)
+            }
         } catch (e) {
             console.log(e)
             return null
