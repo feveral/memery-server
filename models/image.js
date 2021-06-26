@@ -7,14 +7,45 @@ const constants = require('../constants.js')
 const awsS3Saver = require('../libs/aws-s3-saver.js')
 const gcpSaver = require('../libs/gcp-saver.js')
 const { ObjectID } = require('mongodb')
+const probe = require('probe-image-size')
+
+class ImageInfo {
+    constructor (width=0, height=0, format='jpg') {
+        this.width = width
+        this.height = height
+        this.format = format
+    }
+
+    static async builder(imageContent) {
+        try {
+            const Readable = require('stream').Readable;
+            const s = new Readable();
+            s._read = () => {}; // redundant? see update below
+            s.push(imageContent);
+            s.push(null)
+            let result = await probe(s)
+            if (result.orientation >= 5) {
+                return new ImageInfo(result.height, result.width, result.type)
+            } else {
+                return new ImageInfo(result.width, result.height, result.type)
+            }
+        } catch (e) {
+            console.log(e)
+            return null
+        }
+    }
+}
+
 
 class Image {
 
-    constructor (url, thumbnailUrl, usage=0) {
+    constructor (url, thumbnailUrl, usage=0, width=0, height=0) {
         this.url = url
         this.thumbnail_url = thumbnailUrl
         this.usage = usage
         this.created_at = new Date()
+        this.width = width
+        this.height = height
     }
 
     static async addToServer (content, ext) {
@@ -42,6 +73,8 @@ class Image {
     }
 
     static async addToGCPCloudStorage (content, ext) {
+        const imageInfo = await ImageInfo.builder(content)
+        if (!imageInfo) return null
         const imageId = shortUUID().generate()
         const imageThumbnailId = shortUUID().generate();
         (
@@ -52,6 +85,8 @@ class Image {
             }
         )()
         const image = new Image(`${config.gcpCloudStorageImageBaseUrl}/${imageId}.${ext}`, `${config.gcpCloudStorageImageBaseUrl}/${imageThumbnailId}.${ext}`)
+        image.width = imageInfo.width
+        image.height = imageInfo.height
         const collection = await database.getCollection(constants.COLLECTION_IMAGE)
         await collection.insertOne(image)
         return image
@@ -101,7 +136,7 @@ class Image {
         // }
 
         // These is for GCP cloud storage
-        if (image.usage === 0) {
+        if (image.usage <= 0) {
             await collection.deleteOne({_id: ObjectID(id)})
             // awsS3Saver.removeMemeImage(filename)
             // awsS3Saver.removeMemeImage(thumbnailFilename)

@@ -14,7 +14,6 @@ module.exports = {
             ctx.body = { message: 'image file should be in body form-data.'}
             return
         }
-        // const image = await Image.addToServer(ctx.file.buffer, ext)
         const image = await Image.addToGCPCloudStorage(ctx.file.buffer, ext)
         ctx.body = image
     },
@@ -31,6 +30,19 @@ module.exports = {
     },
 
     async deleteImage(ctx) {
-        //TODO: This is only for admin user, must be handled carefully
+        const image_id = ctx.params.id
+        const image = await Image.findOne(image_id)
+        if (!image) {
+            ctx.response.status = 400
+            ctx.body = { message: 'image not found.'}
+            return
+        } else if (image.usage > 0) {
+            ctx.response.status = 400
+            ctx.body = { message: 'this image is been used, cannot be deleted.'}
+            return
+        }
+        // image.usage <= 0
+        await Image.increaseUsage(image_id, -1)
+        ctx.body = { message: 'this image deleted successfully.'}
     }
 }

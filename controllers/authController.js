@@ -23,7 +23,7 @@ module.exports = {
                 ctx.body = { message: 'UnAuthorized: this token is not vaild anymore' }
                 return
             }
-            user = await User.findOne({id: user.id})
+            user = await User.findOne({id: user._id})
             if (user.level === 'admin') {
                 ctx.user = user._id
             } else {

@@ -27,6 +27,8 @@ async function memesAddUserAndImageInfo(memes) {
         }
         for (let j = 0; j < images.length; j++) {
             if (images[j]._id.toString() === memes[i].image_id.toString()) {
+                memes[i].image_width = images[j].width
+                memes[i].image_height = images[j].height
                 memes[i].image_url = images[j].url
                 memes[i].image_thumbnail_url = images[j].thumbnail_url
             }
