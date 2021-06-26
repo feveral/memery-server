@@ -19,10 +19,19 @@ const { ObjectID } = require('mongodb');
                 console.log("image", image)
                 try {
                     const probeResult = await probe(images[i].url)
+                    let width = 0
+                    let height = 0
                     console.log(probeResult)
+                    if (probeResult.orientation >= 5) {
+                        width = probeResult.height
+                        height = probeResult.width
+                    } else {
+                        width = probeResult.width
+                        height = probeResult.height
+                    }
                     await collection.updateOne(
                             {_id: ObjectID(image._id)},
-                            {$set: {width: probeResult.width, height: probeResult.height}}
+                            {$set: {width: width, height: height}}
                     )
                 } catch (e) {
                     console.log(`${e.name}: ${e.message}`)
