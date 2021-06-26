@@ -24,6 +24,7 @@ module.exports = (router) => {
 
     router.get('/api/image/:id', authController.verifyMemeToken, imageController.getImageInfo)
     router.post('/api/image', authController.verifyMemeToken, multer().single('image'), imageController.upload)
+    router.delete('/api/image/:id', authController.verifyAdminMemeToken, imageController.deleteImage)
 
     router.get('/api/video', authController.verifyMemeToken, videoController.getVideos)
     router.post('/api/video', authController.verifyMemeToken, multer().single('video'), videoController.upload)
