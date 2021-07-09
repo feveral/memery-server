@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=production node app.js",
-    "dev": "NODE_ENV=development node app.js",
+    "start": "tsc && NODE_ENV=production node ./dist/app.js",
+    "dev": "ts-node-dev --respawn -- src/app.js",
     "test": "NODE_ENV=test mocha 'test/**/test*.js' --timeout 300000 --exit --recursive"
   },
   "author": "",
