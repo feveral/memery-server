@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "tsc && NODE_ENV=production node ./dist/app.js",
+    "staging": "tsc && NODE_ENV=staging node ./dist/app.js",
     "dev": "ts-node-dev --respawn -- src/app.js",
     "try": "ts-node test.ts",
     "test": "NODE_ENV=test mocha 'test/**/test*.js' --timeout 300000 --exit --recursive"
