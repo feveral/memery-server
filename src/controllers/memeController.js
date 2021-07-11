@@ -1,3 +1,4 @@
+import MemeAction from '../models/memeAction'
 const Meme = require('../models/meme.js')
 const Image = require('../models/image.js')
 const Tag = require('../models/tag.js')
