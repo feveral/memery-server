@@ -27,15 +27,31 @@ class MemeAction {
     static async add (user_id: string | ObjectID, meme_id: string | ObjectID, action: string) {
         if (action !== MemeAction.ACTION_LIKE && action !== MemeAction.ACTION_DISLIKE) return null
         const memeAction = new MemeAction(new ObjectID(), new ObjectID(user_id), new ObjectID(meme_id), action, new Date(), new Date())
-        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        const collection = await database.getCollection(constants.COLLECTION_MEME_ACTION)
+        const updatedAt = memeAction.updated_at
+        delete memeAction.updated_at
+        delete memeAction.action
         await collection.updateOne(
             { user_id: new ObjectID(user_id), meme_id: new ObjectID(meme_id) },
-            { $setOnInsert: memeAction} ,
+            { $setOnInsert: memeAction, $set: {updated_at: updatedAt, action} },
             { upsert: true }
         )
+        memeAction.updated_at = updatedAt
+        memeAction.action = action
         return memeAction
     }
 
+    static async clear (user_id: string | ObjectID, meme_id: string | ObjectID) {
+        const collection = await database.getCollection(constants.COLLECTION_MEME_ACTION)
+        const result = await collection.deleteMany({user_id: new ObjectID(user_id), meme_id: new ObjectID(meme_id)})
+        return result.deletedCount > 0
+    }
+
+    static async clearByMemeId (meme_id: string | ObjectID) {
+        const collection = await database.getCollection(constants.COLLECTION_MEME_ACTION)
+        const result = await collection.deleteMany({meme_id: new ObjectID(meme_id)})
+        return result.deletedCount > 0
+    }
 }
 
 export default MemeAction
