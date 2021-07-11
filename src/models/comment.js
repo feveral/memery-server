@@ -1,4 +1,4 @@
-const database = require('../database/database.js')
+import database from '../database/database'
 const constants = require('../constants.js')
 const Meme = require('./meme.js')
 const User = require('./user.js')

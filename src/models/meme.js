@@ -1,4 +1,4 @@
-const database = require('../database/database.js')
+import database from '../database/database'
 const constants = require('../constants.js')
 const utility = require('../libs/utility')
 const ObjectID = require('mongodb').ObjectID

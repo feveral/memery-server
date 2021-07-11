@@ -1,6 +1,6 @@
 const axios = require('axios')
 const chai = require('../libs/chaiInitialize.js')
-const config = require('../../src/config.js')
+const config = require('../../dist/config.js')
 const expect = chai.expect
 
 describe('AuthApi', function () {

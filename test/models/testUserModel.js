@@ -1,10 +1,10 @@
 const axios = require('axios')
 const chai = require('../libs/chaiInitialize.js')
-const config = require('../../src/config.js')
+const config = require('../../dist/config.js')
 const fs = require('fs')
 const expect = chai.expect
 const FormData = require('form-data')
-const User = require('../../src/models/user.js')
+const User = require('../../dist/models/user.js')
 const { ObjectID } = require('mongodb')
 
 

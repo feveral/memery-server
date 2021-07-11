@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb"
-const database = require('../database/database.js')
+import database from '../database/database'
 const constants = require('../constants.js')
 
 class MemeAction {
@@ -23,8 +23,17 @@ class MemeAction {
         this.updated_at = updated_at
     }
 
+    // TODO: not yet finished
     static async add (user_id: string | ObjectID, meme_id: string | ObjectID, action: string) {
         if (action !== MemeAction.ACTION_LIKE && action !== MemeAction.ACTION_DISLIKE) return null
+        const memeAction = new MemeAction(new ObjectID(), new ObjectID(user_id), new ObjectID(meme_id), action, new Date(), new Date())
+        const collection = await database.getCollection(constants.COLLECTION_MEME)
+        await collection.updateOne(
+            { user_id: new ObjectID(user_id), meme_id: new ObjectID(meme_id) },
+            { $setOnInsert: memeAction} ,
+            { upsert: true }
+        )
+        return memeAction
     }
 
 }
