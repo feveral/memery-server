@@ -50,7 +50,7 @@ jobs:
           script_stop: true
           script: |
             cd ~/memery-server-dev
-            echo -e "$ENV_FILE" | base64 --decode > .env
+            echo -e "$ENV_FILE" > .env
             echo -e "$APPLE_SIGN_IN_KEY" | base64 --decode > apple-sign-in-key.p8
             echo -e "$FIREBASE_ADMIN" | base64 --decode > firebase-admin.json
             echo -e "$GCP_KEY" | base64 --decode > gcp-key.json
