@@ -8,8 +8,8 @@
         "outDir": "./dist"
     },
     "include": [
-        "./src/**/*.js",
-        "./src/**/*"
+        "./src/**/*.ts",
+        "./src/**/*.js"
     ],
     "exclude": [
         "node_modules",
