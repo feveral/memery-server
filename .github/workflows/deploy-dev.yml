@@ -60,7 +60,7 @@ jobs:
               -e APPLE_SIGN_IN_KEY=$APPLE_SIGN_IN_KEY \
               -e FIREBASE_ADMIN=$FIREBASE_ADMIN \
               -e GCP_KEY=$GCP_KEY \
-              -e aaa=2222
+              -e aaa=2222 \ 
               asia.gcr.io/memery/memery-server-dev \
               /bin/bash -c 'echo -e $aaa > /app/apple-sign-in-key.p8 && npx http-server'
             rm /tmp/memery-dev-env
