@@ -25,28 +25,31 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - uses: RafikFarhad/push-to-gcr-github-action@v3.0.2
-        with:
-          # the GCLOUD_SERVICE_ACCOUNT should be encoded in base64
-          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
-          registry: asia.gcr.io
-          project_id: memery
-          image_name: memery-server-dev
+      # - uses: RafikFarhad/push-to-gcr-github-action@v3.0.2
+      #   with:
+      #     # the GCLOUD_SERVICE_ACCOUNT should be encoded in base64
+      #     gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
+      #     registry: asia.gcr.io
+      #     project_id: memery
+      #     image_name: memery-server-dev
         
-      - name: executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        env:
-          ENV_FILE: ${{secrets.DEV_ENV_FILE}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        with:
-          host: 35.221.255.214
-          username: feveraly
-          key: ${{ secrets.SERVER_KEY }}
-          port: 22
-          envs: ENV_FILE
-          script: |
-            echo -e "$ENV_FILE" > /tmp/memery-dev-env
-            source /tmp/memery-dev-env
-            sudo docker pull asia.gcr.io/memery/memery-server-dev
-            sudo docker run -d -p 8877:8877 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev
-            rm /tmp/memery-dev-env
+      # - name: executing remote ssh commands using ssh key
+      #   uses: appleboy/ssh-action@master
+      #   env:
+      #     ENV_FILE: ${{secrets.DEV_ENV_FILE}}
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #   with:
+      #     host: 146.148.39.53
+      #     username: feveraly
+      #     key: ${{ secrets.SERVER_KEY }}
+      #     port: 22
+      #     envs: ENV_FILE
+      #     script: |
+      #       echo -e "$ENV_FILE" > /tmp/memery-dev-env
+      #       source /tmp/memery-dev-env
+      #       sudo docker stop memery-server-dev-container
+      #       sudo docker rm memery-server-dev-container
+      #       sudo docker pull asia.gcr.io/memery/memery-server-dev
+      #       sudo docker run -d -p 8877:8877 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev
+      #       rm /tmp/memery-dev-env
+      #       sudo docker 2>/dev/null rmi `sudo docker images --filter dangling=true -q` | true
