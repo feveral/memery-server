@@ -46,7 +46,7 @@ jobs:
           username: feveraly
           key: ${{ secrets.SERVER_KEY }}
           port: 22
-          envs: ENV_FILE
+          envs: ENV_FILE, APPLE_SIGN_IN_KEY, FIREBASE_ADMIN, GCP_KEY
           script_stop: true
           script: |
             echo -e "$ENV_FILE" > /tmp/memery-dev-env
