@@ -55,5 +55,5 @@ jobs:
             echo -e "$FIREBASE_ADMIN" > firebase-admin.json
             echo -e "$GCP_KEY" > gcp-key.json
             git pull https://feveral:$GITHUB_TOKEN@github.com/feveral/memery-server.git
-            chmod u+x deploy.sh
-            ./deploy.sh
+            chmod u+x deploy-dev.sh
+            ./deploy-dev.sh
