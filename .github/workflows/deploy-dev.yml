@@ -25,13 +25,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - uses: RafikFarhad/push-to-gcr-github-action@v3.0.2
-        with:
-          # the GCLOUD_SERVICE_ACCOUNT should be encoded in base64
-          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
-          registry: asia.gcr.io
-          project_id: memery
-          image_name: memery-server-dev
+      # - uses: RafikFarhad/push-to-gcr-github-action@v3.0.2
+      #   with:
+      #     # the GCLOUD_SERVICE_ACCOUNT should be encoded in base64
+      #     gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
+      #     registry: asia.gcr.io
+      #     project_id: memery
+      #     image_name: memery-server-dev
         
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
@@ -53,10 +53,13 @@ jobs:
             sudo docker stop memery-server-dev-container
             sudo docker rm memery-server-dev-container
             sudo docker pull asia.gcr.io/memery/memery-server-dev
-            sudo docker run -d -p 3000:3000 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev \
+            sudo docker run -d -p 3000:3000 \ 
+              --name memery-server-dev-container \
+              --env-file /tmp/memery-dev-env \
               -e APPLE_SIGN_IN_KEY=$APPLE_SIGN_IN_KEY \
               -e FIREBASE_ADMIN=$FIREBASE_ADMIN \
               -e GCP_KEY=$GCP_KEY \
-              "echo -e APPLE_SIGN_IN_KEY > /app/apple-sign-in-key.p8 && echo -e FIREBASE_ADMIN > /app/firebase-admin.json && echo -e GCP_KEY > /app/gcp-key.json && cd /app && npm start"
+              asia.gcr.io/memery/memery-server-dev \
+              "echo -e "$APPLE_SIGN_IN_KEY" > /app/apple-sign-in-key.p8 && echo -e "$FIREBASE_ADMIN" > /app/firebase-admin.json && echo -e "$GCP_KEY" > /app/gcp-key.json && cd /app && npm start"
             rm /tmp/memery-dev-env
             sudo docker 2>/dev/null rmi `sudo docker images --filter dangling=true -q` | true
