@@ -60,10 +60,7 @@ jobs:
               -e APPLE_SIGN_IN_KEY=$APPLE_SIGN_IN_KEY \
               -e FIREBASE_ADMIN=$FIREBASE_ADMIN \
               -e GCP_KEY=$GCP_KEY \
-              -e aaa=2222 \ 
               asia.gcr.io/memery/memery-server-dev \
-              /bin/bash -c 'echo -e $APPLE_SIGN_IN_KEY > /app/apple-sign-in-key.p8 && npx http-server'
+              /bin/bash -c 'echo -e $APPLE_SIGN_IN_KEY > /app/apple-sign-in-key.p8 && echo -e $FIREBASE_ADMIN > /app/firebase-admin.json && echo -e $GCP_KEY > /app/gcp-key.json && cd /app && node dist/app.js'
             rm /tmp/memery-dev-env
             sudo docker 2>/dev/null rmi `sudo docker images --filter dangling=true -q` | true
-
-# /bin/bash -c 'echo -e "$APPLE_SIGN_IN_KEY" > /app/apple-sign-in-key.p8 && echo -e "$FIREBASE_ADMIN" > /app/firebase-admin.json && echo -e "$GCP_KEY" > /app/gcp-key.json && cd /app && node dist/app.js'
