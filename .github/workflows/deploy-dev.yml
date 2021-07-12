@@ -62,7 +62,7 @@ jobs:
               -e GCP_KEY=$GCP_KEY \
               -e aaa=2222 \ 
               asia.gcr.io/memery/memery-server-dev \
-              /bin/bash -c 'echo -e $aaa > /app/apple-sign-in-key.p8 && npx http-server'
+              /bin/bash -c 'echo -e $APPLE_SIGN_IN_KEY > /app/apple-sign-in-key.p8 && npx http-server'
             rm /tmp/memery-dev-env
             sudo docker 2>/dev/null rmi `sudo docker images --filter dangling=true -q` | true
 
