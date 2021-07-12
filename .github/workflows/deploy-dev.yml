@@ -40,12 +40,12 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           host: 35.221.255.214
-          username: ubuntu
+          username: feveraly
           key: ${{ secrets.SERVER_KEY }}
           port: 22
           envs: ENV_FILE
           script: |
             echo -e "$ENV_FILE" > /tmp/memery-dev-env
             source /tmp/memery-dev-env
-            sudo docker run -d -p 8877:8877 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery/memery-server-dev
+            sudo docker run -d -p 8877:8877 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev
             rm /tmp/memery-dev-env
