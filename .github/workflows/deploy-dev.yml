@@ -39,7 +39,7 @@ jobs:
           ENV_FILE: ${{secrets.DEV_ENV_FILE}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
-          host: 146.148.39.53
+          host: 35.221.128.211
           username: feveraly
           key: ${{ secrets.SERVER_KEY }}
           port: 22
