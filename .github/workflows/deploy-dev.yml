@@ -50,6 +50,6 @@ jobs:
             sudo docker stop memery-server-dev-container
             sudo docker rm memery-server-dev-container
             sudo docker pull asia.gcr.io/memery/memery-server-dev
-            sudo docker run -d -p 8877:8877 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev
+            sudo docker run -d -p 3000:3000 --env-file /tmp/memery-dev-env --name memery-server-dev-container asia.gcr.io/memery/memery-server-dev
             rm /tmp/memery-dev-env
             sudo docker 2>/dev/null rmi `sudo docker images --filter dangling=true -q` | true
