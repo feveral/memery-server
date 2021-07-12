@@ -51,8 +51,8 @@ jobs:
           script: |
             echo -e "$ENV_FILE" > /tmp/memery-dev-env
             source /tmp/memery-dev-env
-            sudo docker stop memery-server-dev-container
-            sudo docker rm memery-server-dev-container
+            sudo docker 2>/dev/null stop memery-server-dev-container
+            sudo docker 2>/dev/null rm memery-server-dev-container
             sudo docker pull asia.gcr.io/memery/memery-server-dev
             sudo docker run -d -p 3000:3000 \
               --name memery-server-dev-container \
