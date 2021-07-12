@@ -54,6 +54,6 @@ jobs:
             echo -e "$APPLE_SIGN_IN_KEY" > apple-sign-in-key.p8
             echo -e "$FIREBASE_ADMIN" > firebase-admin.json
             echo -e "$GCP_KEY" > gcp-key.json
-            git pull https://feveral:$GITHUB_TOKEN@github.com/feveral/memery-server.git
+            git pull https://github.com/feveral/memery-server.git
             chmod u+x deploy-dev.sh
             ./deploy-dev.sh
