@@ -37,6 +37,9 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           ENV_FILE: ${{secrets.DEV_ENV_FILE}}
+          APPLE_SIGN_IN_KEY: ${{secrets.APPLE_SIGN_IN_KEY}}
+          FIREBASE_ADMIN: ${{secrets.FIREBASE_ADMIN}}
+          GCP_KEY: ${{secrets.GCP_KEY}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           host: 35.221.128.211
@@ -46,6 +49,9 @@ jobs:
           envs: ENV_FILE
           script: |
             echo -e "$ENV_FILE" > /tmp/memery-dev-env
+            echo -e "$APPLE_SIGN_IN_KEY" > /app/apple-sign-in-key.p8
+            echo -e "$FIREBASE_ADMIN" > /app/firebase-admin.json
+            echo -e "$GCP_KEY" > /app/gcp-key.json
             source /tmp/memery-dev-env
             sudo docker stop memery-server-dev-container
             sudo docker rm memery-server-dev-container
