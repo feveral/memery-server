@@ -153,6 +153,12 @@ module.exports = {
         const limit = parseInt(ctx.query.limit) || 20
         const template = await Template.findOne(templateId, true)
 
+        if (!template) {
+            ctx.response.status = 400
+            ctx.body = { message: 'template not found.' }
+            return
+        }
+
         if (skip >= template.apply_meme_id.length) {
             ctx.body = []
             return
@@ -160,6 +166,10 @@ module.exports = {
         template.apply_meme_id = template.apply_meme_id.reverse()
         const memeIds = template.apply_meme_id.slice(skip, skip + limit)
         let memes = await Meme.findByIds(memeIds)
+        memes.sort((a, b) => {
+            if (a.upload_time > b.upload_time) return -1
+            else return 1
+        })
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
