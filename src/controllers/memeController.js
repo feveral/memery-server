@@ -157,8 +157,9 @@ module.exports = {
             ctx.body = []
             return
         }
+        template.apply_meme_id = template.apply_meme_id.reverse()
         const memeIds = template.apply_meme_id.slice(skip, skip + limit)
-        let memes = await Meme.findByIds(template.apply_meme_id)
+        let memes = await Meme.findByIds(memeIds)
         memes = await memesAddUserAndImageInfo(memes)
         ctx.body = memes
     },
