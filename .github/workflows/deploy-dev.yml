@@ -55,5 +55,5 @@ jobs:
             echo -e "$FIREBASE_ADMIN" | base64 --decode > firebase-admin.json
             echo -e "$GCP_KEY" | base64 --decode > gcp-key.json
             git pull origin dev
-            chmod u+x deploy-dev.sh
-            ./deploy-dev.sh
+            chmod u+x deploy.sh
+            ./deploy.sh
