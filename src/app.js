@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+const fs = require('fs')
 const Koa = require('koa')
 const Router = require('koa-router')
 const koaBody = require('koa-body')
@@ -19,10 +20,11 @@ app.use(koaBody({parsedMethods:['POST', 'PUT', 'GET', 'DELETE']}))
 app.use(router.routes())
 app.use(router.allowedMethods())
 app.use(koaHistory())
-// app.use(koaStatic('./images/'))
-// app.use((ctx) => {
 
-// })
+app.use((ctx) => {
+    ctx.type = 'html'
+    ctx.body = fs.createReadStream('src/public/index.html')
+})
 
 app.listen(config.port, () => {
     console.log(`Server is listening on port ${config.port}.`)

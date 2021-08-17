@@ -1,4 +1,5 @@
-const database = require('../database/database.js')
+import database from '../database/database'
+import MemeAction from './memeAction'
 const constants = require('../constants.js')
 const utility = require('../libs/utility')
 const ObjectID = require('mongodb').ObjectID
@@ -121,6 +122,8 @@ class Meme {
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const resultLike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet': {like_meme_ids: ObjectID(memeId)} })
         const resultDislike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {dislike_meme_ids: ObjectID(memeId)}})
+        const resultMemeAction = await MemeAction.add(userId, memeId, MemeAction.ACTION_LIKE)
+        
         if (resultLike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {like: 1}})
         }
@@ -135,6 +138,8 @@ class Meme {
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const resultLike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {like_meme_ids: ObjectID(memeId)} })
         const resultDislike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$addToSet': {dislike_meme_ids: ObjectID(memeId)}})
+        const resultMemeAction = await MemeAction.add(userId, memeId, MemeAction.ACTION_DISLIKE)
+
         if (resultLike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {like: -1}})
         }
@@ -149,6 +154,8 @@ class Meme {
         const collectionUser = await database.getCollection(constants.COLLECTION_USER)
         const resultLike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {like_meme_ids: ObjectID(memeId)} })
         const resultDislike = await collectionUser.updateOne({_id: ObjectID(userId)}, {'$pull': {dislike_meme_ids: ObjectID(memeId)}})
+        const resultMemeAction = await MemeAction.clear(userId, memeId)
+
         if (resultLike.result.nModified === 1) {
             await collectionMeme.updateOne({_id: ObjectID(memeId)}, {'$inc': {like: -1}})
         }
@@ -165,6 +172,7 @@ class Meme {
             const imageId = meme.image_id
             await collection.deleteOne({_id: ObjectID(memeId)})
             await Image.increaseUsage(imageId, -1)
+            await MemeAction.clearByMemeId(memeId)
         }
     }
 

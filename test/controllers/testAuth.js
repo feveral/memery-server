@@ -1,6 +1,6 @@
 const axios = require('axios')
 const chai = require('../libs/chaiInitialize.js')
-const config = require('../../config.js')
+const config = require('../../dist/config.js')
 const expect = chai.expect
 
 describe('AuthApi', function () {
@@ -14,7 +14,7 @@ describe('AuthApi', function () {
                 .to.eventually.be.rejectedWith(Error)
                 .and.have.nested.include({
                     'response.status': 400,
-                    'response.data.message': `body parameter "type" should be "google" or "facebook".`
+                    'response.data.message': `body parameter "type" should be "google", "facebook" or "apple".`
                 })
         })
 

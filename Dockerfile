@@ -1,16 +1,12 @@
 FROM node:14
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY package.json .
 
-# install node package dependencies
-RUN npm ci --only=production
+RUN npm install
+RUN npm install -g typescript
 
-# app source
 COPY . .
 
-EXPOSE 3000
-
-RUN npm install pm2 -g
-CMD ["pm2-runtime", "start", "npm", "--name", "memery-server", "--", "start"]
+CMD ["npm", "start"]

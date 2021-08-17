@@ -1,5 +1,5 @@
+import database from '../database/database'
 const { ObjectID } = require("mongodb")
-const database = require('../database/database.js')
 const constants = require('../constants.js')
 const Image = require('../models/image.js')
 

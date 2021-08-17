@@ -8,6 +8,7 @@ module.exports = {
     COLLECTION_COLLECT: 'collect',
     COLLECTION_NOTIFICATION: 'notification',
     COLLECTION_TEMPLATE: 'template',
+    COLLECTION_MEME_ACTION: 'meme_action',
 
     USER_LEVEL_REGULAR: 'regular',
     USER_LEVEL_ADMIN: 'admin',
